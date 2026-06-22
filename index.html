@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es" style="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Serenity Talent - Iniciar Sesión</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;700&amp;family=JetBrains+Mono&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .login-card {
+            box-shadow: 0px 4px 12px rgba(0, 89, 187, 0.1);
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "inverse-primary": "#adc7ff",
+                        "on-secondary-container": "#09657f",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#c64f00",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#0070ea",
+                        "outline-variant": "#c1c6d7",
+                        "surface-container": "#edeeef",
+                        "secondary": "#0c6780",
+                        "surface-dim": "#d9dadb",
+                        "primary": "#0059bb",
+                        "on-tertiary-fixed-variant": "#7c2e00",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#9e3d00",
+                        "on-primary-fixed-variant": "#004493",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed": "#001a41",
+                        "on-error": "#ffffff",
+                        "on-background": "#191c1d",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "primary-fixed-dim": "#adc7ff",
+                        "outline": "#717786",
+                        "surface-tint": "#005bc0",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "secondary-container": "#9ae1ff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-primary-container": "#fefcff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#004d62",
+                        "on-secondary-fixed": "#001f29",
+                        "secondary-fixed": "#baeaff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#89d0ed",
+                        "on-surface-variant": "#414754"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "data-mono": ["13px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+
+<body
+    class="bg-surface font-body-md text-on-surface overflow-hidden min-h-screen flex items-center justify-center p-md">
+    <div class="fixed inset-0 pointer-events-none opacity-40">
+        <div
+            class="absolute top-[-10%] right-[-5%] w-[40%] h-[50%] bg-primary-container blur-[120px] rounded-full opacity-20">
+        </div>
+        <div
+            class="absolute bottom-[-10%] left-[-5%] w-[30%] h-[40%] bg-secondary-container blur-[100px] rounded-full opacity-20">
+        </div>
+    </div>
+    <main class="relative z-10 w-full max-w-[420px]">
+        <div
+            class="login-card bg-surface-container-lowest border border-outline-variant rounded-xl p-xl flex flex-col gap-lg">
+            <div class="flex flex-col items-center gap-sm text-center">
+                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-sm">
+                    <span class="material-symbols-outlined text-on-primary text-3xl"
+                        style="font-variation-settings: 'FILL' 1;">work</span>
+                </div>
+                <h1 class="font-headline-md text-headline-md text-on-surface">Serenity Talent</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">La mejor forma de reclutar</p>
+            </div>
+            <form class="flex flex-col gap-md" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="hidden flex items-center gap-sm p-sm bg-error-container text-on-error-container rounded border border-error/20"
+                    id="errorMessage">
+                    <span class="material-symbols-outlined text-sm">report</span>
+                    <span class="font-body-sm text-body-sm">Credenciales inválidas. Por favor, intente de nuevo.</span>
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="username">Usuario o
+                        Correo electrónico</label>
+                    <div class="relative">
+                        <span
+                            class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">person</span>
+                        <input
+                            class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
+                            id="username" placeholder="recruiter@serenitytalent.com" required="" type="text" />
+                    </div>
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <div class="flex justify-between items-center">
+                        <label class="font-body-sm text-body-sm font-bold text-on-surface-variant"
+                            for="password">Contraseña</label>
+                        <a class="font-body-sm text-body-sm text-primary hover:underline transition-all"
+                            href="#">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <div class="relative">
+                        <span
+                            class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">lock</span>
+                        <input
+                            class="w-full pl-10 pr-10 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
+                            id="password" placeholder="••••••••" required="" type="password" />
+                        <button
+                            class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline hover:text-primary transition-colors text-lg"
+                            onclick="togglePassword()" type="button">
+                            visibility
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center gap-sm py-xs">
+                    <input class="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary cursor-pointer"
+                        id="remember" type="checkbox" />
+                    <label class="font-body-md text-body-md text-on-surface-variant cursor-pointer select-none"
+                        for="remember">Recordar este dispositivo</label>
+                </div>
+                <button
+                    class="w-full mt-sm py-3 bg-primary text-on-primary font-bold rounded hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center gap-sm"
+                    id="submitBtn" type="submit">
+                    <span class="">Iniciar Sesión</span>
+                    <span class="hidden animate-spin material-symbols-outlined text-lg"
+                        id="loader">progress_activity</span>
+                </button>
+            </form>
+            <div class="border-t border-outline-variant pt-lg text-center">
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Solo para uso interno. ¿Necesitas ayuda?
+                    <a class="text-primary font-bold hover:underline" href="#">Contactar a Soporte</a>
+                </p>
+            </div>
+        </div>
+        <div class="mt-xl text-center flex flex-col gap-xs">
+            <p class="font-label-caps text-label-caps text-outline uppercase">Serenity Talent recruitment suite v4.2.0
+            </p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant/60">© 2024 Serenity Talent Corp. Todos los
+                derechos reservados.</p>
+        </div>
+    </main>
+    <div class="fixed inset-0 -z-10 pointer-events-none opacity-[0.03]"
+        style="background-image: radial-gradient(#0059bb 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <script>
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const icon = event.currentTarget;
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                pwd.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const errorMsg = document.getElementById('errorMessage');
+
+            errorMsg.classList.add('hidden');
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            btn.classList.add('opacity-80');
+
+            setTimeout(() => {
+                const username = document.getElementById('username').value;
+
+                if (username === 'error') {
+                    errorMsg.classList.remove('hidden');
+                    btn.disabled = false;
+                    loader.classList.add('hidden');
+                    btn.classList.remove('opacity-80');
+
+                    const card = document.querySelector('.login-card');
+                    card.classList.add('animate-shake');
+                    setTimeout(() => card.classList.remove('animate-shake'), 500);
+                } else {
+                    window.location.href = 'registrarCandidatos.html';
+                }
+            }, 1200);
+        }
+    </script>
+    <style>
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .animate-shake {
+            animation: shake 0.2s cubic-bezier(.36, .07, .19, .97) both;
+            animation-iteration-count: 2;
+        }
+    </style>
+</body>
+
+</html>
