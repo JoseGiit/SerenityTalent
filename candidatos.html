@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity Talent - Candidatos</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f0f1f2",
+                    "surface": "#f8f9fa",
+                    "on-surface": "#191c1d",
+                    "inverse-primary": "#adc7ff",
+                    "on-secondary-container": "#09657f",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#c64f00",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#0070ea",
+                    "outline-variant": "#c1c6d7",
+                    "surface-container": "#edeeef",
+                    "secondary": "#0c6780",
+                    "surface-dim": "#d9dadb",
+                    "primary": "#0059bb",
+                    "on-tertiary-fixed-variant": "#7c2e00",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#9e3d00",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-tertiary-fixed": "#351000",
+                    "on-primary-fixed": "#001a41",
+                    "on-error": "#ffffff",
+                    "on-background": "#191c1d",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container-highest": "#e1e3e4",
+                    "inverse-surface": "#2e3132",
+                    "background": "#f8f9fa",
+                    "primary-fixed-dim": "#adc7ff",
+                    "outline": "#717786",
+                    "surface-tint": "#005bc0",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "secondary-container": "#9ae1ff",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-primary-container": "#fefcff",
+                    "surface-variant": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#004d62",
+                    "on-secondary-fixed": "#001f29",
+                    "secondary-fixed": "#baeaff",
+                    "primary-fixed": "#d8e2ff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#89d0ed",
+                    "on-surface-variant": "#414754"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1440px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "data-mono": ["JetBrains Mono"],
+                    "display-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .status-badge {
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c6d7;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<div class="flex h-screen overflow-hidden">
+<aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
+<div class="flex items-center gap-3 mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">work</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Tablero</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Candidatos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-caps text-label-caps">Vacantes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-caps text-label-caps">Entrevistas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Configuración</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+<span>Crear Vacante</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<header class="docked top-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant shrink-0">
+<div class="flex justify-between items-center px-lg h-full w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-body-md outline-none" placeholder="Buscar candidatos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-body-sm font-bold text-on-surface">Alex Recruiter</p>
+<p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sr. Manager</p>
+</div>
+<img alt="A professional headshot of a recruitment manager in a bright, modern corporate setting. The manager is wearing smart casual attire. Soft studio lighting highlights a confident expression. High-end photography style with a shallow depth of field, emphasizing executive professionalism and trust." class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACCSJiuOhe9a-BRMVhdwCB0AieQt9jlZvrMLoaciGf8dxT6-_BX_g2iIlymquKjcWtCYRoWxrB7-BYTFTCwM0eHUvUCaGda6mcXfytxPMyvpSdFnfwCxRcC8eJvmhjtHoqFCWIr2z7h3kR_163RDKP33fKgz_GjmZ-GzGeqCDj73cuacKWIrkWiYZw2yuejn0a-lqXC-0Kso7Y54rwRXGRCkn_9H0IICIoOy4gkt-dEvpEZ00hW8ACfNiFaOeBvEL1TUjuQUOnSDE"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Candidatos</h2>
+<p class="text-body-md text-on-surface-variant">Gestiona y realiza seguimiento de las postulaciones actuales en Serenity Talent.</p>
+</div>
+<button type="button" onclick="window.open('registrarCandidatos.html', '_blank')" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
+<span>Registrar Candidato</span>
+</button>
+</div>
+<div class="bg-white p-md rounded-xl border border-outline-variant flex flex-wrap gap-md items-center shadow-sm">
+<div class="flex-1 min-w-[200px]">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md" placeholder="Filtrar por nombre, correo o vacante..." type="text"/>
+</div>
+</div>
+<div class="flex gap-sm overflow-x-auto pb-1 md:pb-0">
+<select class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-body-sm outline-none cursor-pointer focus:border-primary">
+<option>Estado: Todos</option>
+<option>Nueva Postulación</option>
+<option>Entrevista</option>
+<option>Evaluación</option>
+<option>Contratado</option>
+</select>
+<select class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-body-sm outline-none cursor-pointer focus:border-primary">
+<option>Vacante: Todas</option>
+<option>Frontend Dev</option>
+<option>UI Designer</option>
+<option>Project Manager</option>
+</select>
+<button class="bg-surface-container-highest text-on-surface p-2 rounded-lg hover:bg-outline-variant transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined">filter_list</span>
+<span class="text-body-sm px-1">Filtros</span>
+</button>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Nombre del Candidato</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Fecha de Postulación</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Vacante</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Estado Actual</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant text-center">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-3 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">RM</div>
+<div>
+<p class="font-bold text-on-surface">Ricardo Mendoza</p>
+<p class="text-body-sm text-on-surface-variant">ricardo.m@email.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">12 Oct 2023</td>
+<td class="px-lg py-3 text-body-md font-bold">Senior Frontend Architect</td>
+<td class="px-lg py-3">
+<span class="status-badge bg-primary/10 text-primary">Nueva Postulación</span>
+</td>
+<td class="px-lg py-3 text-center">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-3 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs">SA</div>
+<div>
+<p class="font-bold text-on-surface">Sofía Alarcón</p>
+<p class="text-body-sm text-on-surface-variant">sofia.a@email.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">08 Oct 2023</td>
+<td class="px-lg py-3 text-body-md font-bold">UI/UX Lead Designer</td>
+<td class="px-lg py-3">
+<span class="status-badge bg-secondary-container text-on-secondary-container">Entrevista</span>
+</td>
+<td class="px-lg py-3 text-center">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-3 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-outline-variant text-on-surface flex items-center justify-center font-bold text-xs">JP</div>
+<div>
+<p class="font-bold text-on-surface">Juan Pérez</p>
+<p class="text-body-sm text-on-surface-variant">juan.p@email.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">05 Oct 2023</td>
+<td class="px-lg py-3 text-body-md font-bold">DevOps Engineer</td>
+<td class="px-lg py-3">
+<span class="status-badge bg-tertiary-fixed text-on-tertiary-fixed-variant">Evaluación</span>
+</td>
+<td class="px-lg py-3 text-center">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-3 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center font-bold text-xs">LV</div>
+<div>
+<p class="font-bold text-on-surface">Laura Vázquez</p>
+<p class="text-body-sm text-on-surface-variant">laura.v@email.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">01 Oct 2023</td>
+<td class="px-lg py-3 text-body-md font-bold">QA Tester</td>
+<td class="px-lg py-3">
+<span class="status-badge bg-green-100 text-green-700">Contratado</span>
+</td>
+<td class="px-lg py-3 text-center">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-3 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant flex items-center justify-center font-bold text-xs">CS</div>
+<div>
+<p class="font-bold text-on-surface">Carlos Sánchez</p>
+<p class="text-body-sm text-on-surface-variant">c.sanchez@email.com</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">28 Sep 2023</td>
+<td class="px-lg py-3 text-body-md font-bold">Product Owner</td>
+<td class="px-lg py-3">
+<span class="status-badge bg-secondary-container text-on-secondary-container">Entrevista</span>
+</td>
+<td class="px-lg py-3 text-center">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-lg py-4 border-t border-outline-variant flex items-center justify-between bg-surface-container-low">
+<p class="text-body-sm text-on-surface-variant">Mostrando 5 de 142 candidatos</p>
+<div class="flex gap-2">
+<button class="p-1 border border-outline-variant rounded hover:bg-white transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary font-bold text-xs">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant hover:bg-white text-xs">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant hover:bg-white text-xs">3</button>
+<button class="p-1 border border-outline-variant rounded hover:bg-white transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div class="lg:col-span-2 bg-primary-container text-on-primary-container p-lg rounded-xl flex items-center justify-between shadow-md relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline-sm text-headline-sm mb-2">Optimización de Pipeline</h3>
+<p class="text-body-md opacity-90 max-w-md mb-md">Has reducido el tiempo promedio de contratación en Serenity Talent un 15% este mes. Sigue así.</p>
+<button class="bg-surface-container-lowest text-primary font-bold px-4 py-2 rounded-lg text-body-sm hover:bg-white transition-colors shadow">
+                            Ver Reporte Completo
+                        </button>
+</div>
+<div class="hidden md:block opacity-20 transform translate-x-12 translate-y-4">
+<span class="material-symbols-outlined !text-[120px]">trending_up</span>
+</div>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
+<div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">Candidatos Activos</h3>
+<div class="flex items-end gap-2">
+<span class="text-display-lg font-display-lg text-primary">42</span>
+<span class="text-body-md text-green-600 mb-2 flex items-center"><span class="material-symbols-outlined">arrow_upward</span> 12%</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2 mt-4">
+<div class="bg-primary h-2 rounded-full" style="width: 65%;"></div>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-2">65% de la meta mensual alcanzada</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.querySelector('input[type="text"]');
+        if (searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+            });
+        }
+
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                const icon = row.querySelector('.material-symbols-outlined');
+                if (icon) icon.style.transform = 'scale(1.2)';
+            });
+            row.addEventListener('mouseleave', () => {
+                const icon = row.querySelector('.material-symbols-outlined');
+                if (icon) icon.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+</body></html>

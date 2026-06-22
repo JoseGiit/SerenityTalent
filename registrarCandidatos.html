@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registrar Candidato - Serenity Talent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-card-shadow {
+            box-shadow: 0px 4px 12px rgba(0, 89, 187, 0.05);
+        }
+        .step-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container": "#edeeef",
+                        "primary": "#0059bb",
+                        "secondary-container": "#9ae1ff",
+                        "on-primary-fixed": "#001a41",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#7c2e00",
+                        "background": "#f8f9fa",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#c64f00",
+                        "on-tertiary-fixed": "#351000",
+                        "secondary": "#0c6780",
+                        "inverse-primary": "#adc7ff",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary-container": "#09657f",
+                        "on-primary-container": "#fefcff",
+                        "on-background": "#191c1d",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-tint": "#005bc0",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary-fixed-variant": "#004d62",
+                        "tertiary": "#9e3d00",
+                        "outline-variant": "#c1c6d7",
+                        "outline": "#717786",
+                        "on-surface-variant": "#414754",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary-container": "#fffbff",
+                        "primary-container": "#0070ea",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary-fixed-variant": "#004493",
+                        "on-secondary-fixed": "#001f29",
+                        "inverse-surface": "#2e3132",
+                        "secondary-fixed": "#baeaff",
+                        "on-surface": "#191c1d",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e1e3e4",
+                        "surface": "#f8f9fa",
+                        "secondary-fixed-dim": "#89d0ed",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "primary-fixed-dim": "#adc7ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "container-max": "1440px",
+                        "xl": "40px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "headline-md-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}],
+                        "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background font-body-md text-on-surface overflow-x-hidden">
+<div class="flex min-h-screen">
+<aside class="fixed left-0 top-0 h-screen w-[280px] bg-surface border-r border-outline-variant flex flex-col py-lg px-md z-30 hidden md:flex">
+<div class="mb-xl flex items-center gap-3">
+<div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">work</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Recruitment Suite</p>
+</div>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Panel de Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-body-md text-body-md">Candidatos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+<span class="font-body-md text-body-md">Vacantes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-body-md text-body-md">Entrevistas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Configuración</span>
+</a>
+</nav>
+<button class="mt-auto w-full py-3 bg-primary text-on-primary font-bold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Crear Vacante
+            </button>
+</aside>
+<main class="flex-grow md:ml-[280px]">
+<header class="fixed top-0 right-0 left-0 md:left-[280px] h-16 bg-surface-container-lowest border-b border-outline-variant z-20 flex items-center px-lg justify-between">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 text-body-md focus:outline-none focus:border-primary transition-colors" placeholder="Buscar candidatos o vacantes..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">help</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<button class="text-body-md font-bold text-on-surface hover:text-primary transition-colors">Perfil</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional corporate headshot of a recruitment manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPU49a3YQTGjgiCLA8alnG4jkyubK_XBYQM5X9jSRsXJZlYmXPPMYG1N8_c5FfSH5mFA4cyk6EDD8vZ-K_NdALJJIGYr_zoGmLa-xV4C1GTBOdojEAmgBiUAiKML3R0pf4VUE3ZebARrwVcBgys8KxDFPkyiLxxOOAo9X4OjfnrKiz3Hm54sKqij-Mdim5gsIjOMkpLrhDCy3aKHIyL62TBYr_szablEGKBRo2yDn8XMrTan-vD0HRmAjp2t9D2APer-KNM6LMlQy1"/>
+</div>
+</div>
+</header>
+<div class="pt-24 pb-12 px-lg max-w-5xl mx-auto">
+<div class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<nav class="flex items-center gap-2 text-body-sm text-on-surface-variant mb-2">
+<span class="">Candidatos</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Registrar Nuevo Candidato</span>
+</nav>
+<h2 class="font-headline-md text-headline-md text-on-surface">Registrar Candidato</h2>
+<p class="text-body-md text-on-surface-variant">Complete la información para añadir un nuevo talento a Serenity Talent.</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl form-card-shadow overflow-hidden">
+<!-- Progress Bar / Tabs -->
+<div class="flex border-b border-outline-variant">
+<div class="flex-1 px-md py-4 text-center border-b-2 border-primary">
+<p class="font-label-caps text-label-caps text-primary uppercase">1. INFORMACIÓN PERSONAL</p>
+</div>
+<div class="flex-1 px-md py-4 text-center border-b-2 border-transparent hover:border-surface-dim transition-colors">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">2. DETALLES PROFESIONALES</p>
+</div>
+<div class="flex-1 px-md py-4 text-center border-b-2 border-transparent hover:border-surface-dim transition-colors">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">3. DOCUMENTACIÓN</p>
+</div>
+</div>
+<form class="p-lg space-y-10">
+<div class="space-y-6">
+<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
+<h3 class="font-headline-sm text-headline-sm">Información Personal</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Nombre Completo</label>
+<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Ana García" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Correo Electrónico</label>
+<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="ana@ejemplo.com" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Teléfono</label>
+<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="+34 600 000 000" type="tel"/>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Ubicación</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">location_on</span>
+<input class="w-full border border-outline-variant rounded-lg py-3 pl-10 pr-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ciudad, País" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
+<h3 class="font-headline-sm text-headline-sm">Detalles Profesionales</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="md:col-span-2 space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Puesto Actual</label>
+<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Senior Frontend Developer" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Años de Experiencia</label>
+<select class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all appearance-none bg-no-repeat bg-[right_12px_center]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23717786%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
+<option>0-2 años</option>
+<option>3-5 años</option>
+<option>6-10 años</option>
+<option>+10 años</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Salario Esperado (Bruto Anual)</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">€</span>
+<input class="w-full border border-outline-variant rounded-lg py-3 pl-8 pr-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="45.000" type="number"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Vincular a Vacante Activa</label>
+<select class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all appearance-none bg-no-repeat bg-[right_12px_center]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23717786%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
+<option>Ninguna / General</option>
+<option>Senior React Architect - Ref #442</option>
+<option>UX Designer - Ref #443</option>
+<option>DevOps Lead - Ref #445</option>
+</select>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
+<h3 class="font-headline-sm text-headline-sm">Habilidades y Aptitudes</h3>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant">Habilidades Técnicas &amp; Soft Skills</label>
+<div class="flex flex-wrap gap-2 p-3 border border-outline-variant rounded-lg bg-surface-container-low min-h-[48px]">
+<span class="flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-body-sm font-bold">
+                                            React.js <button class="material-symbols-outlined text-[14px]" type="button">close</button>
+</span>
+<span class="flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-body-sm font-bold">
+                                            TypeScript <button class="material-symbols-outlined text-[14px]" type="button">close</button>
+</span>
+<span class="flex items-center gap-1 px-3 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-body-sm font-bold">
+                                            Liderazgo <button class="material-symbols-outlined text-[14px]" type="button">close</button>
+</span>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-body-md min-w-[120px]" placeholder="Escriba y pulse enter..." type="text"/>
+</div>
+<p class="text-[11px] text-on-surface-variant italic">Sugerencias: Node.js, Scrum, Inglés C1, Figma.</p>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
+<h3 class="font-headline-sm text-headline-sm">Documentación</h3>
+</div>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center text-center hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[32px]">upload_file</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Subir Curriculum Vitae o Portfolio</h4>
+<p class="text-body-md text-on-surface-variant mt-2">Arrastre y suelte su archivo aquí o <span class="text-primary font-bold">seleccione un archivo</span></p>
+<p class="text-body-sm text-outline mt-4">Soportado: PDF, DOCX (Máx. 10MB)</p>
+<input class="hidden" type="file"/>
+</div>
+</div>
+<div class="pt-lg border-t border-outline-variant flex items-center justify-end gap-md">
+<button class="px-6 py-2 text-primary font-bold border border-primary rounded-lg hover:bg-primary-fixed transition-colors active:scale-95" type="button">
+                                Cancelar
+                            </button>
+<button class="px-8 py-2 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                                Registrar Candidato
+                            </button>
+</div>
+</form>
+</div>
+</div>
+</main>
+</div>
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface border-t border-outline-variant flex md:hidden items-center justify-around z-40">
+<button class="flex flex-col items-center text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Panel</span>
+</button>
+<button class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-[10px] font-bold">Candidatos</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">work</span>
+<span class="text-[10px] font-bold">Vacantes</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Ajustes</span>
+</button>
+</nav>
+<script>
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', () => {
+                element.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            element.addEventListener('blur', () => {
+                element.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
+        });
+
+        const tagInput = document.querySelector('input[placeholder="Escriba y pulse enter..."]');
+        if (tagInput) {
+            tagInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = tagInput.value.trim();
+                    if (value) {
+                        const tag = document.createElement('span');
+                        tag.className = 'flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-body-sm font-bold';
+                        tag.innerHTML = `${value} <button type="button" class="material-symbols-outlined text-[14px]">close</button>`;
+                        tagInput.before(tag);
+                        tagInput.value = '';
+                        tag.querySelector('button').onclick = () => tag.remove();
+                    }
+                }
+            });
+        }
+    </script>
+</body></html>
