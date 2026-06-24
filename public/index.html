@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Serenity Talent - Iniciar Sesión</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .login-card { box-shadow: 0px 4px 12px rgba(0, 89, 187, 0.1); }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+            animation-iteration-count: 2;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface":"#f0f1f2","surface":"#f8f9fa","on-surface":"#191c1d",
+                        "inverse-primary":"#adc7ff","on-secondary-container":"#09657f","error":"#ba1a1a",
+                        "tertiary-container":"#c64f00","on-secondary":"#ffffff","primary-container":"#0070ea",
+                        "outline-variant":"#c1c6d7","surface-container":"#edeeef","secondary":"#0c6780",
+                        "surface-dim":"#d9dadb","primary":"#0059bb","on-tertiary-fixed-variant":"#7c2e00",
+                        "error-container":"#ffdad6","surface-container-lowest":"#ffffff","tertiary":"#9e3d00",
+                        "on-primary-fixed-variant":"#004493","on-tertiary-fixed":"#351000","on-primary-fixed":"#001a41",
+                        "on-error":"#ffffff","on-background":"#191c1d","on-tertiary-container":"#fffbff",
+                        "on-primary":"#ffffff","surface-bright":"#f8f9fa","surface-container-highest":"#e1e3e4",
+                        "inverse-surface":"#2e3132","background":"#f8f9fa","primary-fixed-dim":"#adc7ff",
+                        "outline":"#717786","surface-tint":"#005bc0","on-tertiary":"#ffffff",
+                        "tertiary-fixed-dim":"#ffb695","secondary-container":"#9ae1ff","surface-container-low":"#f3f4f5",
+                        "surface-container-high":"#e7e8e9","tertiary-fixed":"#ffdbcc","on-primary-container":"#fefcff",
+                        "surface-variant":"#e1e3e4","on-secondary-fixed-variant":"#004d62","on-secondary-fixed":"#001f29",
+                        "secondary-fixed":"#baeaff","primary-fixed":"#d8e2ff","on-error-container":"#93000a",
+                        "secondary-fixed-dim":"#89d0ed","on-surface-variant":"#414754"
+                    },
+                    borderRadius: { DEFAULT:"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem" },
+                    spacing: { "container-max":"1440px","md":"16px","xl":"40px","lg":"24px","xs":"4px","sm":"8px","base":"4px","gutter":"16px" },
+                    fontFamily: {
+                        "headline-md":["Hanken Grotesk"],"body-md":["Inter"],"body-lg":["Inter"],
+                        "body-sm":["Inter"],"label-caps":["Inter"],"headline-sm":["Hanken Grotesk"],
+                        "data-mono":["JetBrains Mono"],"display-lg":["Hanken Grotesk"]
+                    },
+                    fontSize: {
+                        "headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],
+                        "body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],
+                        "body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],
+                        "body-sm":["12px",{"lineHeight":"18px","fontWeight":"400"}],
+                        "label-caps":["11px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"700"}],
+                        "headline-sm":["20px",{"lineHeight":"28px","fontWeight":"600"}],
+                        "data-mono":["13px",{"lineHeight":"16px","fontWeight":"400"}],
+                        "display-lg":["48px",{"lineHeight":"56px","fontWeight":"700"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-surface font-body-md text-on-surface overflow-hidden min-h-screen flex items-center justify-center p-md">
+
+    <!-- Fondo decorativo -->
+    <div class="fixed inset-0 pointer-events-none opacity-40">
+        <div class="absolute top-[-10%] right-[-5%] w-[40%] h-[50%] bg-primary-container blur-[120px] rounded-full opacity-20"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[30%] h-[40%] bg-secondary-container blur-[100px] rounded-full opacity-20"></div>
+    </div>
+    <div class="fixed inset-0 -z-10 pointer-events-none opacity-[0.03]"
+        style="background-image: radial-gradient(#0059bb 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+    <!-- Modal Registro -->
+    <div id="registerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-md">
+        <div class="absolute inset-0 bg-black/40" onclick="closeRegister()"></div>
+        <div class="login-card relative bg-surface-container-lowest border border-outline-variant rounded-xl p-xl w-full max-w-md">
+            <button class="absolute right-3 top-3 material-symbols-outlined text-outline" onclick="closeRegister()" aria-label="Cerrar">close</button>
+            <div class="flex flex-col items-center gap-sm text-center mb-sm">
+                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-sm">
+                    <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings:'FILL' 1;">person_add</span>
+                </div>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface">Crear cuenta</h2>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">Regístrate para acceder a Serenity Talent</p>
+            </div>
+            <!-- Mensaje error registro -->
+            <div id="regError" class="hidden flex items-center gap-sm p-sm bg-error-container text-on-error-container rounded border border-error/20 mb-md">
+                <span class="material-symbols-outlined text-sm">report</span>
+                <span id="regErrorText" class="font-body-sm text-body-sm"></span>
+            </div>
+            <div class="flex flex-col gap-md">
+                <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regName">Nombre</label>
+                    <input id="regName" type="text" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="Tu nombre completo">
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regEmail">Correo</label>
+                    <input id="regEmail" type="email" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regUser">Usuario</label>
+                    <input id="regUser" type="text" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="usuario">
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regPassword">Contraseña</label>
+                    <input id="regPassword" type="password" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="••••••••">
+                </div>
+                <div class="flex items-center justify-end gap-sm">
+                    <button type="button" class="py-2 px-4 rounded text-on-surface-variant hover:bg-surface-container transition-all" onclick="closeRegister()">Cancelar</button>
+                    <button id="regSubmit" onclick="handleRegister()" class="py-2 px-4 bg-primary text-on-primary rounded font-bold hover:bg-primary-container transition-all flex items-center gap-sm">
+                        Registrarse
+                        <span id="regLoader" class="hidden material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card principal login -->
+    <main class="relative z-10 w-full max-w-[420px]">
+        <div class="login-card bg-surface-container-lowest border border-outline-variant rounded-xl p-xl flex flex-col gap-lg">
+            <div class="flex flex-col items-center gap-sm text-center">
+                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-sm">
+                    <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings:'FILL' 1;">work</span>
+                </div>
+                <h1 class="font-headline-md text-headline-md text-on-surface">Serenity Talent</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">La mejor forma de reclutar</p>
+            </div>
+
+            <div class="flex flex-col gap-md">
+                <!-- Error login -->
+                <div class="hidden flex items-center gap-sm p-sm bg-error-container text-on-error-container rounded border border-error/20" id="errorMessage">
+                    <span class="material-symbols-outlined text-sm">report</span>
+                    <span id="errorText" class="font-body-sm text-body-sm">Credenciales inválidas. Por favor, intente de nuevo.</span>
+                </div>
+
+                <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="username">Usuario o Correo electrónico</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">person</span>
+                        <input class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
+                            id="username" placeholder="recruiter@serenitytalent.com" type="text" />
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-xs">
+                    <div class="flex justify-between items-center">
+                        <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="password">Contraseña</label>
+                        <a class="font-body-sm text-body-sm text-primary hover:underline transition-all" href="#">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">lock</span>
+                        <input class="w-full pl-10 pr-10 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
+                            id="password" placeholder="••••••••" type="password" />
+                        <button class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline hover:text-primary transition-colors text-lg"
+                            id="togglePwdBtn" onclick="togglePassword()" type="button">visibility</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-sm py-xs">
+                    <input class="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary cursor-pointer" id="remember" type="checkbox" />
+                    <label class="font-body-md text-body-md text-on-surface-variant cursor-pointer select-none" for="remember">Recordar este dispositivo</label>
+                </div>
+
+                <button onclick="handleLogin()"
+                    class="w-full mt-sm py-3 bg-primary text-on-primary font-bold rounded hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center gap-sm"
+                    id="submitBtn" type="button">
+                    <span>Iniciar Sesión</span>
+                    <span class="hidden animate-spin material-symbols-outlined text-lg" id="loader">progress_activity</span>
+                </button>
+            </div>
+
+            <div class="pt-md text-center">
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    ¿No tienes una cuenta?
+                    <button class="text-primary font-bold hover:underline ml-1" type="button" onclick="openRegister()">Crear cuenta</button>
+                </p>
+            </div>
+            <div class="border-t border-outline-variant pt-lg text-center">
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Solo para uso interno. ¿Necesitas ayuda?
+                    <a class="text-primary font-bold hover:underline" href="#">Contactar a Soporte</a>
+                </p>
+            </div>
+        </div>
+        <div class="mt-xl text-center flex flex-col gap-xs">
+            <p class="font-label-caps text-label-caps text-outline uppercase">Serenity Talent recruitment suite v4.2.0</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant/60">© 2024 Serenity Talent Corp. Todos los derechos reservados.</p>
+        </div>
+    </main>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        // ── Toggle contraseña ──────────────────────────────────
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const btn = document.getElementById('togglePwdBtn');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                btn.textContent = 'visibility_off';
+            } else {
+                pwd.type = 'password';
+                btn.textContent = 'visibility';
+            }
+        }
+
+        // ── Modal registro ─────────────────────────────────────
+        function openRegister() {
+            document.getElementById('registerModal').classList.remove('hidden');
+            document.getElementById('regError').classList.add('hidden');
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regUser').value = '';
+            document.getElementById('regPassword').value = '';
+        }
+        function closeRegister() {
+            document.getElementById('registerModal').classList.add('hidden');
+        }
+
+        // ── Login ──────────────────────────────────────────────
+        async function handleLogin() {
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const errorMsg = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            const identifier = document.getElementById('username').value.trim();
+            const Contrasena = document.getElementById('password').value;
+
+            if (!identifier || !Contrasena) {
+                errorText.textContent = 'Por favor ingresa tu usuario y contraseña.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            btn.classList.add('opacity-80');
+
+            try {
+                const res = await fetch(`${API}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, Contrasena })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    localStorage.setItem('st_token', data.token);
+                    localStorage.setItem('st_usuario', JSON.stringify(data.usuario));
+                    window.location.href = 'candidatos.html';
+                } else {
+                    errorText.textContent = data.error || 'Credenciales inválidas.';
+                    errorMsg.classList.remove('hidden');
+                    const card = document.querySelector('.login-card');
+                    card.classList.add('animate-shake');
+                    setTimeout(() => card.classList.remove('animate-shake'), 500);
+                }
+            } catch (err) {
+                errorText.textContent = 'No se pudo conectar con el servidor.';
+                errorMsg.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                btn.classList.remove('opacity-80');
+            }
+        }
+
+        // ── Registro ───────────────────────────────────────────
+        async function handleRegister() {
+            const btn = document.getElementById('regSubmit');
+            const loader = document.getElementById('regLoader');
+            const errorDiv = document.getElementById('regError');
+            const errorText = document.getElementById('regErrorText');
+
+            const Nombre = document.getElementById('regName').value.trim();
+            const Correo = document.getElementById('regEmail').value.trim();
+            const IJsuario = document.getElementById('regUser').value.trim();
+            const Contrasena = document.getElementById('regPassword').value;
+
+            if (!Nombre || !Correo || !IJsuario || !Contrasena) {
+                errorText.textContent = 'Todos los campos son obligatorios.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+
+            try {
+                const res = await fetch(`${API}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Nombre, Correo, IJsuario, Contrasena })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    // Auto-llenar usuario y cerrar modal
+                    document.getElementById('username').value = IJsuario;
+                    document.getElementById('password').value = '';
+                    closeRegister();
+                    // Mostrar éxito breve
+                    const errorMsg = document.getElementById('errorMessage');
+                    const errorTxt = document.getElementById('errorText');
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.classList.remove('bg-error-container', 'text-on-error-container', 'border-error/20');
+                    errorMsg.classList.add('bg-green-50', 'text-green-800', 'border-green-200');
+                    errorTxt.textContent = '¡Cuenta creada! Ingresa tu contraseña para continuar.';
+                    setTimeout(() => {
+                        errorMsg.classList.add('hidden');
+                        errorMsg.classList.add('bg-error-container', 'text-on-error-container', 'border-error/20');
+                        errorMsg.classList.remove('bg-green-50', 'text-green-800', 'border-green-200');
+                    }, 4000);
+                } else {
+                    errorText.textContent = data.error || 'Error en el registro.';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorText.textContent = 'No se pudo conectar con el servidor.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+            }
+        }
+
+        // Enter en campos de login
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('registerModal').classList.contains('hidden')) {
+                    handleRegister();
+                } else {
+                    handleLogin();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
