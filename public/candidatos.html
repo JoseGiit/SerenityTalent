@@ -160,12 +160,6 @@
 <span class="font-label-caps text-label-caps">Configuración</span>
 </a>
 </nav>
-<div class="mt-auto pt-lg border-t border-outline-variant">
-<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
-<span class="material-symbols-outlined">add</span>
-<span>Crear Vacante</span>
-</button>
-</div>
 </aside>
 <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
 <header class="docked top-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant shrink-0">
@@ -200,7 +194,7 @@
 <h2 class="font-headline-md text-headline-md text-on-surface">Candidatos</h2>
 <p class="text-body-md text-on-surface-variant">Gestiona y realiza seguimiento de las postulaciones actuales en Serenity Talent.</p>
 </div>
-<button type="button" onclick="window.open('registrarCandidatos.html', '_blank')" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
+<button type="button" onclick="window.location.href='registrarCandidatos.html'" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
 <span>Registrar Candidato</span>
 </button>
@@ -209,27 +203,8 @@
 <div class="flex-1 min-w-[200px]">
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md" placeholder="Filtrar por nombre, correo o vacante..." type="text"/>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md" placeholder="Filtrar por nombre o correo..." type="text"/>
 </div>
-</div>
-<div class="flex gap-sm overflow-x-auto pb-1 md:pb-0">
-<select class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-body-sm outline-none cursor-pointer focus:border-primary">
-<option>Estado: Todos</option>
-<option>Nueva Postulación</option>
-<option>Entrevista</option>
-<option>Evaluación</option>
-<option>Contratado</option>
-</select>
-<select class="bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-body-sm outline-none cursor-pointer focus:border-primary">
-<option>Vacante: Todas</option>
-<option>Frontend Dev</option>
-<option>UI Designer</option>
-<option>Project Manager</option>
-</select>
-<button class="bg-surface-container-highest text-on-surface p-2 rounded-lg hover:bg-outline-variant transition-colors flex items-center gap-1">
-<span class="material-symbols-outlined">filter_list</span>
-<span class="text-body-sm px-1">Filtros</span>
-</button>
 </div>
 </div>
 <div class="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
@@ -237,129 +212,23 @@
 <table class="w-full text-left border-collapse">
 <thead>
 <tr class="bg-surface-container-low border-b border-outline-variant">
-<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Nombre del Candidato</th>
-<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Fecha de Postulación</th>
-<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Vacante</th>
-<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Estado Actual</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Nombre</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Apellido</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Correo</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Teléfono</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Fecha de Registro</th>
 <th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant text-center">Acciones</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-outline-variant">
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="px-lg py-3 relative">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">RM</div>
-<div>
-<p class="font-bold text-on-surface">Ricardo Mendoza</p>
-<p class="text-body-sm text-on-surface-variant">ricardo.m@email.com</p>
-</div>
-</div>
-</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">12 Oct 2023</td>
-<td class="px-lg py-3 text-body-md font-bold">Senior Frontend Architect</td>
-<td class="px-lg py-3">
-<span class="status-badge bg-primary/10 text-primary">Nueva Postulación</span>
-</td>
-<td class="px-lg py-3 text-center">
-<button class="text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="px-lg py-3 relative">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs">SA</div>
-<div>
-<p class="font-bold text-on-surface">Sofía Alarcón</p>
-<p class="text-body-sm text-on-surface-variant">sofia.a@email.com</p>
-</div>
-</div>
-</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">08 Oct 2023</td>
-<td class="px-lg py-3 text-body-md font-bold">UI/UX Lead Designer</td>
-<td class="px-lg py-3">
-<span class="status-badge bg-secondary-container text-on-secondary-container">Entrevista</span>
-</td>
-<td class="px-lg py-3 text-center">
-<button class="text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="px-lg py-3 relative">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-outline-variant text-on-surface flex items-center justify-center font-bold text-xs">JP</div>
-<div>
-<p class="font-bold text-on-surface">Juan Pérez</p>
-<p class="text-body-sm text-on-surface-variant">juan.p@email.com</p>
-</div>
-</div>
-</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">05 Oct 2023</td>
-<td class="px-lg py-3 text-body-md font-bold">DevOps Engineer</td>
-<td class="px-lg py-3">
-<span class="status-badge bg-tertiary-fixed text-on-tertiary-fixed-variant">Evaluación</span>
-</td>
-<td class="px-lg py-3 text-center">
-<button class="text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="px-lg py-3 relative">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center font-bold text-xs">LV</div>
-<div>
-<p class="font-bold text-on-surface">Laura Vázquez</p>
-<p class="text-body-sm text-on-surface-variant">laura.v@email.com</p>
-</div>
-</div>
-</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">01 Oct 2023</td>
-<td class="px-lg py-3 text-body-md font-bold">QA Tester</td>
-<td class="px-lg py-3">
-<span class="status-badge bg-green-100 text-green-700">Contratado</span>
-</td>
-<td class="px-lg py-3 text-center">
-<button class="text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="px-lg py-3 relative">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant flex items-center justify-center font-bold text-xs">CS</div>
-<div>
-<p class="font-bold text-on-surface">Carlos Sánchez</p>
-<p class="text-body-sm text-on-surface-variant">c.sanchez@email.com</p>
-</div>
-</div>
-</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">28 Sep 2023</td>
-<td class="px-lg py-3 text-body-md font-bold">Product Owner</td>
-<td class="px-lg py-3">
-<span class="status-badge bg-secondary-container text-on-secondary-container">Entrevista</span>
-</td>
-<td class="px-lg py-3 text-center">
-<button class="text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</td>
+<tbody id="candidatos-tbody" class="divide-y divide-outline-variant">
+<tr>
+<td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">Cargando candidatos…</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="px-lg py-4 border-t border-outline-variant flex items-center justify-between bg-surface-container-low">
-<p class="text-body-sm text-on-surface-variant">Mostrando 5 de 142 candidatos</p>
+<p id="candidatos-count" class="text-body-sm text-on-surface-variant">Mostrando 0 candidatos</p>
 <div class="flex gap-2">
 <button class="p-1 border border-outline-variant rounded hover:bg-white transition-colors disabled:opacity-50" disabled="">
 <span class="material-symbols-outlined">chevron_left</span>
@@ -390,7 +259,7 @@
 <div>
 <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">Candidatos Activos</h3>
 <div class="flex items-end gap-2">
-<span class="text-display-lg font-display-lg text-primary">42</span>
+<span id="active-candidates-count" class="text-display-lg font-display-lg text-primary">0</span>
 <span class="text-body-md text-green-600 mb-2 flex items-center"><span class="material-symbols-outlined">arrow_upward</span> 12%</span>
 </div>
 </div>
@@ -405,7 +274,73 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.querySelector('input[type="text"]');
+        const API = '/api';
+        const searchInput = document.querySelector('input[placeholder="Buscar candidatos..."]');
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function buildCandidateRow(candidato) {
+            const initials = [candidato.Nombre, candidato.Apellido]
+                .filter(Boolean)
+                .map(name => name.trim().split(' ')[0])
+                .map(word => word[0] || '')
+                .join('')
+                .toUpperCase();
+
+            return `
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-3 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">${initials}</div>
+<div>
+<p class="font-bold text-on-surface">${candidato.Nombre}</p>
+<p class="text-body-sm text-on-surface-variant">${candidato.Correo}</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant">${candidato.Apellido}</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant">${candidato.Correo}</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant">${candidato.Telefono}</td>
+<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">${formatDate(candidato.FechaRegistro)}</td>
+<td class="px-lg py-3 text-center">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>`;
+        }
+
+        async function loadCandidates() {
+            const tbody = document.getElementById('candidatos-tbody');
+            const counter = document.getElementById('candidatos-count');
+            const activeCandidatesCount = document.getElementById('active-candidates-count');
+
+            try {
+                const response = await fetch(`${API}/candidatos`);
+                const candidates = await response.json();
+
+                if (!Array.isArray(candidates) || candidates.length === 0) {
+                    tbody.innerHTML = `<tr><td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">No hay candidatos registrados aún.</td></tr>`;
+                    counter.textContent = 'Mostrando 0 candidatos';
+                    activeCandidatesCount.textContent = '0';
+                    return;
+                }
+
+                tbody.innerHTML = candidates.map(buildCandidateRow).join('');
+                counter.textContent = `Mostrando ${candidates.length} candidato${candidates.length === 1 ? '' : 's'}`;
+                activeCandidatesCount.textContent = candidates.length;
+            } catch (error) {
+                console.error('Error cargando candidatos:', error);
+                tbody.innerHTML = `<tr><td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">Error al cargar candidatos.</td></tr>`;
+                counter.textContent = 'Mostrando 0 candidatos';
+                activeCandidatesCount.textContent = '0';
+            }
+        }
+
         if (searchInput) {
             searchInput.addEventListener('focus', () => {
                 searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
@@ -415,17 +350,7 @@
             });
         }
 
-        const rows = document.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            row.addEventListener('mouseenter', () => {
-                const icon = row.querySelector('.material-symbols-outlined');
-                if (icon) icon.style.transform = 'scale(1.2)';
-            });
-            row.addEventListener('mouseleave', () => {
-                const icon = row.querySelector('.material-symbols-outlined');
-                if (icon) icon.style.transform = 'scale(1)';
-            });
-        });
+        loadCandidates();
     });
 </script>
 </body></html>

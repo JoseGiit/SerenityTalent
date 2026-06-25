@@ -21,10 +21,28 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
+async function initializeDatabase() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS Candidato (
+      IdCandidato INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      Nombre VARCHAR(100) NOT NULL,
+      Apellido VARCHAR(100) NOT NULL,
+      Correo VARCHAR(150) NOT NULL,
+      Telefono VARCHAR(20) DEFAULT NULL,
+      Curriculum VARCHAR(255) DEFAULT NULL,
+      FechaRegistro DATE NOT NULL,
+      PRIMARY KEY (IdCandidato)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
+}
+
 // ── Middleware ─────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
+  next();
+});
 
 // ── POST /api/register ─────────────────────────────────────────
 app.post('/api/register', async (req, res) => {
@@ -124,8 +142,68 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ── Arrancar ───────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`📄 Abre http://localhost:${PORT}/index.html`);
+// ── GET /api/candidatos ─────────────────────────────────────────
+app.get('/api/candidatos', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT IdCandidato, Nombre, Apellido, Correo, Telefono, Curriculum, FechaRegistro FROM Candidato ORDER BY FechaRegistro DESC'
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('Error en /api/candidatos:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
+
+// ── POST /api/candidatos ────────────────────────────────────────
+app.post('/api/candidatos', async (req, res) => {
+  const {
+    Nombre,
+    Apellido,
+    Correo,
+    Telefono,
+    Curriculum,
+  } = req.body;
+
+  if (!Nombre || !Apellido || !Correo || !Telefono) {
+    return res.status(400).json({ error: 'Nombre, apellido, correo y teléfono son requeridos' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO Candidato (Nombre, Apellido, Correo, Telefono, Curriculum, FechaRegistro) VALUES (?, ?, ?, ?, ?, CURDATE())',
+      [
+        Nombre,
+        Apellido,
+        Correo,
+        Telefono,
+        Curriculum || '',
+      ]
+    );
+
+    const [rows] = await pool.query(
+      'SELECT * FROM Candidato WHERE IdCandidato = ?',
+      [result.insertId]
+    );
+
+    res.status(201).json({ candidato: rows[0] });
+  } catch (err) {
+    console.error('Error en /api/candidatos POST:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Arrancar ───────────────────────────────────────────────────
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+      console.log(`📄 Abre http://localhost:${PORT}/index.html`);
+    });
+  })
+  .catch((err) => {
+    console.error('Error inicializando la base de datos:', err.message);
+    process.exit(1);
+  });

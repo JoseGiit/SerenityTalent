@@ -149,18 +149,10 @@
 <span class="font-body-md text-body-md">Configuración</span>
 </a>
 </nav>
-<button class="mt-auto w-full py-3 bg-primary text-on-primary font-bold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
-<span class="material-symbols-outlined" data-icon="add">add</span>
-                Crear Vacante
-            </button>
 </aside>
 <main class="flex-grow md:ml-[280px]">
 <header class="fixed top-0 right-0 left-0 md:left-[280px] h-16 bg-surface-container-lowest border-b border-outline-variant z-20 flex items-center px-lg justify-between">
 <div class="flex items-center gap-4 flex-1">
-<div class="relative w-full max-w-md group">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 text-body-md focus:outline-none focus:border-primary transition-colors" placeholder="Buscar candidatos o vacantes..." type="text"/>
-</div>
 </div>
 <div class="flex items-center gap-4">
 <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">notifications</button>
@@ -185,103 +177,27 @@
 </div>
 </div>
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl form-card-shadow overflow-hidden">
-<!-- Progress Bar / Tabs -->
-<div class="flex border-b border-outline-variant">
-<div class="flex-1 px-md py-4 text-center border-b-2 border-primary">
-<p class="font-label-caps text-label-caps text-primary uppercase">1. INFORMACIÓN PERSONAL</p>
-</div>
-<div class="flex-1 px-md py-4 text-center border-b-2 border-transparent hover:border-surface-dim transition-colors">
-<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">2. DETALLES PROFESIONALES</p>
-</div>
-<div class="flex-1 px-md py-4 text-center border-b-2 border-transparent hover:border-surface-dim transition-colors">
-<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">3. DOCUMENTACIÓN</p>
-</div>
-</div>
-<form class="p-lg space-y-10">
+<form id="candidate-form" class="p-lg space-y-10">
 <div class="space-y-6">
 <div class="flex items-center gap-2 border-l-4 border-primary pl-3">
 <h3 class="font-headline-sm text-headline-sm">Información Personal</h3>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
 <div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Nombre Completo</label>
-<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Ana García" type="text"/>
+<label class="font-body-sm font-bold text-on-surface-variant" for="nombre">Nombre</label>
+<input id="nombre" name="nombre" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Ana" type="text" required />
 </div>
 <div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Correo Electrónico</label>
-<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="ana@ejemplo.com" type="email"/>
+<label class="font-body-sm font-bold text-on-surface-variant" for="apellido">Apellido</label>
+<input id="apellido" name="apellido" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. García" type="text" required />
 </div>
 <div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Teléfono</label>
-<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="+34 600 000 000" type="tel"/>
+<label class="font-body-sm font-bold text-on-surface-variant" for="correo">Correo Electrónico</label>
+<input id="correo" name="correo" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="ana@ejemplo.com" type="email" required />
 </div>
 <div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Ubicación</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">location_on</span>
-<input class="w-full border border-outline-variant rounded-lg py-3 pl-10 pr-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ciudad, País" type="text"/>
-</div>
-</div>
-</div>
-</div>
-<div class="space-y-6">
-<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
-<h3 class="font-headline-sm text-headline-sm">Detalles Profesionales</h3>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-<div class="md:col-span-2 space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Puesto Actual</label>
-<input class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Senior Frontend Developer" type="text"/>
-</div>
-<div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Años de Experiencia</label>
-<select class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all appearance-none bg-no-repeat bg-[right_12px_center]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23717786%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
-<option>0-2 años</option>
-<option>3-5 años</option>
-<option>6-10 años</option>
-<option>+10 años</option>
-</select>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-<div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Salario Esperado (Bruto Anual)</label>
-<div class="relative">
-<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">€</span>
-<input class="w-full border border-outline-variant rounded-lg py-3 pl-8 pr-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="45.000" type="number"/>
-</div>
-</div>
-<div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Vincular a Vacante Activa</label>
-<select class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all appearance-none bg-no-repeat bg-[right_12px_center]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23717786%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
-<option>Ninguna / General</option>
-<option>Senior React Architect - Ref #442</option>
-<option>UX Designer - Ref #443</option>
-<option>DevOps Lead - Ref #445</option>
-</select>
-</div>
-</div>
-</div>
-<div class="space-y-6">
-<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
-<h3 class="font-headline-sm text-headline-sm">Habilidades y Aptitudes</h3>
-</div>
-<div class="space-y-4">
-<div class="space-y-2">
-<label class="font-body-sm font-bold text-on-surface-variant">Habilidades Técnicas &amp; Soft Skills</label>
-<div class="flex flex-wrap gap-2 p-3 border border-outline-variant rounded-lg bg-surface-container-low min-h-[48px]">
-<span class="flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-body-sm font-bold">
-                                            React.js <button class="material-symbols-outlined text-[14px]" type="button">close</button>
-</span>
-<span class="flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-body-sm font-bold">
-                                            TypeScript <button class="material-symbols-outlined text-[14px]" type="button">close</button>
-</span>
-<span class="flex items-center gap-1 px-3 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-body-sm font-bold">
-                                            Liderazgo <button class="material-symbols-outlined text-[14px]" type="button">close</button>
-</span>
-<input class="flex-grow bg-transparent border-none focus:ring-0 text-body-md min-w-[120px]" placeholder="Escriba y pulse enter..." type="text"/>
-</div>
-<p class="text-[11px] text-on-surface-variant italic">Sugerencias: Node.js, Scrum, Inglés C1, Figma.</p>
+<label class="font-body-sm font-bold text-on-surface-variant" for="telefono">Teléfono</label>
+<input id="telefono" name="telefono" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="+34 600 000 000" type="tel" required />
 </div>
 </div>
 </div>
@@ -289,18 +205,16 @@
 <div class="flex items-center gap-2 border-l-4 border-primary pl-3">
 <h3 class="font-headline-sm text-headline-sm">Documentación</h3>
 </div>
-<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center text-center hover:bg-surface-container-low transition-colors cursor-pointer group">
-<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-primary text-[32px]">upload_file</span>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant" for="curriculum">Subir Currículum</label>
+<div class="border border-outline-variant rounded-lg bg-surface-container-low p-4">
+<input id="curriculum" class="w-full text-body-md text-on-surface" type="file" accept=".pdf,.doc,.docx" />
+<p class="text-body-sm text-on-surface-variant mt-2">Selecciona el archivo de currículum en PDF, DOC o DOCX.</p>
 </div>
-<h4 class="font-headline-sm text-headline-sm text-on-surface">Subir Curriculum Vitae o Portfolio</h4>
-<p class="text-body-md text-on-surface-variant mt-2">Arrastre y suelte su archivo aquí o <span class="text-primary font-bold">seleccione un archivo</span></p>
-<p class="text-body-sm text-outline mt-4">Soportado: PDF, DOCX (Máx. 10MB)</p>
-<input class="hidden" type="file"/>
 </div>
 </div>
 <div class="pt-lg border-t border-outline-variant flex items-center justify-end gap-md">
-<button class="px-6 py-2 text-primary font-bold border border-primary rounded-lg hover:bg-primary-fixed transition-colors active:scale-95" type="button">
+<button id="cancel-button" class="px-6 py-2 text-primary font-bold border border-primary rounded-lg hover:bg-primary-fixed transition-colors active:scale-95" type="button">
                                 Cancelar
                             </button>
 <button class="px-8 py-2 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-2" type="submit">
@@ -308,6 +222,7 @@
                                 Registrar Candidato
                             </button>
 </div>
+<p id="form-feedback" class="text-body-sm mt-2 hidden"></p>
 </form>
 </div>
 </div>
@@ -341,20 +256,57 @@
             });
         });
 
-        const tagInput = document.querySelector('input[placeholder="Escriba y pulse enter..."]');
-        if (tagInput) {
-            tagInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const value = tagInput.value.trim();
-                    if (value) {
-                        const tag = document.createElement('span');
-                        tag.className = 'flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-body-sm font-bold';
-                        tag.innerHTML = `${value} <button type="button" class="material-symbols-outlined text-[14px]">close</button>`;
-                        tagInput.before(tag);
-                        tagInput.value = '';
-                        tag.querySelector('button').onclick = () => tag.remove();
+        const curriculumInput = document.getElementById('curriculum');
+        const feedback = document.getElementById('form-feedback');
+        const form = document.getElementById('candidate-form');
+        const cancelButton = document.getElementById('cancel-button');
+
+        if (cancelButton) {
+            cancelButton.addEventListener('click', () => {
+                window.location.href = 'candidatos.html';
+            });
+        }
+
+        if (form) {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                feedback.classList.add('hidden');
+                feedback.textContent = '';
+
+                const body = {
+                    Nombre: document.getElementById('nombre').value.trim(),
+                    Apellido: document.getElementById('apellido').value.trim(),
+                    Correo: document.getElementById('correo').value.trim(),
+                    Telefono: document.getElementById('telefono').value.trim(),
+                    Curriculum: curriculumInput.files.length ? curriculumInput.files[0].name : '',
+                };
+
+                try {
+                    const response = await fetch('/api/candidatos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body),
+                    });
+
+                    const contentType = response.headers.get('content-type') || '';
+                    const bodyText = contentType.includes('application/json')
+                        ? await response.json()
+                        : await response.text();
+
+                    if (!response.ok) {
+                        const message = typeof bodyText === 'object'
+                            ? bodyText.error || JSON.stringify(bodyText)
+                            : bodyText;
+                        throw new Error(message || 'Error al registrar candidato');
                     }
+
+                    window.location.href = 'candidatos.html';
+                } catch (error) {
+                    console.error('Error guardando candidato:', error);
+                    feedback.classList.remove('hidden');
+                    feedback.classList.remove('text-green-600');
+                    feedback.classList.add('text-red-600');
+                    feedback.textContent = error.message || 'No se pudo guardar el candidato.';
                 }
             });
         }
