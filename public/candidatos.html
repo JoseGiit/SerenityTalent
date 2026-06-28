@@ -275,11 +275,34 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const API = '/api';
-        const searchInput = document.querySelector('input[placeholder="Buscar candidatos..."]');
+
+        const searchInputs = document.querySelectorAll(
+            'input[placeholder="Buscar candidatos..."], input[placeholder="Filtrar por nombre o correo..."]'
+        );
 
         function formatDate(dateString) {
+            if (!dateString) return 'Sin fecha';
+
             const date = new Date(dateString);
-            return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            if (isNaN(date.getTime())) {
+                return 'Sin fecha';
+            }
+
+            return date.toLocaleDateString('es-CR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function escapeHTML(value) {
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
         }
 
         function buildCandidateRow(candidato) {
@@ -292,27 +315,70 @@
 
             return `
 <tr class="hover:bg-surface-container-low transition-colors group">
-<td class="px-lg py-3 relative">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">${initials}</div>
-<div>
-<p class="font-bold text-on-surface">${candidato.Nombre}</p>
-<p class="text-body-sm text-on-surface-variant">${candidato.Correo}</p>
-</div>
-</div>
-</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant">${candidato.Apellido}</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant">${candidato.Correo}</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant">${candidato.Telefono}</td>
-<td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">${formatDate(candidato.FechaRegistro)}</td>
-<td class="px-lg py-3 text-center">
-<button class="text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</td>
+    <td class="px-lg py-3 relative">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">
+                ${initials || '--'}
+            </div>
+
+            <div>
+                <p class="font-bold text-on-surface">${escapeHTML(candidato.Nombre)}</p>
+                <p class="text-body-sm text-on-surface-variant">${escapeHTML(candidato.Correo)}</p>
+            </div>
+        </div>
+    </td>
+
+    <td class="px-lg py-3 text-body-md text-on-surface-variant">
+        ${escapeHTML(candidato.Apellido)}
+    </td>
+
+    <td class="px-lg py-3 text-body-md text-on-surface-variant">
+        ${escapeHTML(candidato.Correo)}
+    </td>
+
+    <td class="px-lg py-3 text-body-md text-on-surface-variant">
+        ${escapeHTML(candidato.Telefono || 'Sin teléfono')}
+    </td>
+
+    <td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">
+        ${formatDate(candidato.FechaRegistro)}
+    </td>
+
+    <td class="px-lg py-3 text-center">
+        <button 
+            onclick="crearPostulacionYActualizar(${candidato.IdCandidato})"
+            class="px-3 py-1 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all">
+            Cambiar estado
+        </button>
+    </td>
 </tr>`;
         }
+
+        window.crearPostulacionYActualizar = async function(IdCandidato) {
+            try {
+                const response = await fetch(`${API}/postulaciones/crear-o-buscar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ IdCandidato })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo crear o buscar la postulación');
+                }
+
+                window.location.href = `actualizar_estado.html?id=${data.postulacion.IdPostulacion}`;
+
+            } catch (error) {
+                console.error('Error abriendo actualización de estado:', error);
+                alert(error.message || 'Error al abrir actualización de estado.');
+            }
+        };
 
         async function loadCandidates() {
             const tbody = document.getElementById('candidatos-tbody');
@@ -323,8 +389,19 @@
                 const response = await fetch(`${API}/candidatos`);
                 const candidates = await response.json();
 
+                if (!response.ok) {
+                    throw new Error(candidates.error || 'Error al cargar candidatos');
+                }
+
                 if (!Array.isArray(candidates) || candidates.length === 0) {
-                    tbody.innerHTML = `<tr><td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">No hay candidatos registrados aún.</td></tr>`;
+                    tbody.innerHTML = `
+                        <tr>
+                            <td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">
+                                No hay candidatos registrados aún.
+                            </td>
+                        </tr>
+                    `;
+
                     counter.textContent = 'Mostrando 0 candidatos';
                     activeCandidatesCount.textContent = '0';
                     return;
@@ -333,22 +410,42 @@
                 tbody.innerHTML = candidates.map(buildCandidateRow).join('');
                 counter.textContent = `Mostrando ${candidates.length} candidato${candidates.length === 1 ? '' : 's'}`;
                 activeCandidatesCount.textContent = candidates.length;
+
             } catch (error) {
                 console.error('Error cargando candidatos:', error);
-                tbody.innerHTML = `<tr><td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">Error al cargar candidatos.</td></tr>`;
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">
+                            Error al cargar candidatos.
+                        </td>
+                    </tr>
+                `;
+
                 counter.textContent = 'Mostrando 0 candidatos';
                 activeCandidatesCount.textContent = '0';
             }
         }
 
-        if (searchInput) {
-            searchInput.addEventListener('focus', () => {
-                searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        searchInputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('ring-2', 'ring-primary/20');
             });
-            searchInput.addEventListener('blur', () => {
-                searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('ring-2', 'ring-primary/20');
             });
-        }
+
+            input.addEventListener('input', () => {
+                const filtro = input.value.toLowerCase().trim();
+                const filas = document.querySelectorAll('#candidatos-tbody tr');
+
+                filas.forEach(fila => {
+                    const texto = fila.textContent.toLowerCase();
+                    fila.style.display = texto.includes(filtro) ? '' : 'none';
+                });
+            });
+        });
 
         loadCandidates();
     });

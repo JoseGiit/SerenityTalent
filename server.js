@@ -142,15 +142,26 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ── GET /api/candidatos ─────────────────────────────────────────
+
+
 app.get('/api/candidatos', async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT IdCandidato, Nombre, Apellido, Correo, Telefono, Curriculum, FechaRegistro FROM Candidato ORDER BY FechaRegistro DESC'
-    );
+    const [rows] = await pool.query(`
+      SELECT 
+        IdCandidato,
+        Nombre,
+        Apellido,
+        Correo,
+        Telefono,
+        Curriculum,
+        FechaRegistro
+      FROM Candidato
+      ORDER BY FechaRegistro DESC, IdCandidato DESC
+    `);
+
     res.json(rows);
   } catch (err) {
-    console.error('Error en /api/candidatos:', err.message);
+    console.error('Error en GET /api/candidatos:', err.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
@@ -190,6 +201,250 @@ app.post('/api/candidatos', async (req, res) => {
   } catch (err) {
     console.error('Error en /api/candidatos POST:', err.message);
     res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── GET /api/postulaciones ─────────────────────────────────────
+app.get('/api/postulaciones', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT
+        p.IdPostulacion,
+        p.IdCandidato,
+        p.IdVacante,
+        p.Estado,
+        p.FechaPostulacion,
+        p.UltimaActualizacion,
+        c.Nombre,
+        c.Apellido,
+        c.Correo,
+        c.Telefono,
+        c.Curriculum,
+        c.FechaRegistro
+      FROM Postulacion p
+      INNER JOIN Candidato c ON p.IdCandidato = c.IdCandidato
+      ORDER BY p.UltimaActualizacion DESC, p.FechaPostulacion DESC
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Error en GET /api/postulaciones:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/postulaciones/:id ─────────────────────────────────
+app.get('/api/postulaciones/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT
+        p.IdPostulacion,
+        p.IdCandidato,
+        p.IdVacante,
+        p.Estado,
+        p.FechaPostulacion,
+        p.UltimaActualizacion,
+        c.Nombre,
+        c.Apellido,
+        c.Correo,
+        c.Telefono,
+        c.Curriculum,
+        c.FechaRegistro
+      FROM Postulacion p
+      INNER JOIN Candidato c ON p.IdCandidato = c.IdCandidato
+      WHERE p.IdPostulacion = ?
+      `,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Postulación no encontrada' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error en GET /api/postulaciones/:id:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PUT /api/postulaciones/:id/estado ──────────────────────────
+app.put('/api/postulaciones/:id/estado', async (req, res) => {
+  const { id } = req.params;
+  const { Estado } = req.body;
+
+  const estadosPermitidos = [
+    'Registrado',
+    'En revisión',
+    'Entrevista',
+    'Evaluación',
+    'Oferta',
+    'Contratado',
+    'Rechazado'
+  ];
+
+  if (!Estado) {
+    return res.status(400).json({ error: 'Debe seleccionar un estado' });
+  }
+
+  if (!estadosPermitidos.includes(Estado)) {
+    return res.status(400).json({ error: 'Estado no permitido' });
+  }
+
+  try {
+    const [existe] = await pool.query(
+      'SELECT IdPostulacion, Estado FROM Postulacion WHERE IdPostulacion = ?',
+      [id]
+    );
+
+    if (existe.length === 0) {
+      return res.status(404).json({ error: 'Postulación no encontrada' });
+    }
+
+    const estadoAnterior = existe[0].Estado;
+
+    await pool.query(
+      `
+      UPDATE Postulacion
+      SET Estado = ?, UltimaActualizacion = NOW()
+      WHERE IdPostulacion = ?
+      `,
+      [Estado, id]
+    );
+
+    const [actualizada] = await pool.query(
+      `
+      SELECT
+        p.IdPostulacion,
+        p.IdCandidato,
+        p.IdVacante,
+        p.Estado,
+        p.FechaPostulacion,
+        p.UltimaActualizacion,
+        c.Nombre,
+        c.Apellido,
+        c.Correo,
+        c.Telefono,
+        c.Curriculum,
+        c.FechaRegistro
+      FROM Postulacion p
+      INNER JOIN Candidato c ON p.IdCandidato = c.IdCandidato
+      WHERE p.IdPostulacion = ?
+      `,
+      [id]
+    );
+
+    res.json({
+      message: 'Estado actualizado correctamente. El candidato puede visualizar el nuevo estado.',
+      estadoAnterior,
+      estadoNuevo: Estado,
+      postulacion: actualizada[0]
+    });
+
+  } catch (err) {
+    console.error('Error actualizando estado:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/postulaciones/crear-o-buscar ─────────────────────
+app.post('/api/postulaciones/crear-o-buscar', async (req, res) => {
+  const { IdCandidato } = req.body;
+
+  if (!IdCandidato) {
+    return res.status(400).json({ error: 'IdCandidato es requerido' });
+  }
+
+  try {
+    // Verificar que el candidato exista
+    const [candidato] = await pool.query(
+      'SELECT IdCandidato FROM Candidato WHERE IdCandidato = ?',
+      [IdCandidato]
+    );
+
+    if (candidato.length === 0) {
+      return res.status(404).json({ error: 'Candidato no encontrado' });
+    }
+
+    // Buscar si ya tiene una postulación
+    const [existente] = await pool.query(
+      `
+      SELECT 
+        IdPostulacion, 
+        IdCandidato, 
+        IdVacante, 
+        Estado, 
+        FechaPostulacion,
+        UltimaActualizacion
+      FROM Postulacion
+      WHERE IdCandidato = ?
+      ORDER BY IdPostulacion DESC
+      LIMIT 1
+      `,
+      [IdCandidato]
+    );
+
+    if (existente.length > 0) {
+      return res.json({
+        message: 'Postulación encontrada',
+        postulacion: existente[0]
+      });
+    }
+
+    // Buscar una vacante activa o la primera disponible
+    const [vacantes] = await pool.query(
+      `
+      SELECT IdVacante 
+      FROM Vacante 
+      ORDER BY IdVacante ASC 
+      LIMIT 1
+      `
+    );
+
+    if (vacantes.length === 0) {
+      return res.status(400).json({
+        error: 'No existe ninguna vacante registrada. Debe existir al menos una vacante para crear la postulación.'
+      });
+    }
+
+    const IdVacante = vacantes[0].IdVacante;
+
+    // Crear postulación nueva
+    const [result] = await pool.query(
+      `
+      INSERT INTO Postulacion
+      (IdCandidato, IdVacante, Estado, FechaPostulacion, UltimaActualizacion)
+      VALUES (?, ?, 'Registrado', CURDATE(), NOW())
+      `,
+      [IdCandidato, IdVacante]
+    );
+
+    const [nueva] = await pool.query(
+      `
+      SELECT 
+        IdPostulacion, 
+        IdCandidato, 
+        IdVacante, 
+        Estado, 
+        FechaPostulacion,
+        UltimaActualizacion
+      FROM Postulacion
+      WHERE IdPostulacion = ?
+      `,
+      [result.insertId]
+    );
+
+    return res.status(201).json({
+      message: 'Postulación creada',
+      postulacion: nueva[0]
+    });
+
+  } catch (err) {
+    console.error('Error creando o buscando postulación:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 });
 
