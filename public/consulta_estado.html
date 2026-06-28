@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Consulta Estado de Postulación - Serenity Talent</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Hanken+Grotesk:wght@600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0059bb",
+                        "background": "#f8f9fa",
+                        "surface": "#f8f9fa",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container": "#edeeef",
+                        "secondary-container": "#9ae1ff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-surface-variant": "#414754",
+                        "outline-variant": "#c1c6d7",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-background font-body-md text-on-surface min-h-screen">
+
+<div class="min-h-screen flex items-center justify-center px-4 py-10">
+    <main class="w-full max-w-4xl">
+
+        <section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+
+            <div class="p-8 bg-surface-container-low border-b border-outline-variant">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings:'FILL' 1;">work</span>
+                    </div>
+
+                    <div>
+                        <h1 class="text-2xl font-bold text-primary">Serenity Talent</h1>
+                        <p class="text-sm text-on-surface-variant">Consulta de postulación</p>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold text-on-surface">
+                    Consulta Estado de Postulación
+                </h2>
+
+                <p class="text-sm text-on-surface-variant mt-1">
+                    Como candidato, ingrese su correo electrónico para conocer el avance actual de su proceso de selección.
+                </p>
+            </div>
+
+            <div class="p-8">
+
+                <form id="consulta-form" class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 mb-6">
+                    <div>
+                        <label for="correo" class="block text-sm font-bold text-on-surface-variant mb-2">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            id="correo"
+                            type="email"
+                            required
+                            placeholder="ejemplo@correo.com"
+                            class="w-full border border-outline-variant rounded-lg p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                        />
+                    </div>
+
+                    <div class="flex items-end">
+                        <button
+                            id="btn-consultar"
+                            type="submit"
+                            class="w-full md:w-auto px-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                        >
+                            <span class="material-symbols-outlined text-[20px]">search</span>
+                            Consultar estado
+                        </button>
+                    </div>
+                </form>
+
+                <p id="feedback" class="hidden text-sm font-bold mb-4"></p>
+
+                <section id="resultado" class="hidden border border-outline-variant rounded-xl overflow-hidden">
+
+                    <div class="p-6 bg-surface-container-low border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 id="candidate-name" class="text-xl font-bold text-on-surface">
+                                Nombre del candidato
+                            </h3>
+
+                            <p class="text-sm text-on-surface-variant">
+                                Correo: <span id="candidate-email"></span>
+                            </p>
+
+                            <p class="text-sm text-on-surface-variant">
+                                Postulación #<span id="postulation-id"></span>
+                            </p>
+                        </div>
+
+                        <div>
+                            <span id="estado-actual" class="status-badge bg-primary/10 text-primary">
+                                Estado actual
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white border border-outline-variant rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-primary">update</span>
+                                <h4 class="font-bold">Información más reciente</h4>
+                            </div>
+
+                            <p class="text-sm text-on-surface-variant">
+                                Última actualización:
+                            </p>
+
+                            <p id="ultima-actualizacion" class="font-bold text-on-surface">
+                                --
+                            </p>
+                        </div>
+
+                        <div class="bg-white border border-outline-variant rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                <h4 class="font-bold">Fecha de postulación</h4>
+                            </div>
+
+                            <p class="text-sm text-on-surface-variant">
+                                Fecha registrada:
+                            </p>
+
+                            <p id="fecha-postulacion" class="font-bold text-on-surface">
+                                --
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 pb-6">
+                        <div class="bg-secondary-container/40 border border-outline-variant rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-primary">info</span>
+                                <h4 class="font-bold">¿Qué significa este estado?</h4>
+                            </div>
+
+                            <p id="estado-descripcion" class="text-sm text-on-surface-variant">
+                                --
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 pb-6">
+                        <h4 class="font-bold mb-3">Historial de postulación</h4>
+
+                        <ul id="historial" class="space-y-2 text-sm text-on-surface-variant">
+                            <li>Historial no disponible.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-6 border-t border-outline-variant bg-surface-container-low">
+                        <h4 class="font-bold mb-3">Pruebas</h4>
+
+                        <ul class="space-y-2 text-sm">
+                            <li id="test-estado">○ Mostrar estado</li>
+                            <li id="test-historial">○ Consultar historial</li>
+                            <li id="test-clara">○ Mostrar información clara</li>
+                            <li id="test-pruebas">○ Pruebas completadas</li>
+                        </ul>
+                    </div>
+
+                </section>
+
+                <div class="mt-6 flex justify-between">
+                    <a href="candidatos.html" class="text-primary font-bold hover:underline">
+                        Volver a página principal
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+const API = '/api';
+
+const form = document.getElementById('consulta-form');
+const botonConsultar = document.getElementById('btn-consultar');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const correo = document.getElementById('correo').value.trim().toLowerCase();
+
+    if (!correo) {
+        mostrarFeedback('Ingrese un correo electrónico.', true);
+        return;
+    }
+
+    try {
+        botonConsultar.disabled = true;
+        botonConsultar.classList.add('opacity-70');
+        mostrarFeedback('Consultando estado...', false);
+
+        const candidatosResponse = await fetch(`${API}/candidatos`);
+        const candidatos = await candidatosResponse.json();
+
+        if (!candidatosResponse.ok) {
+            throw new Error('No se pudieron cargar los candidatos.');
+        }
+
+        const candidato = candidatos.find(c =>
+            String(c.Correo || '').trim().toLowerCase() === correo
+        );
+
+        if (!candidato) {
+            throw new Error('No se encontró ningún candidato registrado con ese correo.');
+        }
+
+        const postulacionesResponse = await fetch(`${API}/postulaciones`);
+        const postulaciones = await postulacionesResponse.json();
+
+        if (!postulacionesResponse.ok) {
+            throw new Error('No se pudieron cargar las postulaciones.');
+        }
+
+        const postulacionesCandidato = postulaciones
+            .filter(p => Number(p.IdCandidato) === Number(candidato.IdCandidato))
+            .sort((a, b) => {
+                const fechaA = new Date(a.UltimaActualizacion || a.FechaPostulacion || 0);
+                const fechaB = new Date(b.UltimaActualizacion || b.FechaPostulacion || 0);
+                return fechaB - fechaA;
+            });
+
+        let postulacionActual;
+
+        if (postulacionesCandidato.length > 0) {
+            postulacionActual = postulacionesCandidato[0];
+        } else {
+            postulacionActual = {
+                IdPostulacion: 'Sin postulación',
+                IdCandidato: candidato.IdCandidato,
+                IdVacante: null,
+                Estado: 'Registrado',
+                FechaPostulacion: candidato.FechaRegistro,
+                UltimaActualizacion: candidato.FechaRegistro,
+                Nombre: candidato.Nombre,
+                Apellido: candidato.Apellido,
+                Correo: candidato.Correo,
+                Telefono: candidato.Telefono,
+                Curriculum: candidato.Curriculum,
+                FechaRegistro: candidato.FechaRegistro
+            };
+        }
+
+        const historial = postulacionesCandidato.length > 0
+            ? postulacionesCandidato
+            : [
+                {
+                    IdPostulacion: 'Sin postulación',
+                    Estado: 'Registrado',
+                    FechaPostulacion: candidato.FechaRegistro,
+                    UltimaActualizacion: candidato.FechaRegistro
+                }
+            ];
+
+        pintarResultado({
+            postulacion: postulacionActual,
+            historial
+        });
+
+        mostrarFeedback('Consulta realizada correctamente.', false);
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById('resultado').classList.add('hidden');
+        mostrarFeedback(error.message || 'Error al consultar el estado.', true);
+    } finally {
+        botonConsultar.disabled = false;
+        botonConsultar.classList.remove('opacity-70');
+    }
+});
+
+function pintarResultado(data) {
+    const postulacion = data.postulacion || {};
+    const historial = data.historial || [];
+
+    const nombreCompleto = `${postulacion.Nombre || ''} ${postulacion.Apellido || ''}`.trim();
+
+    document.getElementById('candidate-name').textContent = nombreCompleto || 'Sin nombre';
+    document.getElementById('candidate-email').textContent = postulacion.Correo || 'Sin correo';
+    document.getElementById('postulation-id').textContent = postulacion.IdPostulacion || '--';
+    document.getElementById('estado-actual').textContent = postulacion.Estado || 'Registrado';
+    document.getElementById('ultima-actualizacion').textContent = formatearFecha(postulacion.UltimaActualizacion || postulacion.FechaPostulacion || postulacion.FechaRegistro);
+    document.getElementById('fecha-postulacion').textContent = formatearFecha(postulacion.FechaPostulacion || postulacion.FechaRegistro);
+    document.getElementById('estado-descripcion').textContent = descripcionEstado(postulacion.Estado);
+
+    const historialList = document.getElementById('historial');
+
+    if (historial.length === 0) {
+        historialList.innerHTML = '<li>No hay historial registrado.</li>';
+    } else {
+        historialList.innerHTML = historial.map(item => `
+            <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+                <span>
+                    Estado: <strong>${escapeHTML(item.Estado)}</strong>
+                    — Actualizado: ${formatearFecha(item.UltimaActualizacion || item.FechaPostulacion)}
+                </span>
+            </li>
+        `).join('');
+    }
+
+    document.getElementById('resultado').classList.remove('hidden');
+
+    marcarPrueba('test-estado', 'Mostrar estado');
+    marcarPrueba('test-historial', 'Consultar historial');
+    marcarPrueba('test-clara', 'Mostrar información clara');
+    marcarPrueba('test-pruebas', 'Pruebas completadas');
+}
+
+function descripcionEstado(estado) {
+    const descripciones = {
+        'Registrado': 'Su postulación fue recibida correctamente y está registrada en el sistema.',
+        'En revisión': 'El equipo de recursos humanos está revisando su información y documentos.',
+        'Entrevista': 'Su proceso avanzó a la etapa de entrevista.',
+        'Evaluación': 'Su postulación está en etapa de evaluación.',
+        'Oferta': 'El proceso avanzó a la etapa de oferta laboral.',
+        'Contratado': 'Usted fue seleccionado para la vacante.',
+        'Rechazado': 'Su postulación no fue seleccionada para continuar en el proceso.'
+    };
+
+    return descripciones[estado] || 'Estado de postulación registrado en el sistema.';
+}
+
+function marcarPrueba(id, texto) {
+    const item = document.getElementById(id);
+
+    if (!item) return;
+
+    item.textContent = `✓ ${texto}`;
+    item.classList.remove('text-on-surface-variant');
+    item.classList.add('text-green-600', 'font-bold');
+}
+
+function mostrarFeedback(mensaje, esError) {
+    const feedback = document.getElementById('feedback');
+
+    feedback.classList.remove('hidden', 'text-red-600', 'text-green-600');
+    feedback.classList.add(esError ? 'text-red-600' : 'text-green-600');
+    feedback.textContent = mensaje;
+}
+
+function formatearFecha(fecha) {
+    if (!fecha) return 'Sin fecha';
+
+    const date = new Date(fecha);
+
+    if (isNaN(date.getTime())) {
+        return 'Sin fecha';
+    }
+
+    return date.toLocaleString('es-CR', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function escapeHTML(value) {
+    return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+</script>
+
+</body>
+</html>

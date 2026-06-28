@@ -4,53 +4,122 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Serenity Talent - Iniciar Sesión</title>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .login-card { box-shadow: 0px 4px 12px rgba(0, 89, 187, 0.1); }
+
+        .login-card {
+            box-shadow: 0px 4px 12px rgba(0, 89, 187, 0.1);
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+
         .animate-shake {
             animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
             animation-iteration-count: 2;
         }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+        }
     </style>
+
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "inverse-on-surface":"#f0f1f2","surface":"#f8f9fa","on-surface":"#191c1d",
-                        "inverse-primary":"#adc7ff","on-secondary-container":"#09657f","error":"#ba1a1a",
-                        "tertiary-container":"#c64f00","on-secondary":"#ffffff","primary-container":"#0070ea",
-                        "outline-variant":"#c1c6d7","surface-container":"#edeeef","secondary":"#0c6780",
-                        "surface-dim":"#d9dadb","primary":"#0059bb","on-tertiary-fixed-variant":"#7c2e00",
-                        "error-container":"#ffdad6","surface-container-lowest":"#ffffff","tertiary":"#9e3d00",
-                        "on-primary-fixed-variant":"#004493","on-tertiary-fixed":"#351000","on-primary-fixed":"#001a41",
-                        "on-error":"#ffffff","on-background":"#191c1d","on-tertiary-container":"#fffbff",
-                        "on-primary":"#ffffff","surface-bright":"#f8f9fa","surface-container-highest":"#e1e3e4",
-                        "inverse-surface":"#2e3132","background":"#f8f9fa","primary-fixed-dim":"#adc7ff",
-                        "outline":"#717786","surface-tint":"#005bc0","on-tertiary":"#ffffff",
-                        "tertiary-fixed-dim":"#ffb695","secondary-container":"#9ae1ff","surface-container-low":"#f3f4f5",
-                        "surface-container-high":"#e7e8e9","tertiary-fixed":"#ffdbcc","on-primary-container":"#fefcff",
-                        "surface-variant":"#e1e3e4","on-secondary-fixed-variant":"#004d62","on-secondary-fixed":"#001f29",
-                        "secondary-fixed":"#baeaff","primary-fixed":"#d8e2ff","on-error-container":"#93000a",
-                        "secondary-fixed-dim":"#89d0ed","on-surface-variant":"#414754"
+                        "inverse-on-surface":"#f0f1f2",
+                        "surface":"#f8f9fa",
+                        "on-surface":"#191c1d",
+                        "inverse-primary":"#adc7ff",
+                        "on-secondary-container":"#09657f",
+                        "error":"#ba1a1a",
+                        "tertiary-container":"#c64f00",
+                        "on-secondary":"#ffffff",
+                        "primary-container":"#0070ea",
+                        "outline-variant":"#c1c6d7",
+                        "surface-container":"#edeeef",
+                        "secondary":"#0c6780",
+                        "surface-dim":"#d9dadb",
+                        "primary":"#0059bb",
+                        "on-tertiary-fixed-variant":"#7c2e00",
+                        "error-container":"#ffdad6",
+                        "surface-container-lowest":"#ffffff",
+                        "tertiary":"#9e3d00",
+                        "on-primary-fixed-variant":"#004493",
+                        "on-tertiary-fixed":"#351000",
+                        "on-primary-fixed":"#001a41",
+                        "on-error":"#ffffff",
+                        "on-background":"#191c1d",
+                        "on-tertiary-container":"#fffbff",
+                        "on-primary":"#ffffff",
+                        "surface-bright":"#f8f9fa",
+                        "surface-container-highest":"#e1e3e4",
+                        "inverse-surface":"#2e3132",
+                        "background":"#f8f9fa",
+                        "primary-fixed-dim":"#adc7ff",
+                        "outline":"#717786",
+                        "surface-tint":"#005bc0",
+                        "on-tertiary":"#ffffff",
+                        "tertiary-fixed-dim":"#ffb695",
+                        "secondary-container":"#9ae1ff",
+                        "surface-container-low":"#f3f4f5",
+                        "surface-container-high":"#e7e8e9",
+                        "tertiary-fixed":"#ffdbcc",
+                        "on-primary-container":"#fefcff",
+                        "surface-variant":"#e1e3e4",
+                        "on-secondary-fixed-variant":"#004d62",
+                        "on-secondary-fixed":"#001f29",
+                        "secondary-fixed":"#baeaff",
+                        "primary-fixed":"#d8e2ff",
+                        "on-error-container":"#93000a",
+                        "secondary-fixed-dim":"#89d0ed",
+                        "on-surface-variant":"#414754"
                     },
-                    borderRadius: { DEFAULT:"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem" },
-                    spacing: { "container-max":"1440px","md":"16px","xl":"40px","lg":"24px","xs":"4px","sm":"8px","base":"4px","gutter":"16px" },
+                    borderRadius: {
+                        DEFAULT:"0.125rem",
+                        "lg":"0.25rem",
+                        "xl":"0.5rem",
+                        "full":"0.75rem"
+                    },
+                    spacing: {
+                        "container-max":"1440px",
+                        "md":"16px",
+                        "xl":"40px",
+                        "lg":"24px",
+                        "xs":"4px",
+                        "sm":"8px",
+                        "base":"4px",
+                        "gutter":"16px"
+                    },
                     fontFamily: {
-                        "headline-md":["Hanken Grotesk"],"body-md":["Inter"],"body-lg":["Inter"],
-                        "body-sm":["Inter"],"label-caps":["Inter"],"headline-sm":["Hanken Grotesk"],
-                        "data-mono":["JetBrains Mono"],"display-lg":["Hanken Grotesk"]
+                        "headline-md":["Hanken Grotesk"],
+                        "body-md":["Inter"],
+                        "body-lg":["Inter"],
+                        "body-sm":["Inter"],
+                        "label-caps":["Inter"],
+                        "headline-sm":["Hanken Grotesk"],
+                        "data-mono":["JetBrains Mono"],
+                        "display-lg":["Hanken Grotesk"]
                     },
                     fontSize: {
                         "headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],
@@ -70,56 +139,178 @@
 
 <body class="bg-surface font-body-md text-on-surface overflow-hidden min-h-screen flex items-center justify-center p-md">
 
-    <!-- Fondo decorativo -->
     <div class="fixed inset-0 pointer-events-none opacity-40">
         <div class="absolute top-[-10%] right-[-5%] w-[40%] h-[50%] bg-primary-container blur-[120px] rounded-full opacity-20"></div>
         <div class="absolute bottom-[-10%] left-[-5%] w-[30%] h-[40%] bg-secondary-container blur-[100px] rounded-full opacity-20"></div>
     </div>
+
     <div class="fixed inset-0 -z-10 pointer-events-none opacity-[0.03]"
-        style="background-image: radial-gradient(#0059bb 1px, transparent 1px); background-size: 32px 32px;"></div>
+        style="background-image: radial-gradient(#0059bb 1px, transparent 1px); background-size: 32px 32px;">
+    </div>
 
     <!-- Modal Registro -->
     <div id="registerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-md">
         <div class="absolute inset-0 bg-black/40" onclick="closeRegister()"></div>
+
         <div class="login-card relative bg-surface-container-lowest border border-outline-variant rounded-xl p-xl w-full max-w-md">
             <button class="absolute right-3 top-3 material-symbols-outlined text-outline" onclick="closeRegister()" aria-label="Cerrar">close</button>
+
             <div class="flex flex-col items-center gap-sm text-center mb-sm">
                 <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-sm">
                     <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings:'FILL' 1;">person_add</span>
                 </div>
+
                 <h2 class="font-headline-sm text-headline-sm text-on-surface">Crear cuenta</h2>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Regístrate para acceder a Serenity Talent</p>
             </div>
-            <!-- Mensaje error registro -->
+
             <div id="regError" class="hidden flex items-center gap-sm p-sm bg-error-container text-on-error-container rounded border border-error/20 mb-md">
                 <span class="material-symbols-outlined text-sm">report</span>
                 <span id="regErrorText" class="font-body-sm text-body-sm"></span>
             </div>
+
             <div class="flex flex-col gap-md">
                 <div class="flex flex-col gap-xs">
                     <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regName">Nombre</label>
                     <input id="regName" type="text" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="Tu nombre completo">
                 </div>
+
                 <div class="flex flex-col gap-xs">
                     <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regEmail">Correo</label>
                     <input id="regEmail" type="email" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="correo@ejemplo.com">
                 </div>
+
                 <div class="flex flex-col gap-xs">
                     <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regUser">Usuario</label>
                     <input id="regUser" type="text" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="usuario">
                 </div>
+
                 <div class="flex flex-col gap-xs">
                     <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regPassword">Contraseña</label>
                     <input id="regPassword" type="password" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="••••••••">
                 </div>
+
                 <div class="flex items-center justify-end gap-sm">
                     <button type="button" class="py-2 px-4 rounded text-on-surface-variant hover:bg-surface-container transition-all" onclick="closeRegister()">Cancelar</button>
+
                     <button id="regSubmit" onclick="handleRegister()" class="py-2 px-4 bg-primary text-on-primary rounded font-bold hover:bg-primary-container transition-all flex items-center gap-sm">
                         Registrarse
                         <span id="regLoader" class="hidden material-symbols-outlined text-sm animate-spin">progress_activity</span>
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Consulta Estado -->
+    <div id="consultModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-md">
+        <div class="absolute inset-0 bg-black/40" onclick="closeConsult()"></div>
+
+        <div class="login-card relative bg-surface-container-lowest border border-outline-variant rounded-xl p-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <button class="absolute right-3 top-3 material-symbols-outlined text-outline" onclick="closeConsult()" aria-label="Cerrar">close</button>
+
+            <div class="flex items-center gap-3 mb-md">
+                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings:'FILL' 1;">work</span>
+                </div>
+
+                <div>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface">Consulta Estado de Postulación</h2>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">
+                        Ingrese su correo para consultar el avance de su proceso.
+                    </p>
+                </div>
+            </div>
+
+            <form id="consultaForm" class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-md mb-md">
+                <div>
+                    <label for="consultaCorreo" class="block font-body-sm text-body-sm font-bold text-on-surface-variant mb-2">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        id="consultaCorreo"
+                        type="email"
+                        required
+                        class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all"
+                        placeholder="correo@ejemplo.com"
+                    >
+                </div>
+
+                <div class="flex items-end">
+                    <button id="consultaBtn" type="submit" class="w-full md:w-auto py-3 px-5 bg-primary text-on-primary rounded font-bold hover:bg-primary-container transition-all flex items-center justify-center gap-sm">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                        Consultar
+                    </button>
+                </div>
+            </form>
+
+            <p id="consultaFeedback" class="hidden text-sm font-bold mb-md"></p>
+
+            <section id="consultaResultado" class="hidden border border-outline-variant rounded-xl overflow-hidden">
+                <div class="p-md bg-surface-container-low border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-md">
+                    <div>
+                        <h3 id="consultaNombre" class="text-xl font-bold text-on-surface">Nombre del candidato</h3>
+                        <p class="text-sm text-on-surface-variant">Correo: <span id="consultaEmail"></span></p>
+                        <p class="text-sm text-on-surface-variant">Postulación #<span id="consultaPostulacion"></span></p>
+                    </div>
+
+                    <span id="consultaEstado" class="status-badge bg-primary/10 text-primary">
+                        Estado actual
+                    </span>
+                </div>
+
+                <div class="p-md grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="bg-white border border-outline-variant rounded-lg p-md">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary">update</span>
+                            <h4 class="font-bold">Información más reciente</h4>
+                        </div>
+
+                        <p class="text-sm text-on-surface-variant">Última actualización:</p>
+                        <p id="consultaUltima" class="font-bold text-on-surface">--</p>
+                    </div>
+
+                    <div class="bg-white border border-outline-variant rounded-lg p-md">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary">calendar_today</span>
+                            <h4 class="font-bold">Fecha de postulación</h4>
+                        </div>
+
+                        <p class="text-sm text-on-surface-variant">Fecha registrada:</p>
+                        <p id="consultaFecha" class="font-bold text-on-surface">--</p>
+                    </div>
+                </div>
+
+                <div class="px-md pb-md">
+                    <div class="bg-secondary-container/40 border border-outline-variant rounded-lg p-md">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary">info</span>
+                            <h4 class="font-bold">¿Qué significa este estado?</h4>
+                        </div>
+
+                        <p id="consultaDescripcion" class="text-sm text-on-surface-variant">--</p>
+                    </div>
+                </div>
+
+                <div class="px-md pb-md">
+                    <h4 class="font-bold mb-3">Historial de postulación</h4>
+                    <ul id="consultaHistorial" class="space-y-2 text-sm text-on-surface-variant">
+                        <li>Historial no disponible.</li>
+                    </ul>
+                </div>
+
+                <div class="p-md border-t border-outline-variant bg-surface-container-low">
+                    <h4 class="font-bold mb-3">Pruebas de la HU-04</h4>
+
+                    <ul class="space-y-2 text-sm">
+                        <li id="testEstado">○ Mostrar estado</li>
+                        <li id="testHistorial">○ Consultar historial</li>
+                        <li id="testClara">○ Mostrar información clara</li>
+                        <li id="testPruebas">○ Pruebas completadas</li>
+                    </ul>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -130,12 +321,12 @@
                 <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-sm">
                     <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings:'FILL' 1;">work</span>
                 </div>
+
                 <h1 class="font-headline-md text-headline-md text-on-surface">Serenity Talent</h1>
                 <p class="font-body-md text-body-md text-on-surface-variant">La mejor forma de reclutar</p>
             </div>
 
             <div class="flex flex-col gap-md">
-                <!-- Error login -->
                 <div class="hidden flex items-center gap-sm p-sm bg-error-container text-on-error-container rounded border border-error/20" id="errorMessage">
                     <span class="material-symbols-outlined text-sm">report</span>
                     <span id="errorText" class="font-body-sm text-body-sm">Credenciales inválidas. Por favor, intente de nuevo.</span>
@@ -143,10 +334,16 @@
 
                 <div class="flex flex-col gap-xs">
                     <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="username">Usuario o Correo electrónico</label>
+
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">person</span>
-                        <input class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
-                            id="username" placeholder="recruiter@serenitytalent.com" type="text" />
+
+                        <input
+                            class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
+                            id="username"
+                            placeholder="recruiter@serenitytalent.com"
+                            type="text"
+                        />
                     </div>
                 </div>
 
@@ -155,12 +352,23 @@
                         <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="password">Contraseña</label>
                         <a class="font-body-sm text-body-sm text-primary hover:underline transition-all" href="#">¿Olvidaste tu contraseña?</a>
                     </div>
+
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">lock</span>
-                        <input class="w-full pl-10 pr-10 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
-                            id="password" placeholder="••••••••" type="password" />
-                        <button class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline hover:text-primary transition-colors text-lg"
-                            id="togglePwdBtn" onclick="togglePassword()" type="button">visibility</button>
+
+                        <input
+                            class="w-full pl-10 pr-10 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none font-body-md"
+                            id="password"
+                            placeholder="••••••••"
+                            type="password"
+                        />
+
+                        <button
+                            class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline hover:text-primary transition-colors text-lg"
+                            id="togglePwdBtn"
+                            onclick="togglePassword()"
+                            type="button"
+                        >visibility</button>
                     </div>
                 </div>
 
@@ -169,9 +377,12 @@
                     <label class="font-body-md text-body-md text-on-surface-variant cursor-pointer select-none" for="remember">Recordar este dispositivo</label>
                 </div>
 
-                <button onclick="handleLogin()"
+                <button
+                    onclick="handleLogin()"
                     class="w-full mt-sm py-3 bg-primary text-on-primary font-bold rounded hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center gap-sm"
-                    id="submitBtn" type="button">
+                    id="submitBtn"
+                    type="button"
+                >
                     <span>Iniciar Sesión</span>
                     <span class="hidden animate-spin material-symbols-outlined text-lg" id="loader">progress_activity</span>
                 </button>
@@ -183,6 +394,16 @@
                     <button class="text-primary font-bold hover:underline ml-1" type="button" onclick="openRegister()">Crear cuenta</button>
                 </p>
             </div>
+
+            <div class="text-center">
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    ¿Ya te postulaste?
+                    <button class="text-primary font-bold hover:underline ml-1" type="button" onclick="openConsult()">
+                        Consultar estado
+                    </button>
+                </p>
+            </div>
+
             <div class="border-t border-outline-variant pt-lg text-center">
                 <p class="font-body-sm text-body-sm text-on-surface-variant">
                     Solo para uso interno. ¿Necesitas ayuda?
@@ -190,6 +411,7 @@
                 </p>
             </div>
         </div>
+
         <div class="mt-xl text-center flex flex-col gap-xs">
             <p class="font-label-caps text-label-caps text-outline uppercase">Serenity Talent recruitment suite v4.2.0</p>
             <p class="font-body-sm text-body-sm text-on-surface-variant/60">© 2024 Serenity Talent Corp. Todos los derechos reservados.</p>
@@ -197,12 +419,12 @@
     </main>
 
     <script>
-        const API = 'http://localhost:3000/api';
+        const API = '/api';
 
-        // ── Toggle contraseña ──────────────────────────────────
         function togglePassword() {
             const pwd = document.getElementById('password');
             const btn = document.getElementById('togglePwdBtn');
+
             if (pwd.type === 'password') {
                 pwd.type = 'text';
                 btn.textContent = 'visibility_off';
@@ -212,7 +434,6 @@
             }
         }
 
-        // ── Modal registro ─────────────────────────────────────
         function openRegister() {
             document.getElementById('registerModal').classList.remove('hidden');
             document.getElementById('regError').classList.add('hidden');
@@ -221,11 +442,27 @@
             document.getElementById('regUser').value = '';
             document.getElementById('regPassword').value = '';
         }
+
         function closeRegister() {
             document.getElementById('registerModal').classList.add('hidden');
         }
 
-        // ── Login ──────────────────────────────────────────────
+        function openConsult() {
+            document.getElementById('consultModal').classList.remove('hidden');
+            document.getElementById('consultaFeedback').classList.add('hidden');
+            document.getElementById('consultaResultado').classList.add('hidden');
+            document.getElementById('consultaCorreo').value = '';
+
+            resetPruebaConsulta('testEstado', 'Mostrar estado');
+            resetPruebaConsulta('testHistorial', 'Consultar historial');
+            resetPruebaConsulta('testClara', 'Mostrar información clara');
+            resetPruebaConsulta('testPruebas', 'Pruebas completadas');
+        }
+
+        function closeConsult() {
+            document.getElementById('consultModal').classList.add('hidden');
+        }
+
         async function handleLogin() {
             const btn = document.getElementById('submitBtn');
             const loader = document.getElementById('loader');
@@ -252,6 +489,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ identifier, Contrasena })
                 });
+
                 const data = await res.json();
 
                 if (res.ok && data.token) {
@@ -261,10 +499,12 @@
                 } else {
                     errorText.textContent = data.error || 'Credenciales inválidas.';
                     errorMsg.classList.remove('hidden');
+
                     const card = document.querySelector('.login-card');
                     card.classList.add('animate-shake');
                     setTimeout(() => card.classList.remove('animate-shake'), 500);
                 }
+
             } catch (err) {
                 errorText.textContent = 'No se pudo conectar con el servidor.';
                 errorMsg.classList.remove('hidden');
@@ -275,7 +515,6 @@
             }
         }
 
-        // ── Registro ───────────────────────────────────────────
         async function handleRegister() {
             const btn = document.getElementById('regSubmit');
             const loader = document.getElementById('regLoader');
@@ -303,20 +542,22 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ Nombre, Correo, IJsuario, Contrasena })
                 });
+
                 const data = await res.json();
 
                 if (res.ok && data.token) {
-                    // Auto-llenar usuario y cerrar modal
                     document.getElementById('username').value = IJsuario;
                     document.getElementById('password').value = '';
                     closeRegister();
-                    // Mostrar éxito breve
+
                     const errorMsg = document.getElementById('errorMessage');
                     const errorTxt = document.getElementById('errorText');
+
                     errorMsg.classList.remove('hidden');
                     errorMsg.classList.remove('bg-error-container', 'text-on-error-container', 'border-error/20');
                     errorMsg.classList.add('bg-green-50', 'text-green-800', 'border-green-200');
                     errorTxt.textContent = '¡Cuenta creada! Ingresa tu contraseña para continuar.';
+
                     setTimeout(() => {
                         errorMsg.classList.add('hidden');
                         errorMsg.classList.add('bg-error-container', 'text-on-error-container', 'border-error/20');
@@ -326,6 +567,7 @@
                     errorText.textContent = data.error || 'Error en el registro.';
                     errorDiv.classList.remove('hidden');
                 }
+
             } catch (err) {
                 errorText.textContent = 'No se pudo conectar con el servidor.';
                 errorDiv.classList.remove('hidden');
@@ -335,9 +577,214 @@
             }
         }
 
-        // Enter en campos de login
+        document.getElementById('consultaForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const correo = document.getElementById('consultaCorreo').value.trim().toLowerCase();
+            const btn = document.getElementById('consultaBtn');
+
+            if (!correo) {
+                mostrarConsultaFeedback('Ingrese un correo electrónico.', true);
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.classList.add('opacity-70');
+                mostrarConsultaFeedback('Consultando estado...', false);
+
+                const candidatosResponse = await fetch(`${API}/candidatos`);
+                const candidatos = await candidatosResponse.json();
+
+                if (!candidatosResponse.ok) {
+                    throw new Error('No se pudieron cargar los candidatos.');
+                }
+
+                const candidato = candidatos.find(c =>
+                    String(c.Correo || '').trim().toLowerCase() === correo
+                );
+
+                if (!candidato) {
+                    throw new Error('No se encontró ningún candidato registrado con ese correo.');
+                }
+
+                const postulacionesResponse = await fetch(`${API}/postulaciones`);
+                const postulaciones = await postulacionesResponse.json();
+
+                if (!postulacionesResponse.ok) {
+                    throw new Error('No se pudieron cargar las postulaciones.');
+                }
+
+                const postulacionesCandidato = postulaciones
+                    .filter(p => Number(p.IdCandidato) === Number(candidato.IdCandidato))
+                    .sort((a, b) => {
+                        const fechaA = new Date(a.UltimaActualizacion || a.FechaPostulacion || 0);
+                        const fechaB = new Date(b.UltimaActualizacion || b.FechaPostulacion || 0);
+                        return fechaB - fechaA;
+                    });
+
+                let postulacionActual;
+
+                if (postulacionesCandidato.length > 0) {
+                    postulacionActual = postulacionesCandidato[0];
+                } else {
+                    postulacionActual = {
+                        IdPostulacion: 'Sin postulación',
+                        IdCandidato: candidato.IdCandidato,
+                        IdVacante: null,
+                        Estado: 'Registrado',
+                        FechaPostulacion: candidato.FechaRegistro,
+                        UltimaActualizacion: candidato.FechaRegistro,
+                        Nombre: candidato.Nombre,
+                        Apellido: candidato.Apellido,
+                        Correo: candidato.Correo,
+                        Telefono: candidato.Telefono,
+                        Curriculum: candidato.Curriculum,
+                        FechaRegistro: candidato.FechaRegistro
+                    };
+                }
+
+                const historial = postulacionesCandidato.length > 0
+                    ? postulacionesCandidato
+                    : [
+                        {
+                            IdPostulacion: 'Sin postulación',
+                            Estado: 'Registrado',
+                            FechaPostulacion: candidato.FechaRegistro,
+                            UltimaActualizacion: candidato.FechaRegistro
+                        }
+                    ];
+
+                pintarConsulta({
+                    postulacion: postulacionActual,
+                    historial
+                });
+
+                mostrarConsultaFeedback('Consulta realizada correctamente.', false);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('consultaResultado').classList.add('hidden');
+                mostrarConsultaFeedback(error.message || 'Error al consultar el estado.', true);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+            }
+        });
+
+        function pintarConsulta(data) {
+            const postulacion = data.postulacion || {};
+            const historial = data.historial || [];
+
+            const nombreCompleto = `${postulacion.Nombre || ''} ${postulacion.Apellido || ''}`.trim();
+
+            document.getElementById('consultaNombre').textContent = nombreCompleto || 'Sin nombre';
+            document.getElementById('consultaEmail').textContent = postulacion.Correo || 'Sin correo';
+            document.getElementById('consultaPostulacion').textContent = postulacion.IdPostulacion || '--';
+            document.getElementById('consultaEstado').textContent = postulacion.Estado || 'Registrado';
+            document.getElementById('consultaUltima').textContent = formatearFecha(postulacion.UltimaActualizacion || postulacion.FechaPostulacion);
+            document.getElementById('consultaFecha').textContent = formatearFecha(postulacion.FechaPostulacion || postulacion.FechaRegistro);
+            document.getElementById('consultaDescripcion').textContent = descripcionEstado(postulacion.Estado);
+
+            const historialList = document.getElementById('consultaHistorial');
+
+            if (historial.length === 0) {
+                historialList.innerHTML = '<li>No hay historial registrado.</li>';
+            } else {
+                historialList.innerHTML = historial.map(item => `
+                    <li class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+                        <span>
+                            Estado: <strong>${escapeHTML(item.Estado)}</strong>
+                            — Actualizado: ${formatearFecha(item.UltimaActualizacion || item.FechaPostulacion)}
+                        </span>
+                    </li>
+                `).join('');
+            }
+
+            document.getElementById('consultaResultado').classList.remove('hidden');
+
+            marcarPruebaConsulta('testEstado', 'Mostrar estado');
+            marcarPruebaConsulta('testHistorial', 'Consultar historial');
+            marcarPruebaConsulta('testClara', 'Mostrar información clara');
+            marcarPruebaConsulta('testPruebas', 'Pruebas completadas');
+        }
+
+        function descripcionEstado(estado) {
+            const descripciones = {
+                'Registrado': 'Su postulación fue recibida correctamente y está registrada en el sistema.',
+                'En revisión': 'El equipo de recursos humanos está revisando su información y documentos.',
+                'Entrevista': 'Su proceso avanzó a la etapa de entrevista.',
+                'Evaluación': 'Su postulación está en etapa de evaluación.',
+                'Oferta': 'El proceso avanzó a la etapa de oferta laboral.',
+                'Contratado': 'Usted fue seleccionado para la vacante.',
+                'Rechazado': 'Su postulación no fue seleccionada para continuar en el proceso.'
+            };
+
+            return descripciones[estado] || 'Estado de postulación registrado en el sistema.';
+        }
+
+        function marcarPruebaConsulta(id, texto) {
+            const item = document.getElementById(id);
+
+            if (!item) return;
+
+            item.textContent = `✓ ${texto}`;
+            item.classList.remove('text-on-surface-variant');
+            item.classList.add('text-green-600', 'font-bold');
+        }
+
+        function resetPruebaConsulta(id, texto) {
+            const item = document.getElementById(id);
+
+            if (!item) return;
+
+            item.textContent = `○ ${texto}`;
+            item.classList.remove('text-green-600', 'font-bold');
+        }
+
+        function mostrarConsultaFeedback(mensaje, esError) {
+            const feedback = document.getElementById('consultaFeedback');
+
+            feedback.classList.remove('hidden', 'text-red-600', 'text-green-600');
+            feedback.classList.add(esError ? 'text-red-600' : 'text-green-600');
+            feedback.textContent = mensaje;
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return 'Sin fecha';
+
+            const date = new Date(fecha);
+
+            if (isNaN(date.getTime())) {
+                return 'Sin fecha';
+            }
+
+            return date.toLocaleString('es-CR', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHTML(value) {
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
+                if (!document.getElementById('consultModal').classList.contains('hidden')) {
+                    document.getElementById('consultaForm').requestSubmit();
+                    return;
+                }
+
                 if (!document.getElementById('registerModal').classList.contains('hidden')) {
                     handleRegister();
                 } else {
@@ -346,5 +793,6 @@
             }
         });
     </script>
+
 </body>
 </html>
