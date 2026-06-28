@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Serenity Talent - Seguimiento de Candidato</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;600;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #DEE2E6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #717786; }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "on-secondary-container": "#09657f",
+                        "error": "#ba1a1a",
+                        "primary-container": "#0070ea",
+                        "outline-variant": "#c1c6d7",
+                        "surface-container": "#edeeef",
+                        "secondary": "#0c6780",
+                        "primary": "#0059bb",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "background": "#f8f9fa",
+                        "outline": "#717786",
+                        "secondary-container": "#9ae1ff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary-container": "#fefcff",
+                        "on-surface-variant": "#414754"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-background font-body-md text-on-surface flex min-h-screen">
+
+<aside class="fixed left-0 h-screen w-[280px] bg-surface border-r border-outline-variant flex-col py-lg px-md z-30 hidden md:flex">
+    <div class="mb-xl px-sm">
+        <h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+        <p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
+    </div>
+
+    <nav class="flex-1 flex flex-col gap-1">
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg" href="index.html">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Panel de Control</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="candidatos.html">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+            <span class="font-bold">Candidatos</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg" href="#">
+            <span class="material-symbols-outlined">work</span>
+            <span>Vacantes</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg" href="#">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span>Entrevistas</span>
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 md:ml-[280px] min-h-screen flex flex-col">
+
+    <header class="bg-surface-container-lowest sticky top-0 w-full h-16 border-b border-outline-variant flex items-center justify-between px-lg z-20">
+        <div class="flex items-center gap-md">
+            <a href="candidatos.html" class="flex items-center gap-2 text-primary font-bold hover:underline">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Volver a candidatos
+            </a>
+        </div>
+
+        <div class="flex items-center gap-lg">
+            <button class="text-on-surface-variant hover:text-primary">
+                <span class="material-symbols-outlined">notifications</span>
+            </button>
+
+            <div class="flex items-center gap-sm">
+                <span class="text-body-md font-bold hidden lg:block">Perfil</span>
+                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+                    P
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="loading" class="p-xl text-center text-on-surface-variant">
+        Cargando información del candidato...
+    </div>
+
+    <div id="contenido" class="hidden p-lg md:p-xl max-w-container-max mx-auto w-full">
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-lg">
+            <nav class="flex items-center text-on-surface-variant gap-xs">
+                <a class="hover:text-primary text-body-sm" href="candidatos.html">Candidatos</a>
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                <span id="breadcrumbNombre" class="text-body-sm font-bold text-on-surface">Candidato</span>
+            </nav>
+
+            <div class="flex items-center gap-md">
+                <button id="btnCorreo" class="flex items-center gap-2 border border-outline px-4 py-2 rounded-lg text-primary hover:bg-surface-container-high">
+                    <span class="material-symbols-outlined">mail</span>
+                    Enviar Correo
+                </button>
+
+                <button id="btnActualizarEstado" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:opacity-90">
+                    Actualizar Estado
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col md:flex-row gap-lg mb-lg">
+            <div id="avatarIniciales" class="w-24 h-24 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-3xl font-bold border-2 border-primary-container shrink-0">
+                --
+            </div>
+
+            <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-md mb-2">
+                    <h2 id="nombreCompleto" class="font-headline-md text-headline-md">Nombre candidato</h2>
+                    <span id="estadoBadge" class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-label-caps font-bold uppercase">
+                        Registrado
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-md text-on-surface-variant">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">work_outline</span>
+                        <span id="puestoTexto" class="text-body-md">Sin vacante asignada</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">location_on</span>
+                        <span id="ubicacionTexto" class="text-body-md">Ubicación no registrada</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+                        <span id="salarioTexto" class="text-body-md">No indicado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg mb-lg">
+            <h3 class="font-label-caps text-label-caps text-outline mb-lg uppercase">Progreso del Proceso</h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-md" id="progresoProceso"></div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+
+            <div class="lg:col-span-8 flex flex-col gap-lg">
+
+                <section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+                    <div class="bg-surface-container-low px-lg py-3 border-b border-outline-variant">
+                        <h3 class="font-headline-sm text-headline-sm">Información del Candidato</h3>
+                    </div>
+
+                    <div class="p-lg grid grid-cols-1 md:grid-cols-2 gap-lg">
+
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-md">
+                                <div class="p-2 bg-primary-container text-on-primary rounded-lg shrink-0">
+                                    <span class="material-symbols-outlined">badge</span>
+                                </div>
+                                <div>
+                                    <p class="text-label-caps text-outline uppercase">ID Candidato</p>
+                                    <p id="idCandidatoTexto" class="text-body-lg font-bold">--</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-md">
+                                <div class="p-2 bg-secondary-container text-on-secondary-container rounded-lg shrink-0">
+                                    <span class="material-symbols-outlined">alternate_email</span>
+                                </div>
+                                <div>
+                                    <p class="text-label-caps text-outline uppercase">Correo</p>
+                                    <p id="correoTexto" class="text-body-lg font-bold break-all">No registrado</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-md">
+                                <div class="p-2 bg-surface-container-high text-on-surface rounded-lg shrink-0">
+                                    <span class="material-symbols-outlined">call</span>
+                                </div>
+                                <div>
+                                    <p class="text-label-caps text-outline uppercase">Teléfono</p>
+                                    <p id="telefonoTexto" class="text-body-lg font-bold">No registrado</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-md">
+                                <div class="p-2 bg-surface-container-high text-on-surface rounded-lg shrink-0">
+                                    <span class="material-symbols-outlined">event</span>
+                                </div>
+                                <div>
+                                    <p class="text-label-caps text-outline uppercase">Fecha de Registro</p>
+                                    <p id="fechaTexto" class="text-body-lg font-bold">Sin fecha</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+                    <div class="bg-surface-container-low px-lg py-3 border-b border-outline-variant">
+                        <h3 class="font-headline-sm text-headline-sm">Seguimiento</h3>
+                    </div>
+
+                    <div class="p-lg space-y-lg">
+                        <div class="p-md bg-surface-container-low rounded-lg border border-outline-variant">
+                            <p id="resumenTexto" class="text-body-md text-on-surface-variant leading-relaxed">
+                                Información de seguimiento del candidato.
+                            </p>
+                        </div>
+
+                        <button class="w-full py-3 border-2 border-dashed border-outline-variant text-outline hover:border-primary hover:text-primary rounded-lg flex items-center justify-center gap-2 font-bold">
+                            <span class="material-symbols-outlined">add_comment</span>
+                            Añadir nueva evaluación
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="lg:col-span-4 flex flex-col gap-lg">
+
+                <section class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+                    <h3 class="font-headline-sm text-headline-sm mb-lg">Documentos</h3>
+
+                    <div class="space-y-md">
+                        <div class="group flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:border-primary cursor-pointer">
+                            <div class="flex items-center gap-md">
+                                <div class="w-10 h-10 bg-error-container text-error rounded flex items-center justify-center">
+                                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                                </div>
+                                <div>
+                                    <p id="cvTexto" class="text-body-md font-bold group-hover:text-primary">CV no registrado</p>
+                                    <p class="text-body-sm text-outline">Documento del candidato</p>
+                                </div>
+                            </div>
+
+                            <button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg space-y-md">
+                    <h3 class="font-headline-sm text-headline-sm">Información Rápida</h3>
+
+                    <div class="space-y-lg">
+                        <div>
+                            <p class="text-label-caps text-outline uppercase mb-2">Contacto</p>
+
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 text-body-md">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">alternate_email</span>
+                                    <span id="correoRapido" class="break-all">No registrado</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 text-body-md">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">call</span>
+                                    <span id="telefonoRapido">No registrado</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-label-caps text-outline uppercase mb-2">Habilidades Clave</p>
+
+                            <div id="habilidadesTexto" class="flex flex-wrap gap-2">
+                                <span class="bg-surface-container-high text-on-surface px-2 py-1 rounded text-body-sm">No registradas</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-md border-t border-outline-variant">
+                            <div class="flex justify-between items-center text-body-sm">
+                                <span class="text-outline">Estado:</span>
+                                <span id="estadoRapido" class="font-bold">Registrado</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-body-sm mt-1">
+                                <span class="text-outline">Fecha:</span>
+                                <span id="fechaRapida" class="font-bold">Sin fecha</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="errorBox" class="hidden p-xl text-center">
+        <h2 class="text-headline-md font-bold text-error mb-2">No se pudo cargar el candidato</h2>
+        <p class="text-on-surface-variant mb-4">Verifica que el enlace tenga un ID válido.</p>
+        <a href="candidatos.html" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold">
+            Volver a candidatos
+        </a>
+    </div>
+
+    <footer class="mt-auto p-lg text-center text-outline text-body-sm">
+        © 2026 Serenity Talent Recruitment Suite.
+    </footer>
+
+</main>
+
+<script>
+    const API = '/api';
+
+    const params = new URLSearchParams(window.location.search);
+    const idCandidato = params.get('id');
+
+    function escapeHTML(value) {
+        return String(value || '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'Sin fecha';
+
+        const date = new Date(dateString);
+
+        if (isNaN(date.getTime())) {
+            return 'Sin fecha';
+        }
+
+        return date.toLocaleDateString('es-CR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+
+    function getInitials(candidato) {
+        return [candidato.Nombre, candidato.Apellido]
+            .filter(Boolean)
+            .map(nombre => nombre.trim()[0])
+            .join('')
+            .toUpperCase();
+    }
+
+    function getEstado(candidato) {
+        return candidato.Estado || candidato.EstadoPostulacion || candidato.estado || 'Registrado';
+    }
+
+    function getBadgeClass(estado) {
+        const lower = String(estado).toLowerCase();
+
+        if (lower.includes('rechaz') || lower.includes('descart')) {
+            return 'bg-error-container text-error';
+        }
+
+        if (lower.includes('entrevista')) {
+            return 'bg-secondary-container text-on-secondary-container';
+        }
+
+        if (lower.includes('oferta') || lower.includes('acept')) {
+            return 'bg-primary-container text-on-primary-container';
+        }
+
+        return 'bg-surface-container-high text-on-surface-variant';
+    }
+
+    function buildStep(label, activo) {
+        if (activo) {
+            return `
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 bg-primary-container text-primary border-primary">
+                        <span class="material-symbols-outlined">check</span>
+                    </div>
+                    <span class="text-body-sm font-bold text-center">${label}</span>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="flex flex-col items-center gap-2">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 bg-surface-container-low text-on-surface-variant border-outline-variant">
+                    <span class="material-symbols-outlined">radio_button_unchecked</span>
+                </div>
+                <span class="text-body-sm text-center">${label}</span>
+            </div>
+        `;
+    }
+
+    function pintarProgreso(estado) {
+        const lower = String(estado).toLowerCase();
+
+        const progreso = document.getElementById('progresoProceso');
+
+        progreso.innerHTML = `
+            ${buildStep('Aplicación', true)}
+            ${buildStep('Screening', lower.includes('screening') || lower.includes('entrevista') || lower.includes('prueba') || lower.includes('oferta'))}
+            ${buildStep('Entrevista', lower.includes('entrevista') || lower.includes('prueba') || lower.includes('oferta'))}
+            ${buildStep('Prueba Técnica', lower.includes('prueba') || lower.includes('oferta'))}
+            ${buildStep('Oferta', lower.includes('oferta'))}
+        `;
+    }
+
+    function pintarHabilidades(habilidades) {
+        const contenedor = document.getElementById('habilidadesTexto');
+
+        if (!habilidades) {
+            contenedor.innerHTML = `
+                <span class="bg-surface-container-high text-on-surface px-2 py-1 rounded text-body-sm">
+                    No registradas
+                </span>
+            `;
+            return;
+        }
+
+        contenedor.innerHTML = String(habilidades)
+            .split(',')
+            .map(habilidad => habilidad.trim())
+            .filter(Boolean)
+            .map(habilidad => `
+                <span class="bg-surface-container-high text-on-surface px-2 py-1 rounded text-body-sm">
+                    ${escapeHTML(habilidad)}
+                </span>
+            `)
+            .join('');
+    }
+
+    async function crearPostulacionYActualizar(id) {
+        try {
+            const response = await fetch(`${API}/postulaciones/crear-o-buscar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ IdCandidato: id })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'No se pudo crear o buscar la postulación');
+            }
+
+            window.location.href = `actualizar_estado.html?id=${data.postulacion.IdPostulacion}`;
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Error al abrir actualización de estado.');
+        }
+    }
+
+    async function cargarCandidato() {
+        const loading = document.getElementById('loading');
+        const contenido = document.getElementById('contenido');
+        const errorBox = document.getElementById('errorBox');
+
+        if (!idCandidato) {
+            loading.classList.add('hidden');
+            errorBox.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API}/candidatos`);
+            const candidatos = await response.json();
+
+            if (!response.ok) {
+                throw new Error(candidatos.error || 'Error al cargar candidatos');
+            }
+
+            const candidato = candidatos.find(c => String(c.IdCandidato) === String(idCandidato));
+
+            if (!candidato) {
+                throw new Error('Candidato no encontrado');
+            }
+
+            const nombreCompleto = `${candidato.Nombre || ''} ${candidato.Apellido || ''}`.trim();
+            const estado = getEstado(candidato);
+            const fecha = formatDate(candidato.FechaRegistro);
+
+            const puesto = candidato.Puesto || candidato.Vacante || candidato.NombreVacante || 'Sin vacante asignada';
+            const ubicacion = candidato.Ubicacion || candidato.Direccion || 'Ubicación no registrada';
+            const salario = candidato.Salario || candidato.PretensionSalarial || candidato.SalarioEsperado || 'No indicado';
+            const habilidades = candidato.Habilidades || candidato.Skills || '';
+
+            document.getElementById('breadcrumbNombre').textContent = nombreCompleto;
+            document.getElementById('nombreCompleto').textContent = nombreCompleto;
+            document.getElementById('avatarIniciales').textContent = getInitials(candidato) || '--';
+
+            const estadoBadge = document.getElementById('estadoBadge');
+            estadoBadge.textContent = estado;
+            estadoBadge.className = `${getBadgeClass(estado)} px-3 py-1 rounded-full text-label-caps font-bold uppercase`;
+
+            document.getElementById('puestoTexto').textContent = puesto;
+            document.getElementById('ubicacionTexto').textContent = ubicacion;
+            document.getElementById('salarioTexto').textContent = salario;
+
+            document.getElementById('idCandidatoTexto').textContent = candidato.IdCandidato || '--';
+            document.getElementById('correoTexto').textContent = candidato.Correo || 'No registrado';
+            document.getElementById('telefonoTexto').textContent = candidato.Telefono || 'No registrado';
+            document.getElementById('fechaTexto').textContent = fecha;
+
+            document.getElementById('correoRapido').textContent = candidato.Correo || 'No registrado';
+            document.getElementById('telefonoRapido').textContent = candidato.Telefono || 'No registrado';
+            document.getElementById('estadoRapido').textContent = estado;
+            document.getElementById('fechaRapida').textContent = fecha;
+
+            document.getElementById('cvTexto').textContent = `CV_${nombreCompleto.replaceAll(' ', '_') || 'Candidato'}.pdf`;
+
+            document.getElementById('resumenTexto').innerHTML = `
+                El candidato <strong>${escapeHTML(nombreCompleto)}</strong> se encuentra registrado en el sistema con estado 
+                <strong>${escapeHTML(estado)}</strong>. Desde esta vista puedes revisar su información principal, consultar su seguimiento
+                y actualizar el estado de su postulación.
+            `;
+
+            document.getElementById('btnCorreo').onclick = () => {
+                if (candidato.Correo) {
+                    window.location.href = `mailto:${candidato.Correo}`;
+                } else {
+                    alert('Este candidato no tiene correo registrado.');
+                }
+            };
+
+            document.getElementById('btnActualizarEstado').onclick = () => {
+                crearPostulacionYActualizar(candidato.IdCandidato);
+            };
+
+            pintarProgreso(estado);
+            pintarHabilidades(habilidades);
+
+            loading.classList.add('hidden');
+            contenido.classList.remove('hidden');
+
+        } catch (error) {
+            console.error(error);
+            loading.classList.add('hidden');
+            errorBox.classList.remove('hidden');
+        }
+    }
+
+    cargarCandidato();
+</script>
+
+</body>
+</html>
