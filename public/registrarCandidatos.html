@@ -185,19 +185,19 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
 <div class="space-y-2">
 <label class="font-body-sm font-bold text-on-surface-variant" for="nombre">Nombre</label>
-<input id="nombre" name="nombre" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Ana" type="text" required />
+<input id="nombre" name="nombre" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. Ana" type="text" required minlength="2" />
 </div>
 <div class="space-y-2">
 <label class="font-body-sm font-bold text-on-surface-variant" for="apellido">Apellido</label>
-<input id="apellido" name="apellido" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. García" type="text" required />
+<input id="apellido" name="apellido" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="Ej. García" type="text" required minlength="2" />
 </div>
 <div class="space-y-2">
 <label class="font-body-sm font-bold text-on-surface-variant" for="correo">Correo Electrónico</label>
-<input id="correo" name="correo" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="ana@ejemplo.com" type="email" required />
+<input id="correo" name="correo" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="ana@ejemplo.com" type="email" required autocomplete="email" />
 </div>
 <div class="space-y-2">
 <label class="font-body-sm font-bold text-on-surface-variant" for="telefono">Teléfono</label>
-<input id="telefono" name="telefono" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="+34 600 000 000" type="tel" required />
+<input id="telefono" name="telefono" class="w-full border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all" placeholder="+34 600 000 000" type="tel" required minlength="7" pattern="[0-9+\-\s()]{7,15}" />
 </div>
 </div>
 </div>
@@ -270,6 +270,11 @@
         if (form) {
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+
+                if (!form.reportValidity()) {
+                    return;
+                }
+
                 feedback.classList.add('hidden');
                 feedback.textContent = '';
 
