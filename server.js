@@ -8,18 +8,31 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 const JWT_SECRET = 'serenity_secret_2024';
+const DB_NAME = 'railway';
 
 // ── Base de datos ──────────────────────────────────────────────
 const pool = mysql.createPool({
   host: 'reseau.proxy.rlwy.net',
   port: 22884,
-  database: 'railway',
+  database: DB_NAME,
   user: 'root',
   password: 'QbfQUyBUvPvDuURDeOyxkEPTrAOzznWn',
   ssl: false,
   waitForConnections: true,
   connectionLimit: 10,
 });
+
+async function ensureColumnExists(table, columnName, columnDefinition) {
+  const [rows] = await pool.query(
+    `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+    [DB_NAME, table, columnName]
+  );
+
+  if (rows.length === 0) {
+    const query = 'ALTER TABLE `' + table + '` ADD COLUMN ' + columnDefinition;
+    await pool.query(query);
+  }
+}
 
 async function initializeDatabase() {
   await pool.query(`
@@ -30,10 +43,14 @@ async function initializeDatabase() {
       Correo VARCHAR(150) NOT NULL,
       Telefono VARCHAR(20) DEFAULT NULL,
       Curriculum VARCHAR(255) DEFAULT NULL,
+      Estado VARCHAR(50) DEFAULT 'Activo',
       FechaRegistro DATE NOT NULL,
       PRIMARY KEY (IdCandidato)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
+
+  await ensureColumnExists('Candidato', 'Estado', "Estado VARCHAR(50) DEFAULT 'Activo'");
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS Vacante (
       IdVacante INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -166,6 +183,7 @@ app.get('/api/candidatos', async (req, res) => {
         Correo,
         Telefono,
         Curriculum,
+        Estado,
         FechaRegistro
       FROM Candidato
       ORDER BY FechaRegistro DESC, IdCandidato DESC
@@ -174,6 +192,69 @@ app.get('/api/candidatos', async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error('Error en GET /api/candidatos:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.get('/api/candidatos/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT IdCandidato, Nombre, Apellido, Correo, Telefono, Curriculum, Estado, FechaRegistro FROM Candidato WHERE IdCandidato = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Candidato no encontrado' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error en GET /api/candidatos/:id:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.put('/api/candidatos/:id', async (req, res) => {
+  const { id } = req.params;
+  const { Nombre, Apellido, Correo, Telefono, Estado, Curriculum } = req.body;
+
+  if (!Nombre || !Apellido || !Correo) {
+    return res.status(400).json({ error: 'Nombre, apellido y correo son requeridos' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      `UPDATE Candidato SET Nombre = ?, Apellido = ?, Correo = ?, Telefono = ?, Estado = ?, Curriculum = ? WHERE IdCandidato = ?`,
+      [Nombre.trim(), Apellido.trim(), Correo.trim(), Telefono || null, Estado || 'Activo', Curriculum || '', id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Candidato no encontrado' });
+    }
+
+    const [rows] = await pool.query('SELECT * FROM Candidato WHERE IdCandidato = ?', [id]);
+    res.json({ candidato: rows[0] });
+  } catch (err) {
+    console.error('Error en PUT /api/candidatos/:id:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.delete('/api/candidatos/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await pool.query('DELETE FROM Candidato WHERE IdCandidato = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Candidato no encontrado' });
+    }
+
+    res.json({ message: 'Candidato eliminado correctamente' });
+  } catch (err) {
+    console.error('Error en DELETE /api/candidatos/:id:', err.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
