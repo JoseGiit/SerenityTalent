@@ -34,6 +34,18 @@ async function initializeDatabase() {
       PRIMARY KEY (IdCandidato)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS Vacante (
+      IdVacante INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      Titulo VARCHAR(255) NOT NULL,
+      Descripcion TEXT NOT NULL,
+      Departamento VARCHAR(150) DEFAULT NULL,
+      Estado VARCHAR(50) DEFAULT 'Activa',
+      FechaCreacion DATE NOT NULL,
+      FechaCierre DATE DEFAULT NULL,
+      PRIMARY KEY (IdVacante)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
 }
 
 // ── Middleware ─────────────────────────────────────────────────
@@ -200,6 +212,45 @@ app.post('/api/candidatos', async (req, res) => {
     res.status(201).json({ candidato: rows[0] });
   } catch (err) {
     console.error('Error en /api/candidatos POST:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── POST /api/vacantes ───────────────────────────────────────
+app.post('/api/vacantes', async (req, res) => {
+  const { Titulo, Descripcion, Departamento, Estado, FechaCreacion, FechaCierre } = req.body;
+
+  console.log('POST /api/vacantes body:', req.body);
+
+  if (!Titulo || !Descripcion) {
+    return res.status(400).json({ error: 'Titulo y Descripcion son requeridos' });
+  }
+
+  try {
+    const fechaCreacion = FechaCreacion || new Date().toISOString().slice(0,10);
+
+    const estadoClean = (Estado || 'Activa').toString().trim().slice(0,50);
+    const [result] = await pool.query(
+      'INSERT INTO Vacante (Titulo, Descripcion, Departamento, Estado, FechaCreacion, FechaCierre) VALUES (?, ?, ?, ?, ?, ?)',
+      [Titulo, Descripcion, Departamento || '', estadoClean, fechaCreacion, FechaCierre || null]
+    );
+
+    const [rows] = await pool.query('SELECT * FROM Vacante WHERE IdVacante = ?', [result.insertId]);
+
+    res.status(201).json({ vacante: rows[0] });
+  } catch (err) {
+    console.error('Error en POST /api/vacantes:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── GET /api/vacantes (para pruebas) ─────────────────────────────────────
+app.get('/api/vacantes', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM Vacante ORDER BY IdVacante DESC');
+    res.json(rows);
+  } catch (err) {
+    console.error('Error en GET /api/vacantes:', err.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
