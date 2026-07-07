@@ -63,6 +63,42 @@ async function initializeDatabase() {
       PRIMARY KEY (IdVacante)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS Postulacion (
+      IdPostulacion INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      IdCandidato INT UNSIGNED NOT NULL,
+      IdVacante INT UNSIGNED NOT NULL,
+      Estado VARCHAR(50) DEFAULT 'Registrado',
+      FechaPostulacion DATE NOT NULL,
+      UltimaActualizacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (IdPostulacion)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS Entrevista (
+      IdEntrevista INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      IdPostulacion INT UNSIGNED NOT NULL,
+      Fecha DATE DEFAULT NULL,
+      Hora VARCHAR(20) DEFAULT NULL,
+      Modalidad VARCHAR(50) DEFAULT NULL,
+      Observaciones VARCHAR(255) DEFAULT NULL,
+      PRIMARY KEY (IdEntrevista)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS Evaluacion (
+      IdEvaluacion INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      IdEntrevista INT UNSIGNED NOT NULL,
+      IdUsuario INT UNSIGNED NOT NULL DEFAULT 1,
+      Calificacion INT NOT NULL,
+      Comentarios VARCHAR(255) DEFAULT NULL,
+      Fecha DATE NOT NULL,
+      PRIMARY KEY (IdEvaluacion)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
 }
 
 // ── Middleware ─────────────────────────────────────────────────
@@ -577,6 +613,108 @@ app.post('/api/postulaciones/crear-o-buscar', async (req, res) => {
   } catch (err) {
     console.error('Error creando o buscando postulación:', err.message);
     return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/entrevistas', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT
+        e.IdEntrevista,
+        e.IdPostulacion,
+        e.Fecha,
+        e.Hora,
+        e.Modalidad,
+        e.Observaciones,
+        p.IdCandidato,
+        p.IdVacante,
+        p.Estado AS EstadoEntrevista,
+        p.FechaPostulacion,
+        c.Nombre,
+        c.Apellido,
+        c.Correo,
+        c.Telefono,
+        v.Titulo AS Vacante,
+        (SELECT COUNT(*) FROM Evaluacion ev WHERE ev.IdEntrevista = e.IdEntrevista) AS EvaluacionesCount
+      FROM Entrevista e
+      LEFT JOIN Postulacion p ON e.IdPostulacion = p.IdPostulacion
+      LEFT JOIN Candidato c ON p.IdCandidato = c.IdCandidato
+      LEFT JOIN Vacante v ON p.IdVacante = v.IdVacante
+      ORDER BY e.Fecha DESC, e.IdEntrevista DESC
+    `);
+
+    const entrevistas = rows.map((item) => ({
+      ...item,
+      Evaluada: Number(item.EvaluacionesCount) > 0,
+      EvaluacionesCount: Number(item.EvaluacionesCount),
+      FechaPostulacion: item.FechaPostulacion || item.Fecha || null,
+    }));
+
+    res.json(entrevistas);
+  } catch (err) {
+    console.error('Error en GET /api/entrevistas:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/evaluaciones', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT IdEvaluacion, IdEntrevista, IdUsuario, Calificacion, Comentarios, Fecha
+      FROM Evaluacion
+      ORDER BY Fecha DESC, IdEvaluacion DESC
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Error en GET /api/evaluaciones:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/evaluaciones', async (req, res) => {
+  const { IdEntrevista, IdUsuario = 1, Calificacion, Comentarios = '' } = req.body;
+
+  if (!IdEntrevista || Calificacion === undefined || Calificacion === null) {
+    return res.status(400).json({ error: 'IdEntrevista y Calificacion son requeridos' });
+  }
+
+  const calificacionNum = Number(Calificacion);
+
+  if (Number.isNaN(calificacionNum) || calificacionNum < 1 || calificacionNum > 5) {
+    return res.status(400).json({ error: 'La calificación debe estar entre 1 y 5' });
+  }
+
+  try {
+    const comentarioTexto = String(Comentarios || '').slice(0, 255);
+    const [existente] = await pool.query(
+      'SELECT IdEvaluacion FROM Evaluacion WHERE IdEntrevista = ? LIMIT 1',
+      [IdEntrevista]
+    );
+
+    let result;
+
+    if (existente.length > 0) {
+      [result] = await pool.query(
+        'UPDATE Evaluacion SET IdUsuario = ?, Calificacion = ?, Comentarios = ?, Fecha = CURDATE() WHERE IdEntrevista = ?',
+        [IdUsuario, calificacionNum, comentarioTexto, IdEntrevista]
+      );
+    } else {
+      [result] = await pool.query(
+        'INSERT INTO Evaluacion (IdEntrevista, IdUsuario, Calificacion, Comentarios, Fecha) VALUES (?, ?, ?, ?, CURDATE())',
+        [IdEntrevista, IdUsuario, calificacionNum, comentarioTexto]
+      );
+    }
+
+    const [rows] = await pool.query(
+      'SELECT * FROM Evaluacion WHERE IdEntrevista = ? ORDER BY IdEvaluacion DESC LIMIT 1',
+      [IdEntrevista]
+    );
+
+    res.status(201).json({ evaluacion: rows[0], actualizado: existente.length > 0 });
+  } catch (err) {
+    console.error('Error en POST /api/evaluaciones:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

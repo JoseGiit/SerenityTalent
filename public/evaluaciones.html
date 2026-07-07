@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity Talent - Evaluaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f0f1f2",
+                    "surface": "#f8f9fa",
+                    "on-surface": "#191c1d",
+                    "inverse-primary": "#adc7ff",
+                    "on-secondary-container": "#09657f",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#c64f00",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#0070ea",
+                    "outline-variant": "#c1c6d7",
+                    "surface-container": "#edeeef",
+                    "secondary": "#0c6780",
+                    "surface-dim": "#d9dadb",
+                    "primary": "#0059bb",
+                    "on-tertiary-fixed-variant": "#7c2e00",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#9e3d00",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-tertiary-fixed": "#351000",
+                    "on-primary-fixed": "#001a41",
+                    "on-error": "#ffffff",
+                    "on-background": "#191c1d",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container-highest": "#e1e3e4",
+                    "inverse-surface": "#2e3132",
+                    "background": "#f8f9fa",
+                    "primary-fixed-dim": "#adc7ff",
+                    "outline": "#717786",
+                    "surface-tint": "#005bc0",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "secondary-container": "#9ae1ff",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-primary-container": "#fefcff",
+                    "surface-variant": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#004d62",
+                    "on-secondary-fixed": "#001f29",
+                    "secondary-fixed": "#baeaff",
+                    "primary-fixed": "#d8e2ff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#89d0ed",
+                    "on-surface-variant": "#414754"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1440px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "data-mono": ["JetBrains Mono"],
+                    "display-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .status-badge {
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c6d7;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<div class="flex h-screen overflow-hidden">
+<aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
+<div class="flex items-center gap-3 mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">work</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="index.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Tablero</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="candidatos.html">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Candidatos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="vacantes.html">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-caps text-label-caps">Vacantes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-caps text-label-caps">Entrevistas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="evaluaciones.html">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-caps text-label-caps">Evaluaciones</span>
+</a>
+</nav>
+</aside>
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<header class="docked top-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant shrink-0">
+<div class="flex justify-between items-center px-lg h-full w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-4 flex-1">
+<div class="text-sm font-semibold text-on-surface-variant">Módulo de evaluaciones</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-body-sm font-bold text-on-surface">Alex Recruiter</p>
+<p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sr. Manager</p>
+</div>
+<img alt="Perfil del reclutador" class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACCSJiuOhe9a-BRMVhdwCB0AieQt9jlZvrMLoaciGf8dxT6-_BX_g2iIlymquKjcWtCYRoWxrB7-BYTFTCwM0eHUvUCaGda6mcXfytxPMyvpSdFnfwCxRcC8eJvmhjtHoqFCWIr2z7h3kR_163RDKP33fKgz_GjmZ-GzGeqCDj73cuacKWIrkWiYZw2yuejn0a-lqXC-0Kso7Y54rwRXGRCkn_9H0IICIoOy4gkt-dEvpEZ00hW8ACfNiFaOeBvEL1TUjuQUOnSDE"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Evaluaciones</h2>
+<p class="text-body-md text-on-surface-variant">Gestiona y registra la valoración final de cada entrevista.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-3">
+</button>
+</div>
+</div>
+<div class="bg-white p-md rounded-xl border border-outline-variant flex flex-wrap gap-md items-center shadow-sm">
+<div class="flex-1 min-w-[200px]">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input id="search-entrevistas" class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md" placeholder="Filtrar entrevistas..." type="text"/>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-lg">
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="px-lg py-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Entrevistas por evaluar</h3>
+<p class="text-body-sm text-on-surface-variant">Selecciona una entrevista para completar su evaluación final.</p>
+</div>
+<span id="count-badge" class="rounded-full bg-primary-fixed px-3 py-1 text-body-sm font-semibold text-on-primary-fixed-variant">0 entrevistas</span>
+</div>
+<div class="p-lg">
+<div id="entrevistas-list" class="space-y-3"></div>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-outline-variant p-lg shadow-sm">
+<div class="mb-6 flex items-start justify-between gap-3">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Formulario de evaluación</h3>
+<p class="mt-1 text-body-sm text-on-surface-variant">Guarda la valoración final para la entrevista seleccionada.</p>
+</div>
+<span class="rounded-full bg-secondary-container px-3 py-1 text-body-sm font-semibold text-on-secondary-container">Formulario</span>
+</div>
+<form id="form-evaluacion" class="space-y-5">
+<input type="hidden" id="id-entrevista" name="IdEntrevista"/>
+<div class="rounded-lg border border-outline-variant bg-surface-container-low p-4">
+<label class="mb-2 block text-body-sm font-semibold text-on-surface">Candidato</label>
+<div id="candidato-seleccionado" class="text-body-sm text-on-surface-variant">Selecciona una entrevista</div>
+</div>
+<div>
+<label class="mb-2 block text-body-sm font-semibold text-on-surface">Calificación</label>
+<select id="calificacion" name="Calificacion" class="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm focus:border-primary focus:ring-1 focus:ring-primary">
+<option value="">Selecciona una calificación</option>
+<option value="1">1 - Rechazado</option>
+<option value="2">2 - Bajo</option>
+<option value="3">3 - Aceptable</option>
+<option value="4">4 - Bueno</option>
+<option value="5">5 - Excelente</option>
+</select>
+</div>
+<div>
+<label class="mb-2 block text-body-sm font-semibold text-on-surface">Comentarios</label>
+<textarea id="comentarios" name="Comentarios" rows="6" class="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Escribe las observaciones de la entrevista..."></textarea>
+</div>
+<div class="flex flex-col gap-3 border-t border-outline-variant pt-4 sm:flex-row sm:items-center sm:justify-between">
+<p id="estado-form" class="text-body-sm text-on-surface-variant">Aún no se ha guardado la evaluación.</p>
+<button type="submit" class="rounded-lg bg-primary px-4 py-2 text-body-sm font-semibold text-on-primary transition hover:opacity-90">Guardar evaluación</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+  const entrevistasList = document.getElementById('entrevistas-list');
+  const countBadge = document.getElementById('count-badge');
+  const form = document.getElementById('form-evaluacion');
+  const idEntrevistaInput = document.getElementById('id-entrevista');
+  const candidatoSeleccionado = document.getElementById('candidato-seleccionado');
+  const calificacionInput = document.getElementById('calificacion');
+  const comentariosInput = document.getElementById('comentarios');
+  const estadoForm = document.getElementById('estado-form');
+  const searchInput = document.getElementById('search-entrevistas');
+
+  let entrevistas = [];
+  let entrevistaSeleccionada = null;
+  let filtroTexto = '';
+
+  function normalizarTexto(valor) {
+    return String(valor || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function getEntrevistasFiltradas() {
+    const texto = normalizarTexto(filtroTexto).trim();
+    if (!texto) return entrevistas;
+
+    return entrevistas.filter((entrevista) => {
+      const campos = [
+        entrevista.Nombre,
+        entrevista.Apellido,
+        entrevista.Vacante,
+        entrevista.Correo,
+        entrevista.EstadoEntrevista,
+        entrevista.Modalidad,
+        entrevista.Observaciones,
+        entrevista.FechaPostulacion
+      ];
+
+      return campos.some((campo) => normalizarTexto(campo).includes(texto));
+    });
+  }
+
+  async function cargarEntrevistas() {
+    try {
+      const response = await fetch('/api/entrevistas');
+      const data = await response.json();
+      entrevistas = Array.isArray(data) ? data : [];
+      renderEntrevistas();
+    } catch (error) {
+      entrevistasList.innerHTML = '<div class="rounded-lg border border-error/30 bg-error-container p-3 text-body-sm text-error">No se pudieron cargar las entrevistas.</div>';
+    }
+  }
+
+  function renderEntrevistas() {
+    const visibles = getEntrevistasFiltradas();
+    countBadge.textContent = `${visibles.length} ${visibles.length === 1 ? 'entrevista' : 'entrevistas'}`;
+
+    if (!visibles.length) {
+      entrevistasList.innerHTML = '<div class="rounded-lg border border-outline-variant bg-surface-container-low p-4 text-body-sm text-on-surface-variant">No se encontraron entrevistas con ese criterio.</div>';
+      return;
+    }
+
+    entrevistasList.innerHTML = visibles.map((entrevista) => `
+      <button type="button" data-id="${entrevista.IdEntrevista}" class="w-full rounded-xl border p-4 text-left transition ${entrevistaSeleccionada && entrevistaSeleccionada.IdEntrevista === entrevista.IdEntrevista ? 'border-primary bg-primary-fixed' : 'border-outline-variant bg-surface-container-low hover:border-primary'}">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="font-semibold text-on-surface">${entrevista.Nombre || ''} ${entrevista.Apellido || ''}</p>
+            <p class="text-body-sm text-on-surface-variant">${entrevista.Vacante || 'Vacante sin asignar'} • ${entrevista.Correo || ''}</p>
+          </div>
+          <span class="rounded-full px-3 py-1 text-body-sm font-semibold ${entrevista.Evaluada ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}">${entrevista.Evaluada ? 'Evaluada' : 'Por evaluar'}</span>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2 text-body-sm text-on-surface-variant">
+          <span class="rounded-full bg-surface-container px-2 py-1">${entrevista.EstadoEntrevista || 'Registrado'}</span>
+          <span class="rounded-full bg-surface-container px-2 py-1">${entrevista.FechaPostulacion || '-'}</span>
+          <span class="rounded-full bg-surface-container px-2 py-1">${entrevista.EvaluacionesCount || 0} eval.</span>
+        </div>
+      </button>
+    `).join('');
+
+    document.querySelectorAll('#entrevistas-list button[data-id]').forEach((button) => {
+      button.addEventListener('click', () => seleccionarEntrevista(Number(button.dataset.id)));
+    });
+  }
+
+  async function seleccionarEntrevista(id) {
+    const entrevista = entrevistas.find((item) => item.IdEntrevista === id);
+    if (!entrevista) return;
+
+    entrevistaSeleccionada = entrevista;
+    idEntrevistaInput.value = entrevista.IdEntrevista;
+    candidatoSeleccionado.textContent = `${entrevista.Nombre || ''} ${entrevista.Apellido || ''} • ${entrevista.Vacante || 'Sin vacante'}`;
+    estadoForm.textContent = entrevista.Evaluada ? 'Esta entrevista ya tiene una evaluación registrada.' : 'Aún no se ha guardado la evaluación.';
+    renderEntrevistas();
+
+    try {
+      const response = await fetch('/api/evaluaciones');
+      const evaluaciones = await response.json();
+      const evaluacion = evaluaciones.find((item) => Number(item.IdEntrevista) === Number(id));
+      if (evaluacion) {
+        calificacionInput.value = evaluacion.Calificacion;
+        comentariosInput.value = evaluacion.Comentarios || '';
+        estadoForm.textContent = `Evaluación registrada el ${evaluacion.Fecha || ''}`;
+      } else {
+        calificacionInput.value = '';
+        comentariosInput.value = '';
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!idEntrevistaInput.value) {
+      estadoForm.textContent = 'Primero selecciona una entrevista.';
+      return;
+    }
+
+    const payload = {
+      IdEntrevista: Number(idEntrevistaInput.value),
+      IdUsuario: 1,
+      Calificacion: Number(calificacionInput.value),
+      Comentarios: comentariosInput.value.trim()
+    };
+
+    try {
+      const response = await fetch('/api/evaluaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'No se pudo guardar');
+      estadoForm.textContent = result.actualizado ? 'Evaluación actualizada correctamente.' : 'Evaluación guardada correctamente.';
+      await cargarEntrevistas();
+      await seleccionarEntrevista(payload.IdEntrevista);
+    } catch (error) {
+      estadoForm.textContent = error.message;
+    }
+  });
+
+  searchInput.addEventListener('input', (event) => {
+    filtroTexto = event.target.value;
+    renderEntrevistas();
+  });
+
+  cargarEntrevistas();
+</script>
+
+</body>
+</html>
