@@ -175,13 +175,7 @@
 <span class="material-symbols-outlined">help</span>
 </button>
 <div class="h-8 w-px bg-outline-variant mx-2"></div>
-<div class="flex items-center gap-3">
-<div class="text-right hidden sm:block">
-<p class="text-body-sm font-bold text-on-surface">Alex Recruiter</p>
-<p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sr. Manager</p>
-</div>
-<img alt="Perfil del reclutador" class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACCSJiuOhe9a-BRMVhdwCB0AieQt9jlZvrMLoaciGf8dxT6-_BX_g2iIlymquKjcWtCYRoWxrB7-BYTFTCwM0eHUvUCaGda6mcXfytxPMyvpSdFnfwCxRcC8eJvmhjtHoqFCWIr2z7h3kR_163RDKP33fKgz_GjmZ-GzGeqCDj73cuacKWIrkWiYZw2yuejn0a-lqXC-0Kso7Y54rwRXGRCkn_9H0IICIoOy4gkt-dEvpEZ00hW8ACfNiFaOeBvEL1TUjuQUOnSDE"/>
-</div>
+<div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </div>
 </header>
@@ -405,4 +399,33 @@
 </script>
 
 </body>
+<script>
+  function renderHeaderUser() {
+    const container = document.getElementById('header-user');
+    if (!container) return;
+
+    try {
+      const storedUser = localStorage.getItem('st_usuario');
+      if (!storedUser) {
+        container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        return;
+      }
+
+      const usuario = JSON.parse(storedUser);
+      const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
+      const rol = usuario.rol === 1 ? 'Administrador' : usuario.rol === 2 ? 'Reclutador' : 'Usuario';
+
+      container.innerHTML = `
+        <div class="text-right hidden sm:block">
+          <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
+          <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
+        </div>
+      `;
+    } catch (error) {
+      container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderHeaderUser);
+</script>
 </html>

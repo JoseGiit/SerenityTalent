@@ -187,13 +187,7 @@
 <span class="material-symbols-outlined">help</span>
 </button>
 <div class="h-8 w-px bg-outline-variant mx-2"></div>
-<div class="flex items-center gap-3">
-<div class="text-right hidden sm:block">
-<p class="font-body-sm font-bold text-on-surface">Alex Rivera</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant">Reclutador Principal</p>
-</div>
-<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="Un retrato profesional de un gerente de reclutamiento en una oficina moderna y luminosa." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYLGvxRWWjyC79OLRHlkeCk0QWTWI44wvHfGh6lP3N7LiDxreydzS8eQCcTyrjq_uVQvi9padmgxcolAS2qYvE0VL0rZinIt90I3lK_5T-TzLzTk-Tl3isA3aRyQZuKmXcvk3Ymc_2Kui6TlVXBdycJ0BpGmOQLU7-tUANVKGiDcwV8MhGoTGXYOiLR84BWc7Q0zbEFypbSv0dNqZ75bvRVcBLRkAic8-6-MK09QVMTKcZe6oSf3rwAlixQ8cvRj34zR1lT4uTXYs"/>
-</div>
+<div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </header>
 <!-- Canvas -->
@@ -475,4 +469,33 @@
 
         window.addEventListener('load', loadVacantes);
     </script>
+<script>
+  function renderHeaderUser() {
+    const container = document.getElementById('header-user');
+    if (!container) return;
+
+    try {
+      const storedUser = localStorage.getItem('st_usuario');
+      if (!storedUser) {
+        container.innerHTML = '<div class="text-right hidden sm:block"><p class="font-body-sm font-bold text-on-surface">Usuario</p><p class="font-label-caps text-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        return;
+      }
+
+      const usuario = JSON.parse(storedUser);
+      const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
+      const rol = usuario.rol === 1 ? 'Administrador' : usuario.rol === 2 ? 'Reclutador' : 'Usuario';
+
+      container.innerHTML = `
+        <div class="text-right hidden sm:block">
+          <p class="font-body-sm font-bold text-on-surface">${nombre}</p>
+          <p class="font-label-caps text-label-caps text-on-surface-variant">${rol}</p>
+        </div>
+      `;
+    } catch (error) {
+      container.innerHTML = '<div class="text-right hidden sm:block"><p class="font-body-sm font-bold text-on-surface">Usuario</p><p class="font-label-caps text-label-caps text-on-surface-variant">Sin sesión</p></div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderHeaderUser);
+</script>
 </body></html>
