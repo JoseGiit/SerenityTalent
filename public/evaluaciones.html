@@ -151,7 +151,7 @@
 <span class="material-symbols-outlined">work</span>
 <span class="font-label-caps text-label-caps">Vacantes</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="entrevistas.html">
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="font-label-caps text-label-caps">Entrevistas</span>
 </a>
@@ -260,9 +260,46 @@
   const estadoForm = document.getElementById('estado-form');
   const searchInput = document.getElementById('search-entrevistas');
 
+  const EVALUACIONES_KEY = 'st_evaluaciones';
+
   let entrevistas = [];
   let entrevistaSeleccionada = null;
   let filtroTexto = '';
+
+  function leerEvaluacionesLocales() {
+    try {
+      const data = JSON.parse(localStorage.getItem(EVALUACIONES_KEY) || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Error leyendo evaluaciones locales:', error);
+      return [];
+    }
+  }
+
+  function guardarEvaluacionesLocales(evaluaciones) {
+    localStorage.setItem(EVALUACIONES_KEY, JSON.stringify(evaluaciones));
+  }
+
+  function sincronizarEstadoEntrevista(idEntrevista, evaluada) {
+    try {
+      const locales = JSON.parse(localStorage.getItem('st_entrevistas') || '[]');
+      if (!Array.isArray(locales)) return;
+
+      const actualizadas = locales.map((item) => {
+        if (Number(item.IdEntrevista) !== Number(idEntrevista)) return item;
+        return {
+          ...item,
+          Evaluada: evaluada,
+          EvaluacionesCount: evaluada ? 1 : 0,
+          UltimaActualizacion: new Date().toISOString()
+        };
+      });
+
+      localStorage.setItem('st_entrevistas', JSON.stringify(actualizadas));
+    } catch (error) {
+      console.error('Error actualizando la entrevista local:', error);
+    }
+  }
 
   function normalizarTexto(valor) {
     return String(valor || '')
@@ -291,15 +328,45 @@
     });
   }
 
+  function leerEntrevistasLocales() {
+    try {
+      const data = JSON.parse(localStorage.getItem('st_entrevistas') || '[]');
+      return Array.isArray(data)
+        ? data.map((item) => ({
+            ...item,
+            Vacante: item.Vacante || 'Vacante sin asignar',
+            FechaPostulacion: item.FechaEntrevista || item.FechaPostulacion || '-',
+            Evaluada: Boolean(item.Evaluada),
+            EvaluacionesCount: Number(item.EvaluacionesCount || 0)
+          }))
+        : [];
+    } catch (error) {
+      console.error('Error leyendo entrevistas locales:', error);
+      return [];
+    }
+  }
+
   async function cargarEntrevistas() {
+    const locales = leerEntrevistasLocales();
+    let servidor = [];
+
     try {
       const response = await fetch('/api/entrevistas');
-      const data = await response.json();
-      entrevistas = Array.isArray(data) ? data : [];
-      renderEntrevistas();
+      if (response.ok) {
+        const data = await response.json();
+        servidor = Array.isArray(data) ? data : [];
+      }
     } catch (error) {
-      entrevistasList.innerHTML = '<div class="rounded-lg border border-error/30 bg-error-container p-3 text-body-sm text-error">No se pudieron cargar las entrevistas.</div>';
+      console.warn('La ruta /api/entrevistas no está disponible; se usarán las entrevistas locales.');
     }
+
+    const combinadas = new Map();
+    [...servidor, ...locales].forEach((item) => {
+      combinadas.set(String(item.IdEntrevista), item);
+    });
+
+    entrevistas = Array.from(combinadas.values());
+    renderEntrevistas();
   }
 
   function renderEntrevistas() {
@@ -343,20 +410,16 @@
     estadoForm.textContent = entrevista.Evaluada ? 'Esta entrevista ya tiene una evaluación registrada.' : 'Aún no se ha guardado la evaluación.';
     renderEntrevistas();
 
-    try {
-      const response = await fetch('/api/evaluaciones');
-      const evaluaciones = await response.json();
-      const evaluacion = evaluaciones.find((item) => Number(item.IdEntrevista) === Number(id));
-      if (evaluacion) {
-        calificacionInput.value = evaluacion.Calificacion;
-        comentariosInput.value = evaluacion.Comentarios || '';
-        estadoForm.textContent = `Evaluación registrada el ${evaluacion.Fecha || ''}`;
-      } else {
-        calificacionInput.value = '';
-        comentariosInput.value = '';
-      }
-    } catch (error) {
-      console.error(error);
+    const evaluaciones = leerEvaluacionesLocales();
+    const evaluacion = evaluaciones.find((item) => Number(item.IdEntrevista) === Number(id));
+
+    if (evaluacion) {
+      calificacionInput.value = evaluacion.Calificacion;
+      comentariosInput.value = evaluacion.Comentarios || '';
+      estadoForm.textContent = `Evaluación registrada el ${evaluacion.Fecha || ''}`;
+    } else {
+      calificacionInput.value = '';
+      comentariosInput.value = '';
     }
   }
 
@@ -374,25 +437,54 @@
       Comentarios: comentariosInput.value.trim()
     };
 
+    if (!payload.Calificacion || payload.Calificacion < 1 || payload.Calificacion > 5) {
+      estadoForm.textContent = 'Seleccione una calificación válida.';
+      return;
+    }
+
     try {
-      const response = await fetch('/api/evaluaciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'No se pudo guardar');
-      estadoForm.textContent = result.actualizado ? 'Evaluación actualizada correctamente.' : 'Evaluación guardada correctamente.';
+      const evaluaciones = leerEvaluacionesLocales();
+      const indice = evaluaciones.findIndex(
+        (item) => Number(item.IdEntrevista) === Number(payload.IdEntrevista)
+      );
+
+      const ahora = new Date().toLocaleString('es-CR');
+      const registro = {
+        IdEvaluacion: indice >= 0
+          ? evaluaciones[indice].IdEvaluacion
+          : evaluaciones.reduce((maximo, item) => Math.max(maximo, Number(item.IdEvaluacion) || 0), 0) + 1,
+        IdEntrevista: payload.IdEntrevista,
+        IdUsuario: payload.IdUsuario,
+        Calificacion: payload.Calificacion,
+        Comentarios: payload.Comentarios,
+        Fecha: ahora
+      };
+
+      if (indice >= 0) {
+        evaluaciones[indice] = registro;
+        estadoForm.textContent = 'Evaluación actualizada correctamente.';
+      } else {
+        evaluaciones.push(registro);
+        estadoForm.textContent = 'Evaluación guardada correctamente.';
+      }
+
+      guardarEvaluacionesLocales(evaluaciones);
+      sincronizarEstadoEntrevista(payload.IdEntrevista, true);
       await cargarEntrevistas();
       await seleccionarEntrevista(payload.IdEntrevista);
     } catch (error) {
-      estadoForm.textContent = error.message;
+      console.error(error);
+      estadoForm.textContent = 'No se pudo guardar la evaluación localmente.';
     }
   });
 
   searchInput.addEventListener('input', (event) => {
     filtroTexto = event.target.value;
     renderEntrevistas();
+  });
+
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'st_entrevistas' || event.key === EVALUACIONES_KEY) cargarEntrevistas();
   });
 
   cargarEntrevistas();
