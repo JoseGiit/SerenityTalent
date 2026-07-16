@@ -395,7 +395,6 @@
 
         // ── Vacante preseleccionada por URL (?vacante=ID), ej. desde "Ver vacante" ──
         const idVacantePreseleccionada = new URLSearchParams(window.location.search).get('vacante');
-
         // ── Cargar vacantes reales desde la base de datos ──────────────
         async function cargarVacantes() {
             try {
@@ -432,7 +431,6 @@
             vacanteSelect.value = idVacantePreseleccionada;
             vacanteSelect.dispatchEvent(new Event('change'));
         }
-
         vacanteSelect.addEventListener('change', () => {
             const seleccionada = vacantesCache.find(v => String(v.IdVacante) === vacanteSelect.value);
             vacanteDepartamento.textContent = seleccionada

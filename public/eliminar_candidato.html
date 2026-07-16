@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Serenity Talent - Eliminar Candidato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "on-secondary-container": "#09657f",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "primary": "#0059bb",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c1c6d7",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary-container": "#9ae1ff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#414754"
+                    },
+                    spacing: {
+                        md: "16px",
+                        xl: "40px",
+                        lg: "24px"
+                    },
+                    borderRadius: {
+                        lg: "0.25rem",
+                        xl: "0.5rem"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-caps": ["11px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "700" }]
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<div class="min-h-screen flex items-center justify-center p-lg">
+    <section class="w-full max-w-xl bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+        <div class="p-lg border-b border-outline-variant bg-error-container text-on-error-container flex items-center gap-3">
+            <span class="material-symbols-outlined text-[32px]">warning</span>
+            <div>
+                <h1 class="font-headline-md text-headline-md">Eliminar candidato</h1>
+                <p class="text-body-md">Esta acción eliminará el registro seleccionado.</p>
+            </div>
+        </div>
+
+        <div class="p-lg space-y-md">
+            <div id="message" class="hidden p-4 rounded-lg text-body-md"></div>
+
+            <div id="card-candidato" class="bg-surface-container-low rounded-xl border border-outline-variant p-md">
+                <p class="text-body-md text-on-surface-variant">Cargando información del candidato...</p>
+            </div>
+
+            <p class="text-body-md text-on-surface-variant">
+                ¿Seguro que deseas eliminar este candidato? Esta acción no se puede deshacer desde esta pantalla.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-md border-t border-outline-variant">
+                <button type="button" onclick="window.location.href='candidatos.html'" class="px-lg py-3 rounded-lg font-bold border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-all">
+                    Cancelar
+                </button>
+                <button id="btn-eliminar" type="button" class="px-lg py-3 rounded-lg font-bold bg-error text-on-error hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">delete</span>
+                    Eliminar candidato
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const API = '/api';
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const message = document.getElementById('message');
+        const card = document.getElementById('card-candidato');
+        const btnEliminar = document.getElementById('btn-eliminar');
+
+        function escapeHTML(value) {
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function showMessage(text, type = 'error') {
+            message.textContent = text;
+            message.classList.remove('hidden', 'bg-error-container', 'text-on-error-container', 'bg-green-100', 'text-green-700');
+
+            if (type === 'success') {
+                message.classList.add('bg-green-100', 'text-green-700');
+            } else {
+                message.classList.add('bg-error-container', 'text-on-error-container');
+            }
+        }
+
+        async function cargarCandidato() {
+            if (!id) {
+                showMessage('No se recibió el ID del candidato.');
+                btnEliminar.disabled = true;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/candidatos/${id}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo cargar el candidato.');
+                }
+
+                const candidato = Array.isArray(data) ? data[0] : data;
+
+                if (!candidato) {
+                    throw new Error('Candidato no encontrado.');
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">
+                            ${escapeHTML((candidato.Nombre || '').charAt(0) + (candidato.Apellido || '').charAt(0)).toUpperCase() || '--'}
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-on-surface text-lg">${escapeHTML(candidato.Nombre)} ${escapeHTML(candidato.Apellido)}</h2>
+                            <p class="text-body-md text-on-surface-variant">${escapeHTML(candidato.Correo)}</p>
+                            <p class="text-body-md text-on-surface-variant">Teléfono: ${escapeHTML(candidato.Telefono || 'Sin teléfono')}</p>
+                            <p class="text-body-md text-on-surface-variant">Estado: ${escapeHTML(candidato.Estado || 'Activo')}</p>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error cargando candidato:', error);
+                showMessage(error.message || 'Error al cargar el candidato.');
+                btnEliminar.disabled = true;
+            }
+        }
+
+        btnEliminar.addEventListener('click', async () => {
+            const confirmar = confirm('¿Confirmas que deseas eliminar este candidato?');
+
+            if (!confirmar) return;
+
+            try {
+                btnEliminar.disabled = true;
+                btnEliminar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Eliminando...';
+
+                const response = await fetch(`${API}/candidatos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (error) {
+                    data = {};
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo eliminar el candidato.');
+                }
+
+                showMessage('Candidato eliminado correctamente.', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'candidatos.html';
+                }, 900);
+
+            } catch (error) {
+                console.error('Error eliminando candidato:', error);
+                showMessage(error.message || 'Error al eliminar el candidato.');
+                btnEliminar.disabled = false;
+                btnEliminar.innerHTML = '<span class="material-symbols-outlined">delete</span> Eliminar candidato';
+            }
+        });
+
+        cargarCandidato();
+    });
+</script>
+</body>
+</html>

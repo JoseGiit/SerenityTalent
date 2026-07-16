@@ -165,25 +165,19 @@
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="font-label-caps text-label-caps">Entrevistas</span>
 </a>
-<<<<<<< Updated upstream
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-body-md">Configuración</span>
-</a>
-</nav>
-<div class="mt-auto p-sm">
-<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-lg font-body-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
-                Nueva Vacante
-            </button>
-</div>
-=======
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="evaluaciones.html">
 <span class="material-symbols-outlined">fact_check</span>
 <span class="font-label-caps text-label-caps">Evaluaciones</span>
 </a>
 </nav>
->>>>>>> Stashed changes
+=======
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="evaluaciones.html">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-body-md">Evaluaciones</span>
+</a>
+</nav>
+
+>>>>>>> main
 </aside>
 <!-- Main Content Shell -->
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -203,13 +197,7 @@
 <span class="material-symbols-outlined">help</span>
 </button>
 <div class="h-8 w-px bg-outline-variant mx-2"></div>
-<div class="flex items-center gap-3">
-<div class="text-right hidden sm:block">
-<p class="font-body-sm font-bold text-on-surface">Alex Rivera</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant">Reclutador Principal</p>
-</div>
-<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="Un retrato profesional de un gerente de reclutamiento en una oficina moderna y luminosa." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYLGvxRWWjyC79OLRHlkeCk0QWTWI44wvHfGh6lP3N7LiDxreydzS8eQCcTyrjq_uVQvi9padmgxcolAS2qYvE0VL0rZinIt90I3lK_5T-TzLzTk-Tl3isA3aRyQZuKmXcvk3Ymc_2Kui6TlVXBdycJ0BpGmOQLU7-tUANVKGiDcwV8MhGoTGXYOiLR84BWc7Q0zbEFypbSv0dNqZ75bvRVcBLRkAic8-6-MK09QVMTKcZe6oSf3rwAlixQ8cvRj34zR1lT4uTXYs"/>
-</div>
+<div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </header>
 <!-- Canvas -->
@@ -226,10 +214,17 @@
 <span class="material-symbols-outlined text-[18px]">filter_list</span>
                             Filtrar
                         </button>
+                        
 <button class="bg-surface border border-outline px-4 py-2 rounded-lg font-body-sm font-bold text-primary flex items-center gap-2 hover:bg-surface-container-low transition-colors">
 <span class="material-symbols-outlined text-[18px]">sort</span>
                             Ordenar
                         </button>
+                        <div class="mt-auto p-sm">
+<a href="registroVacante.html" class="w-full inline-block bg-primary text-on-primary py-3 px-4 rounded-lg font-body-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 text-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                Nueva Vacante
+            </a>
+</div>
 </div>
 </div>
 <!-- Bento Grid Layout -->
@@ -238,7 +233,8 @@
 <div class="col-span-12 lg:col-span-4 glass-card p-lg rounded-xl bento-item flex flex-col justify-between min-h-[180px]">
 <div>
 <p class="font-label-caps text-label-caps text-on-surface-variant uppercase">Procesos Activos</p>
-<h3 class="font-display-lg text-display-lg text-primary mt-2">24</h3>
+<h3 id="activeVacantesCount" class="font-display-lg text-display-lg text-primary mt-2">0</h3>
+<p id="activeVacantesLabel" class="font-body-sm text-on-surface-variant mt-2">Vacantes activas</p>
 </div>
 <div class="flex items-center gap-2 text-success-green">
 <span class="material-symbols-outlined text-green-600">trending_up</span>
@@ -262,7 +258,8 @@
 </div>
 </div>
 <!-- Main Jobs List (Asymmetric Grid) -->
-<div class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter mt-lg">
+<div id="vacantesStatus" class="text-center text-on-surface-variant text-sm mt-lg">Cargando vacantes...</div>
+<div id="vacantesContainer" class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter mt-lg">
 <!-- Job Card 1 -->
 <div class="bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group">
 <div class="flex justify-between items-start mb-md">
@@ -413,8 +410,6 @@
                 }
             })
         });
-<<<<<<< Updated upstream
-=======
 
         async function loadVacantes() {
             const statusEl = document.getElementById('vacantesStatus');
@@ -482,6 +477,38 @@
         }
 
         window.addEventListener('load', loadVacantes);
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> main
     </script>
+<script>
+  function renderHeaderUser() {
+    const container = document.getElementById('header-user');
+    if (!container) return;
+
+    try {
+      const storedUser = localStorage.getItem('st_usuario');
+      if (!storedUser) {
+        container.innerHTML = '<div class="text-right hidden sm:block"><p class="font-body-sm font-bold text-on-surface">Usuario</p><p class="font-label-caps text-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        return;
+      }
+
+      const usuario = JSON.parse(storedUser);
+      const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
+      const rol = usuario.rol === 1 ? 'Administrador' : usuario.rol === 2 ? 'Reclutador' : 'Usuario';
+
+      container.innerHTML = `
+        <div class="text-right hidden sm:block">
+          <p class="font-body-sm font-bold text-on-surface">${nombre}</p>
+          <p class="font-label-caps text-label-caps text-on-surface-variant">${rol}</p>
+        </div>
+      `;
+    } catch (error) {
+      container.innerHTML = '<div class="text-right hidden sm:block"><p class="font-body-sm font-bold text-on-surface">Usuario</p><p class="font-label-caps text-label-caps text-on-surface-variant">Sin sesión</p></div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderHeaderUser);
+</script>
 </body></html>

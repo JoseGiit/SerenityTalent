@@ -1,0 +1,442 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Serenity Talent - Crear Vacante</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Configuration Verbatim -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#717786",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary-fixed": "#baeaff",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c1c6d7",
+                    "tertiary-container": "#c64f00",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "surface-tint": "#005bc0",
+                    "background": "#f8f9fa",
+                    "inverse-surface": "#2e3132",
+                    "on-surface": "#191c1d",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-background": "#191c1d",
+                    "tertiary": "#9e3d00",
+                    "surface-bright": "#f8f9fa",
+                    "primary-container": "#0070ea",
+                    "surface-variant": "#e1e3e4",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#351000",
+                    "error-container": "#ffdad6",
+                    "surface-container-high": "#e7e8e9",
+                    "on-primary-container": "#fefcff",
+                    "secondary": "#0c6780",
+                    "on-tertiary-container": "#fffbff",
+                    "surface": "#f8f9fa",
+                    "secondary-fixed-dim": "#89d0ed",
+                    "on-secondary-fixed": "#001f29",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#004d62",
+                    "on-secondary-container": "#09657f",
+                    "surface-dim": "#d9dadb",
+                    "primary-fixed-dim": "#adc7ff",
+                    "on-tertiary-fixed-variant": "#7c2e00",
+                    "surface-container-highest": "#e1e3e4",
+                    "surface-container": "#edeeef",
+                    "primary-fixed": "#d8e2ff",
+                    "on-surface-variant": "#414754",
+                    "inverse-primary": "#adc7ff",
+                    "secondary-container": "#9ae1ff",
+                    "on-primary-fixed": "#001a41",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#004493",
+                    "primary": "#0059bb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1440px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xl": "40px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "headline-md-mobile": ["Hanken Grotesk"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "data-mono": ["JetBrains Mono"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-caps": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}],
+                    "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #0059bb;
+            box-shadow: 0 0 0 2px rgba(0, 89, 187, 0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface bg-background min-h-screen flex overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="hidden md:flex flex-col h-screen w-[280px] bg-surface border-r border-outline-variant py-lg px-md shrink-0">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Suite de Reclutamiento</p>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Panel de Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Candidatos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-caps text-label-caps">Vacantes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-caps text-label-caps">Entrevistas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="evaluaciones.html">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-caps text-label-caps">Evaluaciones</span>
+</a>
+</nav>
+
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col min-w-0 h-screen overflow-y-auto">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 w-full h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-lg shrink-0">
+<div class="flex items-center gap-md max-w-xl flex-grow">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-body-md" placeholder="Buscar vacantes, candidatos..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="h-8 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-3 cursor-pointer">
+<span class="font-body-md font-bold text-primary">Perfil</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a Hispanic recruitment manager in a modern office setting. He is wearing a sharp charcoal suit and has a warm, confident expression. The background features soft bokeh of a high-tech coworking space with plants and glass partitions. The lighting is natural and bright, conveying a trustworthy corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmft5vaLqYWK17sxIhuVki6vh6I4CAiOvv0uy653dkaqbZWhNskoZfwaEqS1xg9fizUMcw9C8FE35fN2ss7YXK0NlPb2E63gdnrNfqqfPs8kEWm0XJX0jIn9zR2AcB_tLTESTTBhTwLO4RiRNpLz2KykCQ09YrdfdVbMzsmGPeSn2mzQGSMq7sgj9wsGRqndxzl3CHIrNtoswcRLByNnBS-VNz0U1ERIpV_tL5ixXAQ1Qc2aemTuRiYR4k5zuGmDqE2QfCC5PHJz2S">
+</div>
+</div>
+</div>
+</header>
+<!-- Page Header & Form Container -->
+<section class="p-xl max-w-container-max mx-auto w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-xl gap-md">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+<a class="font-body-sm hover:text-primary transition-colors" href="#">Vacantes</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-body-sm font-bold text-on-surface">Nueva Vacante</span>
+</nav>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Crear Nueva Vacante</h2>
+<p class="font-body-md text-on-surface-variant">Complete los detalles para publicar una nueva oportunidad en Serenity Talent.</p>
+</div>
+<div class="flex gap-md">
+                    <button class="px-lg py-sm border border-outline-variant text-primary font-label-caps rounded-lg hover:bg-surface-container-low transition-colors" onclick="history.back();">
+                        Descartar
+                    </button>
+                    <button id="submitBtn" type="submit" disabled class="px-lg py-sm bg-primary text-white font-label-caps rounded-lg hover:opacity-90 shadow-sm transition-all active:scale-95">
+                        Publicar vacante
+                    </button>
+                    <div id="formMessage" class="text-sm text-on-surface-variant ml-4"></div>
+                    <input type="hidden" id="estadoInput" name="Estado" value="Activa">
+</div>
+</div>
+<!-- Bento Form Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Main Form Column -->
+<div class="lg:col-span-8 space-y-lg">
+<!-- General Info Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<div class="flex items-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<h3 class="font-headline-sm text-headline-sm font-bold">Información General</h3>
+</div>
+<div class="space-y-lg">
+<div class="grid grid-cols-1 gap-md">
+<label class="block">
+<span class="font-body-sm font-bold text-on-surface mb-2 block">Título de la Vacante (Titulo)</span>
+<input id="titulo" name="Titulo" class="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface form-input-focus text-body-md" placeholder="Ej: Desarrollador Senior Fullstack" type="text">
+</label>
+</div>
+<div class="grid grid-cols-1 gap-md">
+<label class="block">
+<span class="font-body-sm font-bold text-on-surface mb-2 block">Descripción Detallada (Descripcion)</span>
+<textarea id="descripcion" name="Descripcion" class="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface form-input-focus text-body-md" placeholder="Describa las responsabilidades, requisitos y beneficios..." rows="6"></textarea>
+</label>
+</div>
+</div>
+</div>
+<!-- Details Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<div class="flex items-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">business_center</span>
+<h3 class="font-headline-sm text-headline-sm font-bold">Clasificación</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<label class="block">
+<span class="font-body-sm font-bold text-on-surface mb-2 block">Departamento</span>
+<select id="departamento" name="Departamento" class="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface form-input-focus text-body-md appearance-none">
+<option value="Tecnologías de Información">Tecnologías de Información</option>
+<option value="Recursos Humanos">Recursos Humanos</option>
+<option value="Operaciones">Operaciones</option>
+<option value="Ventas y Marketing">Ventas y Marketing</option>
+<option value="Finanzas">Finanzas</option>
+</select>
+</label>
+<label class="block">
+<span class="font-body-sm font-bold text-on-surface mb-2 block">Estado (Estado)</span>
+<div class="flex gap-md mt-1">
+                <button data-estado="Activa" class="flex-1 flex items-center justify-center gap-2 py-2 px-md border-2 border-primary bg-primary-container text-on-primary-container rounded-lg font-bold transition-all">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                        Activa
+                                    </button>
+<button data-estado="Inactiva" class="flex-1 flex items-center justify-center gap-2 py-2 px-md border border-outline-variant text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined text-sm">pause_circle</span>
+                                        Inactiva
+                                    </button>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Secondary Column -->
+<div class="lg:col-span-4 space-y-lg">
+<!-- Dates Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<div class="flex items-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<h3 class="font-headline-sm text-headline-sm font-bold">Cronograma</h3>
+</div>
+<div class="space-y-lg">
+<label class="block">
+<span class="font-body-sm font-bold text-on-surface mb-2 block">Fecha de Creación</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">today</span>
+<input id="fechaCreacion" name="FechaCreacion" class="w-full pl-10 pr-4 py-2 rounded-lg border border-outline-variant bg-surface-container-low form-input-focus text-body-md" readonly="" type="date" value="2024-05-20">
+</div>
+<span class="text-[10px] text-on-surface-variant mt-1 block italic">* Campo generado automáticamente</span>
+</label>
+<label class="block">
+<span class="font-body-sm font-bold text-on-surface mb-2 block">Fecha de Cierre (FechaCierre)</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">event_busy</span>
+<input id="fechaCierre" name="FechaCierre" class="w-full pl-10 pr-4 py-2 rounded-lg border border-outline-variant bg-surface form-input-focus text-body-md" type="date">
+</div>
+</label>
+</div>
+</div>
+<!-- Visual Assets Card -->
+
+<!-- Help Card -->
+<div class="bg-primary text-on-primary rounded-xl p-lg shadow-lg relative overflow-hidden">
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">lightbulb</span>
+</div>
+<h4 class="font-body-md font-bold mb-2">Consejo Profesional</h4>
+<p class="text-xs opacity-90 leading-relaxed">
+                            Las vacantes con descripciones superiores a 200 palabras y fechas de cierre de al menos 15 días reciben un 40% más de aplicantes calificados en nuestro sistema.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Footer Meta Info -->
+<div class="mt-xl flex flex-col md:flex-row justify-between items-center py-lg border-t border-outline-variant gap-md">
+<p class="text-xs text-on-surface-variant">© 2024 Serenity Talent. Todos los derechos reservados.</p>
+<div class="flex gap-lg">
+<a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Términos y Condiciones</a>
+<a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Privacidad</a>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Floating Action Button (Alternative for Mobile Context) -->
+<button class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-xl flex items-center justify-center z-50 hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-2xl">save</span>
+</button>
+<script>
+        // Micro-interaction for form highlighting
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.closest('.bg-surface-container-lowest')?.classList.add('ring-1', 'ring-primary-container');
+            });
+            input.addEventListener('blur', () => {
+                input.closest('.bg-surface-container-lowest')?.classList.remove('ring-1', 'ring-primary-container');
+            });
+        });
+
+        // Simple Status Switch Logic
+        const statusButtons = document.querySelectorAll('.lg\\:col-span-8 .flex.gap-md button');
+        statusButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                statusButtons.forEach(b => {
+                    b.classList.remove('border-2', 'border-primary', 'bg-primary-container', 'text-on-primary-container', 'font-bold');
+                    b.classList.add('border', 'border-outline-variant', 'text-on-surface-variant');
+                    const icon = b.querySelector('.material-symbols-outlined');
+                    if (icon) icon.textContent = b.textContent.trim() === 'Activa' ? 'check_circle' : 'pause_circle';
+                });
+                btn.classList.remove('border', 'border-outline-variant', 'text-on-surface-variant');
+                btn.classList.add('border-2', 'border-primary', 'bg-primary-container', 'text-on-primary-container', 'font-bold');
+            });
+        });
+    </script>
+
+<script>
+    (function(){
+        const titulo = document.getElementById('titulo');
+        const descripcion = document.getElementById('descripcion');
+        const departamento = document.getElementById('departamento');
+        const fechaCreacion = document.getElementById('fechaCreacion');
+        const fechaCierre = document.getElementById('fechaCierre');
+        const estadoInput = document.getElementById('estadoInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const formMessage = document.getElementById('formMessage');
+
+        // Initialize creation date
+        try {
+            const today = new Date().toISOString().slice(0,10);
+            if (fechaCreacion) fechaCreacion.value = today;
+        } catch(e) {}
+
+        // Ensure status buttons update hidden input
+        const statusButtons = document.querySelectorAll('.lg\\:col-span-8 .flex.gap-md button');
+        function setEstadoFromButtons() {
+            let estado = 'Activa';
+            statusButtons.forEach(b => {
+                if (b.classList.contains('border-2') || b.classList.contains('font-bold')) {
+                    // Prefer explicit data-estado attribute; fallback to trimmed text
+                    estado = (b.dataset && b.dataset.estado) ? b.dataset.estado : b.textContent.trim();
+                }
+            });
+            estadoInput.value = estado;
+        }
+        // run once
+        setEstadoFromButtons();
+        statusButtons.forEach(b => b.addEventListener('click', setEstadoFromButtons));
+
+        function checkForm() {
+            const ok = titulo.value.trim().length > 0 && descripcion.value.trim().length > 0 && departamento.value.trim().length > 0;
+            submitBtn.disabled = !ok;
+            submitBtn.classList.toggle('opacity-50', !ok);
+            submitBtn.classList.toggle('cursor-not-allowed', !ok);
+            return ok;
+        }
+
+        [titulo, descripcion, departamento, fechaCierre].forEach(el => {
+            if (!el) return;
+            el.addEventListener('input', checkForm);
+            el.addEventListener('change', checkForm);
+        });
+        checkForm();
+
+        submitBtn.addEventListener('click', async (e) => {
+            if (submitBtn.disabled) return;
+            submitBtn.disabled = true;
+            formMessage.textContent = 'Publicando...';
+
+            const payload = {
+                Titulo: titulo.value.trim(),
+                Descripcion: descripcion.value.trim(),
+                Departamento: departamento.value.trim(),
+                Estado: estadoInput.value || 'Activa',
+                FechaCreacion: fechaCreacion.value || new Date().toISOString().slice(0,10),
+                FechaCierre: fechaCierre.value || null
+            };
+
+            try {
+                const res = await fetch('/api/vacantes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    formMessage.textContent = 'Vacante publicada correctamente.';
+                    setTimeout(() => window.location.href = 'vacantes.html', 900);
+                } else {
+                    // Intentar parsear JSON; si falla, mostrar texto plano o estado
+                    let errMsg = `Error publicando la vacante (status ${res.status}).`;
+                    try {
+                        const data = await res.json();
+                        if (data && data.error) errMsg = data.error;
+                        else errMsg = JSON.stringify(data);
+                    } catch (parseErr) {
+                        try {
+                            const text = await res.text();
+                            if (text) errMsg = text;
+                        } catch (_) {}
+                    }
+                    console.error('POST /api/vacantes failed:', res.status, errMsg);
+                    formMessage.textContent = errMsg;
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Network error when posting vacante:', err);
+                formMessage.textContent = 'Error de conexión.';
+                submitBtn.disabled = false;
+            }
+        });
+    })();
+</script>
+
+
+</body></html>

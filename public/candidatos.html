@@ -151,13 +151,13 @@
 <span class="material-symbols-outlined">work</span>
 <span class="font-label-caps text-label-caps">Vacantes</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="entrevistas.html">
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="font-label-caps text-label-caps">Entrevistas</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-label-caps text-label-caps">Configuración</span>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="evaluaciones.html">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-caps text-label-caps">Evaluaciones</span>
 </a>
 </nav>
 </aside>
@@ -178,13 +178,7 @@
 <span class="material-symbols-outlined">help</span>
 </button>
 <div class="h-8 w-px bg-outline-variant mx-2"></div>
-<div class="flex items-center gap-3">
-<div class="text-right hidden sm:block">
-<p class="text-body-sm font-bold text-on-surface">Alex Recruiter</p>
-<p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sr. Manager</p>
-</div>
-<img alt="A professional headshot of a recruitment manager in a bright, modern corporate setting. The manager is wearing smart casual attire. Soft studio lighting highlights a confident expression. High-end photography style with a shallow depth of field, emphasizing executive professionalism and trust." class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACCSJiuOhe9a-BRMVhdwCB0AieQt9jlZvrMLoaciGf8dxT6-_BX_g2iIlymquKjcWtCYRoWxrB7-BYTFTCwM0eHUvUCaGda6mcXfytxPMyvpSdFnfwCxRcC8eJvmhjtHoqFCWIr2z7h3kR_163RDKP33fKgz_GjmZ-GzGeqCDj73cuacKWIrkWiYZw2yuejn0a-lqXC-0Kso7Y54rwRXGRCkn_9H0IICIoOy4gkt-dEvpEZ00hW8ACfNiFaOeBvEL1TUjuQUOnSDE"/>
-</div>
+<div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </div>
 </header>
@@ -195,10 +189,6 @@
 <p class="text-body-md text-on-surface-variant">Gestiona y realiza seguimiento de las postulaciones actuales en Serenity Talent.</p>
 </div>
 <div class="flex flex-col sm:flex-row gap-3">
-<button type="button" onclick="window.location.href='consulta_estado.html'" class="bg-secondary-container text-on-secondary-container px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">manage_search</span>
-<span>Consultar Estado</span>
-</button>
 <button type="button" onclick="window.location.href='registrarCandidatos.html'" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
 <span>Registrar Candidato</span>
@@ -222,13 +212,13 @@
 <th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Apellido</th>
 <th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Correo</th>
 <th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Teléfono</th>
-<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Fecha de Registro</th>
+<th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant">Estado</th>
 <th class="px-lg py-4 font-label-caps text-label-caps text-on-surface-variant text-center">Acciones</th>
 </tr>
 </thead>
 <tbody id="candidatos-tbody" class="divide-y divide-outline-variant">
 <tr>
-<td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">Cargando candidatos…</td>
+<td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="7">Cargando candidatos…</td>
 </tr>
 </tbody>
 </table>
@@ -311,15 +301,35 @@
                 .replaceAll("'", '&#039;');
         }
 
-        function buildCandidateRow(candidato) {
-    const initials = [candidato.Nombre, candidato.Apellido]
-        .filter(Boolean)
-        .map(name => name.trim().split(' ')[0])
-        .map(word => word[0] || '')
-        .join('')
-        .toUpperCase();
+        function getEstadoBadge(estado) {
+            const estadoTexto = estado || 'Activo';
 
-    return `
+            const clases = {
+                'Activo': 'bg-green-100 text-green-700',
+                'Inactivo': 'bg-red-100 text-red-700',
+                'Pendiente': 'bg-yellow-100 text-yellow-700',
+                'Contratado': 'bg-blue-100 text-blue-700',
+                'Rechazado': 'bg-red-100 text-red-700',
+                'En revisión': 'bg-yellow-100 text-yellow-700',
+                'Entrevista': 'bg-blue-100 text-blue-700'
+            };
+
+            return `
+                <span class="status-badge ${clases[estadoTexto] || 'bg-surface-container-high text-on-surface-variant'}">
+                    ${escapeHTML(estadoTexto)}
+                </span>
+            `;
+        }
+
+        function buildCandidateRow(candidato) {
+            const initials = [candidato.Nombre, candidato.Apellido]
+                .filter(Boolean)
+                .map(name => name.trim().split(' ')[0])
+                .map(word => word[0] || '')
+                .join('')
+                .toUpperCase();
+
+            return `
 <tr onclick="window.location.href='seguimiento_candidato.html?id=${candidato.IdCandidato}'"
     class="hover:bg-surface-container-low transition-colors group cursor-pointer">
 
@@ -350,43 +360,109 @@
         ${escapeHTML(candidato.Telefono || 'Sin teléfono')}
     </td>
 
-    <td class="px-lg py-3 text-body-md text-on-surface-variant font-data-mono">
-        ${formatDate(candidato.FechaRegistro)}
+    <td class="px-lg py-3 text-body-md">
+        ${getEstadoBadge(candidato.Estado)}
     </td>
 
-    <td class="px-lg py-3 text-center">
-        <button 
-            onclick="event.stopPropagation(); crearPostulacionYActualizar(${candidato.IdCandidato})"
-            class="px-3 py-1 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all">
-            Cambiar estado
-        </button>
+    <td class="px-lg py-3 text-center relative">
+        <div class="relative inline-block">
+            <button 
+                type="button"
+                onclick="event.stopPropagation(); toggleMenu(${candidato.IdCandidato})"
+                class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+                <span class="material-symbols-outlined">more_vert</span>
+            </button>
+
+            <div id="menu-${candidato.IdCandidato}" 
+                class="hidden absolute right-0 mt-2 w-52 bg-white border border-outline-variant rounded-lg shadow-lg z-50 overflow-hidden">
+
+                <button
+                    type="button"
+                    onclick="event.stopPropagation(); programarEntrevista(${candidato.IdCandidato})"
+                    class="w-full px-4 py-2 text-left text-body-sm hover:bg-surface-container-low flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">calendar_add_on</span>
+                    Programar entrevista
+                </button>
+
+                <button 
+                    type="button"
+                    onclick="event.stopPropagation(); actualizarCandidato(${candidato.IdCandidato})"
+                    class="w-full px-4 py-2 text-left text-body-sm hover:bg-surface-container-low flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    Actualizar
+                </button>
+
+                <button 
+                    type="button"
+                    onclick="event.stopPropagation(); eliminarCandidato(${candidato.IdCandidato})"
+                    class="w-full px-4 py-2 text-left text-body-sm text-error hover:bg-error-container flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                    Eliminar
+                </button>
+            </div>
+        </div>
     </td>
 </tr>`;
-}
+        }
 
-        window.crearPostulacionYActualizar = async function(IdCandidato) {
-            try {
-                const response = await fetch(`${API}/postulaciones/crear-o-buscar`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ IdCandidato })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'No se pudo crear o buscar la postulación');
+        window.toggleMenu = function(IdCandidato) {
+            document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+                if (menu.id !== `menu-${IdCandidato}`) {
+                    menu.classList.add('hidden');
                 }
+            });
 
-                window.location.href = `actualizar_estado.html?id=${data.postulacion.IdPostulacion}`;
-
-            } catch (error) {
-                console.error('Error abriendo actualización de estado:', error);
-                alert(error.message || 'Error al abrir actualización de estado.');
+            const menu = document.getElementById(`menu-${IdCandidato}`);
+            if (menu) {
+                menu.classList.toggle('hidden');
             }
         };
+
+        window.actualizarCandidato = function(IdCandidato) {
+            window.location.href = `actualizar_candidato.html?id=${IdCandidato}`;
+        };
+
+        window.programarEntrevista = function(IdCandidato) {
+            window.location.href = `entrevistas.html?id=${IdCandidato}`;
+        };
+
+        window.eliminarCandidato = async function(IdCandidato) {
+            const confirmar = confirm('¿Seguro que deseas eliminar este candidato?');
+
+            if (!confirmar) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/candidatos/${IdCandidato}`, {
+                    method: 'DELETE'
+                });
+
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = {};
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo eliminar el candidato');
+                }
+
+                alert('Candidato eliminado correctamente.');
+                loadCandidates();
+
+            } catch (error) {
+                console.error('Error eliminando candidato:', error);
+                alert(error.message || 'Error al eliminar el candidato.');
+            }
+        };
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        });
 
         async function loadCandidates() {
             const tbody = document.getElementById('candidatos-tbody');
@@ -404,7 +480,7 @@
                 if (!Array.isArray(candidates) || candidates.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">
+                            <td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="7">
                                 No hay candidatos registrados aún.
                             </td>
                         </tr>
@@ -424,7 +500,7 @@
 
                 tbody.innerHTML = `
                     <tr>
-                        <td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="6">
+                        <td class="px-lg py-6 text-center text-body-md text-on-surface-variant" colspan="7">
                             Error al cargar candidatos.
                         </td>
                     </tr>
@@ -457,5 +533,34 @@
 
         loadCandidates();
     });
+</script>
+<script>
+  function renderHeaderUser() {
+    const container = document.getElementById('header-user');
+    if (!container) return;
+
+    try {
+      const storedUser = localStorage.getItem('st_usuario');
+      if (!storedUser) {
+        container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        return;
+      }
+
+      const usuario = JSON.parse(storedUser);
+      const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
+      const rol = usuario.rol === 1 ? 'Administrador' : usuario.rol === 2 ? 'Reclutador' : 'Usuario';
+
+      container.innerHTML = `
+        <div class="text-right hidden sm:block">
+          <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
+          <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
+        </div>
+      `;
+    } catch (error) {
+      container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderHeaderUser);
 </script>
 </body></html>

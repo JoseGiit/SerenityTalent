@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Serenity Talent - Actualizar Candidato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "inverse-primary": "#adc7ff",
+                        "on-secondary-container": "#09657f",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#c64f00",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#0070ea",
+                        "outline-variant": "#c1c6d7",
+                        "surface-container": "#edeeef",
+                        "secondary": "#0c6780",
+                        "surface-dim": "#d9dadb",
+                        "primary": "#0059bb",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "outline": "#717786",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#9ae1ff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary-container": "#fefcff",
+                        "surface-variant": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#414754"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.125rem",
+                        lg: "0.25rem",
+                        xl: "0.5rem",
+                        full: "0.75rem"
+                    },
+                    spacing: {
+                        "container-max": "1440px",
+                        md: "16px",
+                        xl: "40px",
+                        lg: "24px",
+                        xs: "4px",
+                        sm: "8px",
+                        base: "4px",
+                        gutter: "16px"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-caps": ["11px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "700" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }]
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<div class="flex min-h-screen overflow-hidden">
+    <aside class="w-[280px] border-r border-outline-variant flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
+        <div class="flex items-center gap-3 mb-xl">
+            <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">work</span>
+            </div>
+            <div>
+                <h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+                <p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="index.html">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-label-caps text-label-caps">Tablero</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="candidatos.html">
+                <span class="material-symbols-outlined">group</span>
+                <span class="font-label-caps text-label-caps">Candidatos</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="vacantes.html">
+                <span class="material-symbols-outlined">work</span>
+                <span class="font-label-caps text-label-caps">Vacantes</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 min-w-0 overflow-y-auto">
+        <header class="h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center px-lg">
+            <button type="button" onclick="window.location.href='candidatos.html'" class="flex items-center gap-2 text-primary font-bold hover:underline">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Volver a candidatos
+            </button>
+        </header>
+
+        <section class="p-lg lg:p-xl max-w-3xl mx-auto">
+            <div class="mb-lg">
+                <h2 class="font-headline-md text-headline-md text-on-surface">Actualizar candidato</h2>
+                <p class="text-body-md text-on-surface-variant">Modifica la información general del candidato seleccionado.</p>
+            </div>
+
+            <div id="message" class="hidden mb-md p-4 rounded-lg text-body-md"></div>
+
+            <form id="form-candidato" class="bg-white rounded-xl border border-outline-variant shadow-sm p-lg space-y-md">
+                <input type="hidden" id="IdCandidato" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div>
+                        <label for="Nombre" class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Nombre</label>
+                        <input id="Nombre" name="Nombre" type="text" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" placeholder="Nombre" />
+                    </div>
+                    <div>
+                        <label for="Apellido" class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Apellido</label>
+                        <input id="Apellido" name="Apellido" type="text" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" placeholder="Apellido" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div>
+                        <label for="Correo" class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Correo</label>
+                        <input id="Correo" name="Correo" type="email" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" placeholder="correo@ejemplo.com" />
+                    </div>
+                    <div>
+                        <label for="Telefono" class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Teléfono</label>
+                        <input id="Telefono" name="Telefono" type="text" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary" placeholder="8888-8888" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="Estado" class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Estado</label>
+                    <select id="Estado" name="Estado" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                        <option value="Activo">Activo</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En revisión">En revisión</option>
+                        <option value="Entrevista">Entrevista</option>
+                        <option value="Contratado">Contratado</option>
+                        <option value="Rechazado">Rechazado</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-end gap-3 pt-md border-t border-outline-variant">
+                    <button type="button" onclick="window.location.href='candidatos.html'" class="px-lg py-3 rounded-lg font-bold border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-all">
+                        Cancelar
+                    </button>
+                    <button id="btn-guardar" type="submit" class="px-lg py-3 rounded-lg font-bold bg-primary text-on-primary hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">save</span>
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const API = '/api';
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const form = document.getElementById('form-candidato');
+        const message = document.getElementById('message');
+        const btnGuardar = document.getElementById('btn-guardar');
+
+        function showMessage(text, type = 'error') {
+            message.textContent = text;
+            message.classList.remove('hidden', 'bg-error-container', 'text-on-error-container', 'bg-green-100', 'text-green-700');
+
+            if (type === 'success') {
+                message.classList.add('bg-green-100', 'text-green-700');
+            } else {
+                message.classList.add('bg-error-container', 'text-on-error-container');
+            }
+        }
+
+        function setValue(idCampo, valor) {
+            const campo = document.getElementById(idCampo);
+            if (campo) campo.value = valor || '';
+        }
+
+        async function cargarCandidato() {
+            if (!id) {
+                showMessage('No se recibió el ID del candidato.');
+                form.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/candidatos/${id}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo cargar el candidato.');
+                }
+
+                const candidato = Array.isArray(data) ? data[0] : data;
+
+                if (!candidato) {
+                    throw new Error('Candidato no encontrado.');
+                }
+
+                setValue('IdCandidato', candidato.IdCandidato);
+                setValue('Nombre', candidato.Nombre);
+                setValue('Apellido', candidato.Apellido);
+                setValue('Correo', candidato.Correo);
+                setValue('Telefono', candidato.Telefono);
+                setValue('Estado', candidato.Estado || 'Activo');
+
+            } catch (error) {
+                console.error('Error cargando candidato:', error);
+                showMessage(error.message || 'Error al cargar el candidato.');
+            }
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const payload = {
+                Nombre: document.getElementById('Nombre').value.trim(),
+                Apellido: document.getElementById('Apellido').value.trim(),
+                Correo: document.getElementById('Correo').value.trim(),
+                Telefono: document.getElementById('Telefono').value.trim(),
+                Estado: document.getElementById('Estado').value
+            };
+
+            if (!payload.Nombre || !payload.Apellido || !payload.Correo) {
+                showMessage('Nombre, apellido y correo son obligatorios.');
+                return;
+            }
+
+            try {
+                btnGuardar.disabled = true;
+                btnGuardar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Guardando...';
+
+                const response = await fetch(`${API}/candidatos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo actualizar el candidato.');
+                }
+
+                showMessage('Candidato actualizado correctamente.', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'candidatos.html';
+                }, 900);
+
+            } catch (error) {
+                console.error('Error actualizando candidato:', error);
+                showMessage(error.message || 'Error al actualizar el candidato.');
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span> Guardar cambios';
+            }
+        });
+
+        cargarCandidato();
+    });
+</script>
+</body>
+</html>
