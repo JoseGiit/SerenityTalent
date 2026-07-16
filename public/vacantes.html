@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html class="light" lang="es"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -139,29 +138,34 @@
 </head>
 <body class="bg-background text-on-surface font-body-md overflow-hidden h-screen flex">
 <!-- SideNavBar Shell -->
-<aside class="docked left-0 h-screen w-[280px] bg-surface border-r border-outline-variant flex flex-col py-lg px-md shrink-0">
-<div class="mb-xl px-sm">
+<aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
+<div class="flex items-center gap-3 mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">work</span>
+</div>
+<div>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
-<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Suite de Reclutamiento</p>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
+</div>
 </div>
 <nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="index.html">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="index.html">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="font-body-md">Panel de Control</span>
+<span class="font-label-caps text-label-caps">Tablero</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="candidatos.html">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="candidatos.html">
 <span class="material-symbols-outlined">group</span>
-<span class="font-body-md">Candidatos</span>
+<span class="font-label-caps text-label-caps">Candidatos</span>
 </a>
-<!-- Active State: Vacantes -->
-<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg opacity-80 scale-95 duration-150" href="vacantes.html">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="vacantes.html">
 <span class="material-symbols-outlined">work</span>
-<span class="font-body-md">Vacantes</span>
+<span class="font-label-caps text-label-caps">Vacantes</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="entrevistas.html">
 <span class="material-symbols-outlined">calendar_today</span>
-<span class="font-body-md">Entrevistas</span>
+<span class="font-label-caps text-label-caps">Entrevistas</span>
 </a>
+<<<<<<< Updated upstream
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
 <span class="material-symbols-outlined">settings</span>
 <span class="font-body-md">Configuración</span>
@@ -173,6 +177,13 @@
                 Nueva Vacante
             </button>
 </div>
+=======
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="evaluaciones.html">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-caps text-label-caps">Evaluaciones</span>
+</a>
+</nav>
+>>>>>>> Stashed changes
 </aside>
 <!-- Main Content Shell -->
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -362,7 +373,6 @@
 </div>
 </div>
 </div>
-</div>
 </main>
 </div>
 <!-- Micro-interaction Scripts -->
@@ -403,5 +413,75 @@
                 }
             })
         });
+<<<<<<< Updated upstream
+=======
+
+        async function loadVacantes() {
+            const statusEl = document.getElementById('vacantesStatus');
+            const container = document.getElementById('vacantesContainer');
+            const activeCountEl = document.getElementById('activeVacantesCount');
+            const activeLabelEl = document.getElementById('activeVacantesLabel');
+
+            if (!statusEl || !container || !activeCountEl || !activeLabelEl) {
+                return;
+            }
+
+            statusEl.textContent = 'Cargando vacantes...';
+            container.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/vacantes');
+                if (!response.ok) {
+                    throw new Error('Error al cargar vacantes');
+                }
+                const vacantes = await response.json();
+                const activeVacantes = vacantes.filter(v => String(v.Estado || '').toLowerCase() === 'activa');
+
+                activeCountEl.textContent = activeVacantes.length;
+                activeLabelEl.textContent = activeVacantes.length === 1 ? 'vacante activa' : 'vacantes activas';
+
+                if (!vacantes.length) {
+                    statusEl.textContent = 'No se encontraron vacantes.';
+                    container.innerHTML = '<div class="col-span-12 bg-surface-container-high rounded-xl p-lg text-center text-on-surface-variant">Aún no hay vacantes publicadas. Crea una nueva vacante para empezar.</div>';
+                    return;
+                }
+
+                statusEl.textContent = `Mostrando ${vacantes.length} vacante${vacantes.length === 1 ? '' : 's'}`;
+
+                vacantes.forEach(vacante => {
+                    const departamento = vacante.Departamento || 'General';
+                    const estado = vacante.Estado || 'Activa';
+                    const fechaCreacion = vacante.FechaCreacion || '';
+                    const fechaCierre = vacante.FechaCierre ? `• Cierra ${vacante.FechaCierre}` : '';
+
+                    const card = document.createElement('article');
+                    card.className = 'bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-md">
+                            <div class="w-12 h-12 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-[28px]">work_outline</span>
+                            </div>
+                            <span class="bg-primary/10 text-primary font-label-caps text-label-caps px-2 py-1 rounded-sm">${departamento}</span>
+                        </div>
+                        <h4 class="font-headline-sm text-headline-sm text-on-surface mb-1">${vacante.Titulo || 'Vacante sin título'}</h4>
+                        <p class="font-body-sm text-on-surface-variant mb-4">${estado} • ${fechaCreacion} ${fechaCierre}</p>
+                        <div class="font-body-md text-on-surface-variant line-clamp-3 mb-lg">${vacante.Descripcion || 'Sin descripción disponible.'}</div>
+                        <div class="mt-auto flex items-center justify-between pt-md border-t border-outline-variant">
+                            <span class="font-body-sm text-on-surface-variant">${estado}</span>
+                            <a href="postulacionCandidato.html?vacante=${vacante.IdVacante}" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm font-bold group-hover:scale-105 transition-transform inline-block text-center">Ver vacante</a>
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                statusEl.textContent = 'No se pudo cargar la lista de vacantes. Intenta de nuevo.';
+                container.innerHTML = '<div class="col-span-12 bg-surface-container-high rounded-xl p-lg text-center text-on-surface-variant">Error al obtener vacantes desde el servidor.</div>';
+                console.error(error);
+            }
+        }
+
+        window.addEventListener('load', loadVacantes);
+>>>>>>> Stashed changes
     </script>
 </body></html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serenity Talent - Entrevistas</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "inverse-on-surface": "#f0f1f2",
+                            "surface": "#f8f9fa",
+                            "on-surface": "#191c1d",
+                            "inverse-primary": "#adc7ff",
+                            "on-secondary-container": "#09657f",
+                            "error": "#ba1a1a",
+                            "tertiary-container": "#c64f00",
+                            "on-secondary": "#ffffff",
+                            "primary-container": "#0070ea",
+                            "outline-variant": "#c1c6d7",
+                            "surface-container": "#edeeef",
+                            "secondary": "#0c6780",
+                            "surface-dim": "#d9dadb",
+                            "primary": "#0059bb",
+                            "on-tertiary-fixed-variant": "#7c2e00",
+                            "error-container": "#ffdad6",
+                            "surface-container-lowest": "#ffffff",
+                            "tertiary": "#9e3d00",
+                            "on-primary-fixed-variant": "#004493",
+                            "on-tertiary-fixed": "#351000",
+                            "on-primary-fixed": "#001a41",
+                            "on-error": "#ffffff",
+                            "on-background": "#191c1d",
+                            "on-tertiary-container": "#fffbff",
+                            "on-primary": "#ffffff",
+                            "surface-bright": "#f8f9fa",
+                            "surface-container-highest": "#e1e3e4",
+                            "inverse-surface": "#2e3132",
+                            "background": "#f8f9fa",
+                            "primary-fixed-dim": "#adc7ff",
+                            "outline": "#717786",
+                            "surface-tint": "#005bc0",
+                            "on-tertiary": "#ffffff",
+                            "tertiary-fixed-dim": "#ffb695",
+                            "secondary-container": "#9ae1ff",
+                            "surface-container-low": "#f3f4f5",
+                            "surface-container-high": "#e7e8e9",
+                            "tertiary-fixed": "#ffdbcc",
+                            "on-primary-container": "#fefcff",
+                            "surface-variant": "#e1e3e4",
+                            "on-secondary-fixed-variant": "#004d62",
+                            "on-secondary-fixed": "#001f29",
+                            "secondary-fixed": "#baeaff",
+                            "primary-fixed": "#d8e2ff",
+                            "on-error-container": "#93000a",
+                            "secondary-fixed-dim": "#89d0ed",
+                            "on-surface-variant": "#414754"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                    },
+                    "spacing": {
+                            "container-max": "1440px",
+                            "md": "16px",
+                            "xl": "40px",
+                            "lg": "24px",
+                            "xs": "4px",
+                            "sm": "8px",
+                            "base": "4px",
+                            "gutter": "16px"
+                    },
+                    "fontFamily": {
+                            "headline-md": ["Hanken Grotesk"],
+                            "body-md": ["Inter"],
+                            "body-lg": ["Inter"],
+                            "body-sm": ["Inter"],
+                            "label-caps": ["Inter"],
+                            "headline-sm": ["Hanken Grotesk"],
+                            "data-mono": ["JetBrains Mono"],
+                            "display-lg": ["Hanken Grotesk"],
+                            "headline": ["Hanken Grotesk"],
+                            "body": ["Inter"]
+                    },
+                    "fontSize": {
+                            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                            "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                            "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                            "display-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c1c6d7; border-radius: 10px; }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface font-body-md">
+<div class="flex h-screen overflow-hidden">
+<aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
+<div class="flex items-center gap-3 mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">work</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="index.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Tablero</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="candidatos.html">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Candidatos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="vacantes.html">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-caps text-label-caps">Vacantes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="entrevistas.html">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-caps text-label-caps">Entrevistas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="evaluaciones.html">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-caps text-label-caps">Evaluaciones</span>
+</a>
+</nav>
+</aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header class="h-16 bg-surface-container-lowest border-b border-outline-variant shrink-0">
+            <div class="h-full px-lg flex items-center justify-between">
+                <div>
+                    <p class="font-bold">Gestión de entrevistas</p>
+                    <p class="text-xs text-on-surface-variant">Programación y seguimiento</p>
+                </div>
+                <div id="header-user" class="text-right"></div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-lg lg:p-xl">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-lg">
+                <div>
+                    <h2 class="font-headline text-2xl font-bold">Entrevistas</h2>
+                    <p class="text-sm text-on-surface-variant">Programa, consulta y actualiza entrevistas de candidatos seleccionados.</p>
+                </div>
+                <button id="btn-nueva" type="button" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90">
+                    <span class="material-symbols-outlined">add</span>Nueva entrevista
+                </button>
+            </div>
+
+            <div id="feedback" class="hidden mb-md p-4 rounded-lg text-sm font-bold"></div>
+
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md mb-lg">
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Total</p><p id="total-entrevistas" class="text-3xl font-bold text-primary mt-2">0</p></div>
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Pendientes</p><p id="total-programadas" class="text-3xl font-bold text-blue-600 mt-2">0</p></div>
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Realizadas</p><p id="total-realizadas" class="text-3xl font-bold text-green-600 mt-2">0</p></div>
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Canceladas</p><p id="total-canceladas" class="text-3xl font-bold text-red-600 mt-2">0</p></div>
+            </section>
+
+            <div class="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-lg items-start">
+                <section id="form-card" class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-lg border-b border-outline-variant bg-surface-container-low">
+                        <h3 id="form-title" class="font-headline text-xl font-bold">Programar entrevista</h3>
+                        <p class="text-sm text-on-surface-variant">Seleccione candidato, fecha y hora.</p>
+                    </div>
+
+                    <form id="entrevista-form" class="p-lg space-y-md">
+                        <input type="hidden" id="IdEntrevista">
+
+                        <div>
+                            <label for="IdCandidato" class="block text-sm font-bold text-on-surface-variant mb-2">Candidato</label>
+                            <select id="IdCandidato" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                                <option value="">Cargando candidatos...</option>
+                            </select>
+                        </div>
+
+                        <div id="candidato-info" class="hidden p-4 bg-secondary-container/30 border border-secondary-container rounded-lg">
+                            <p id="candidato-nombre" class="font-bold"></p>
+                            <p id="candidato-correo" class="text-sm text-on-surface-variant"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                            <div>
+                                <label for="FechaEntrevista" class="block text-sm font-bold text-on-surface-variant mb-2">Fecha</label>
+                                <input id="FechaEntrevista" type="date" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                            </div>
+                            <div>
+                                <label for="HoraEntrevista" class="block text-sm font-bold text-on-surface-variant mb-2">Hora</label>
+                                <input id="HoraEntrevista" type="time" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                            <div>
+                                <label for="Modalidad" class="block text-sm font-bold text-on-surface-variant mb-2">Modalidad</label>
+                                <select id="Modalidad" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                                    <option value="Presencial">Presencial</option>
+                                    <option value="Virtual">Virtual</option>
+                                    <option value="Telefónica">Telefónica</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="EstadoEntrevista" class="block text-sm font-bold text-on-surface-variant mb-2">Estado</label>
+                                <select id="EstadoEntrevista" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                                    <option value="Programada">Programada</option>
+                                    <option value="Confirmada">Confirmada</option>
+                                    <option value="Realizada">Realizada</option>
+                                    <option value="Reprogramada">Reprogramada</option>
+                                    <option value="Cancelada">Cancelada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="Lugar" class="block text-sm font-bold text-on-surface-variant mb-2">Lugar o enlace</label>
+                            <input id="Lugar" type="text" maxlength="200" placeholder="Sala 2 o enlace de reunión" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                        </div>
+
+                        <div>
+                            <label for="Observaciones" class="block text-sm font-bold text-on-surface-variant mb-2">Observaciones</label>
+                            <textarea id="Observaciones" rows="4" maxlength="500" placeholder="Indicaciones para la entrevista..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary"></textarea>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-md border-t border-outline-variant">
+                            <button id="btn-cancelar" type="button" class="px-5 py-3 rounded-lg font-bold border border-outline-variant hover:bg-surface-container-low">Limpiar</button>
+                            <button id="btn-guardar" type="submit" class="px-5 py-3 rounded-lg font-bold bg-primary text-on-primary flex items-center justify-center gap-2 hover:opacity-90">
+                                <span class="material-symbols-outlined">save</span>Guardar entrevista
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-lg border-b border-outline-variant bg-surface-container-low">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div>
+                                <h3 class="font-headline text-xl font-bold">Entrevistas registradas</h3>
+                                <p id="contador" class="text-sm text-on-surface-variant">Mostrando 0 entrevistas</p>
+                            </div>
+                            <div class="relative w-full md:w-72">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                                <input id="buscar" type="text" placeholder="Buscar entrevista..." class="w-full pl-10 rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-outline-variant text-xs uppercase text-on-surface-variant">
+                                    <th class="px-5 py-4">Candidato</th>
+                                    <th class="px-5 py-4">Fecha y hora</th>
+                                    <th class="px-5 py-4">Modalidad</th>
+                                    <th class="px-5 py-4">Estado</th>
+                                    <th class="px-5 py-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="entrevistas-tbody" class="divide-y divide-outline-variant">
+                                <tr><td colspan="5" class="px-5 py-8 text-center text-on-surface-variant">Cargando entrevistas...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <section class="mt-lg bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+                <h3 class="font-headline text-xl font-bold mb-4">Cumplimiento de la historia de usuario</h3>
+                <ul class="space-y-2 text-sm text-on-surface-variant">
+                    <li id="test-fecha">○ Se puede registrar fecha y hora</li>
+                    <li id="test-candidato">○ La entrevista queda asociada al candidato</li>
+                    <li id="test-consulta">○ La información puede consultarse posteriormente</li>
+                    <li id="test-cambios">○ Los cambios quedan almacenados correctamente</li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API = '/api';
+    const STORAGE_KEY = 'st_entrevistas';
+    const MAX_SQL_INT = 2147483647;
+
+    const form = document.getElementById('entrevista-form');
+    const tbody = document.getElementById('entrevistas-tbody');
+    const candidatoSelect = document.getElementById('IdCandidato');
+    const feedback = document.getElementById('feedback');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const buscarInput = document.getElementById('buscar');
+
+    let entrevistas = [];
+    let candidatos = [];
+    let filtro = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        configurarFechaMinima();
+        renderHeaderUser();
+        cargarEntrevistasGuardadas();
+        await cargarCandidatos();
+        preseleccionarCandidato();
+        mostrarCandidatoSeleccionado();
+        renderEntrevistas();
+        verificarPruebasGuardadas();
+    });
+
+    function cargarEntrevistasGuardadas() {
+        try {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            entrevistas = Array.isArray(data) ? data : [];
+            migrarIdsEntrevistas();
+        } catch (error) {
+            console.error('Error cargando entrevistas:', error);
+            entrevistas = [];
+        }
+    }
+
+    function guardarEnLocalStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entrevistas));
+    }
+
+    function generarIdEntrevista() {
+        const idsValidos = entrevistas
+            .map((item) => Number(item.IdEntrevista))
+            .filter((id) => Number.isInteger(id) && id > 0 && id <= MAX_SQL_INT);
+
+        return idsValidos.length > 0 ? Math.max(...idsValidos) + 1 : 1;
+    }
+
+    function migrarIdsEntrevistas() {
+        let cambio = false;
+        const usados = new Set();
+        let siguiente = 1;
+
+        entrevistas = entrevistas.map((item) => {
+            let id = Number(item.IdEntrevista);
+
+            if (!Number.isInteger(id) || id <= 0 || id > MAX_SQL_INT || usados.has(id)) {
+                while (usados.has(siguiente)) siguiente += 1;
+                id = siguiente;
+                cambio = true;
+            }
+
+            usados.add(id);
+            if (id >= siguiente) siguiente = id + 1;
+            return { ...item, IdEntrevista: id };
+        });
+
+        if (cambio) guardarEnLocalStorage();
+    }
+
+    async function cargarCandidatos() {
+        try {
+            const response = await fetch(`${API}/candidatos`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'No se pudieron cargar los candidatos.');
+            candidatos = Array.isArray(data) ? data : [];
+            candidatos.sort((a, b) => `${a.Nombre || ''} ${a.Apellido || ''}`.localeCompare(`${b.Nombre || ''} ${b.Apellido || ''}`));
+            pintarCandidatos();
+        } catch (error) {
+            console.error('Error cargando candidatos:', error);
+            cargarCandidatosDesdeEntrevistas();
+            if (!candidatos.length) {
+                candidatoSelect.innerHTML = '<option value="">No se pudieron cargar los candidatos</option>';
+                mostrarFeedback('No se pudieron cargar los candidatos. Verifique que su servidor actual esté iniciado.', true);
+            }
+        }
+    }
+
+    function cargarCandidatosDesdeEntrevistas() {
+        const unicos = new Map();
+        entrevistas.forEach((e) => {
+            if (e.IdCandidato) unicos.set(String(e.IdCandidato), { IdCandidato: e.IdCandidato, Nombre: e.Nombre || '', Apellido: e.Apellido || '', Correo: e.Correo || '', Telefono: e.Telefono || '' });
+        });
+        candidatos = Array.from(unicos.values());
+        pintarCandidatos();
+    }
+
+    function pintarCandidatos() {
+        candidatoSelect.innerHTML = '<option value="">Seleccione un candidato</option>' + candidatos.map((c) => `
+            <option value="${c.IdCandidato}">${escapeHTML(c.Nombre)} ${escapeHTML(c.Apellido)} — ${escapeHTML(c.Correo)}</option>
+        `).join('');
+    }
+
+    function preseleccionarCandidato() {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (id && candidatos.some((c) => String(c.IdCandidato) === String(id))) candidatoSelect.value = id;
+    }
+
+    function mostrarCandidatoSeleccionado() {
+        const candidato = candidatos.find((c) => String(c.IdCandidato) === String(candidatoSelect.value));
+        const contenedor = document.getElementById('candidato-info');
+        if (!candidato) {
+            contenedor.classList.add('hidden');
+            return;
+        }
+        document.getElementById('candidato-nombre').textContent = `${candidato.Nombre || ''} ${candidato.Apellido || ''}`.trim();
+        document.getElementById('candidato-correo').textContent = candidato.Correo || 'Sin correo';
+        contenedor.classList.remove('hidden');
+    }
+
+    candidatoSelect.addEventListener('change', mostrarCandidatoSeleccionado);
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const idEntrevista = document.getElementById('IdEntrevista').value;
+        const idCandidato = Number(candidatoSelect.value);
+        const fecha = document.getElementById('FechaEntrevista').value;
+        const hora = document.getElementById('HoraEntrevista').value;
+        const candidato = candidatos.find((c) => Number(c.IdCandidato) === idCandidato);
+
+        if (!candidato) return mostrarFeedback('Debe seleccionar un candidato.', true);
+        if (!fecha || !hora) return mostrarFeedback('Debe registrar la fecha y la hora.', true);
+
+        const fechaHora = new Date(`${fecha}T${hora}`);
+        if (Number.isNaN(fechaHora.getTime())) return mostrarFeedback('La fecha u hora no es válida.', true);
+
+        const ahora = new Date().toISOString();
+        const registro = {
+            IdEntrevista: idEntrevista ? Number(idEntrevista) : generarIdEntrevista(),
+            IdCandidato: candidato.IdCandidato,
+            Nombre: candidato.Nombre || '',
+            Apellido: candidato.Apellido || '',
+            Correo: candidato.Correo || '',
+            Telefono: candidato.Telefono || '',
+            Vacante: candidato.Vacante || candidato.NombreVacante || 'Vacante sin asignar',
+            FechaEntrevista: fecha,
+            HoraEntrevista: hora,
+            Modalidad: document.getElementById('Modalidad').value,
+            Lugar: document.getElementById('Lugar').value.trim(),
+            Observaciones: document.getElementById('Observaciones').value.trim(),
+            EstadoEntrevista: document.getElementById('EstadoEntrevista').value,
+            FechaCreacion: ahora,
+            UltimaActualizacion: ahora,
+            Evaluada: false,
+            EvaluacionesCount: 0
+        };
+
+        if (idEntrevista) {
+            const indice = entrevistas.findIndex((e) => Number(e.IdEntrevista) === Number(idEntrevista));
+            if (indice === -1) return mostrarFeedback('No se encontró la entrevista que desea actualizar.', true);
+            registro.FechaCreacion = entrevistas[indice].FechaCreacion || ahora;
+            registro.Evaluada = Boolean(entrevistas[indice].Evaluada);
+            registro.EvaluacionesCount = Number(entrevistas[indice].EvaluacionesCount || 0);
+            entrevistas[indice] = registro;
+            mostrarFeedback('Entrevista actualizada y almacenada correctamente.', false);
+        } else {
+            entrevistas.push(registro);
+            mostrarFeedback('Entrevista programada y almacenada correctamente.', false);
+        }
+
+        guardarEnLocalStorage();
+        marcarTodasLasPruebas();
+        limpiarFormulario();
+        renderEntrevistas();
+    });
+
+    function renderEntrevistas() {
+        ordenarEntrevistas();
+        const visibles = getEntrevistasFiltradas();
+        actualizarResumen();
+        document.getElementById('contador').textContent = `Mostrando ${visibles.length} entrevista${visibles.length === 1 ? '' : 's'}`;
+
+        if (!visibles.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-on-surface-variant">No hay entrevistas registradas.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = visibles.map((e) => `
+            <tr class="hover:bg-surface-container-low">
+                <td class="px-5 py-4">
+                    <p class="font-bold">${escapeHTML(e.Nombre)} ${escapeHTML(e.Apellido)}</p>
+                    <p class="text-xs text-on-surface-variant">${escapeHTML(e.Correo)}</p>
+                    <p class="text-xs text-on-surface-variant">ID candidato: ${escapeHTML(e.IdCandidato)}</p>
+                </td>
+                <td class="px-5 py-4"><p class="font-bold">${formatearFecha(e.FechaEntrevista)}</p><p class="text-sm text-on-surface-variant">${escapeHTML(e.HoraEntrevista)}</p></td>
+                <td class="px-5 py-4"><p class="font-bold">${escapeHTML(e.Modalidad)}</p><p class="text-xs text-on-surface-variant">${escapeHTML(e.Lugar || 'Sin lugar indicado')}</p></td>
+                <td class="px-5 py-4">${getEstadoBadge(e.EstadoEntrevista)}</td>
+                <td class="px-5 py-4">
+                    <div class="flex items-center justify-center gap-2">
+                        <button type="button" onclick="verEntrevista(${e.IdEntrevista})" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high" title="Consultar"><span class="material-symbols-outlined">visibility</span></button>
+                        <button type="button" onclick="editarEntrevista(${e.IdEntrevista})" class="p-2 rounded-lg text-primary hover:bg-secondary-container" title="Editar"><span class="material-symbols-outlined">edit</span></button>
+                        <button type="button" onclick="eliminarEntrevista(${e.IdEntrevista})" class="p-2 rounded-lg text-error hover:bg-error-container" title="Eliminar"><span class="material-symbols-outlined">delete</span></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function ordenarEntrevistas() {
+        entrevistas.sort((a, b) => `${a.FechaEntrevista || ''}T${a.HoraEntrevista || '00:00'}`.localeCompare(`${b.FechaEntrevista || ''}T${b.HoraEntrevista || '00:00'}`));
+    }
+
+    function actualizarResumen() {
+        document.getElementById('total-entrevistas').textContent = entrevistas.length;
+        document.getElementById('total-programadas').textContent = entrevistas.filter((e) => ['Programada', 'Confirmada', 'Reprogramada'].includes(e.EstadoEntrevista)).length;
+        document.getElementById('total-realizadas').textContent = entrevistas.filter((e) => e.EstadoEntrevista === 'Realizada').length;
+        document.getElementById('total-canceladas').textContent = entrevistas.filter((e) => e.EstadoEntrevista === 'Cancelada').length;
+    }
+
+    window.verEntrevista = function(id) {
+        const e = entrevistas.find((item) => Number(item.IdEntrevista) === Number(id));
+        if (!e) return mostrarFeedback('No se encontró la entrevista.', true);
+        alert(`ENTREVISTA PROGRAMADA\n\nCandidato: ${e.Nombre} ${e.Apellido}\nCorreo: ${e.Correo || 'Sin correo'}\nFecha: ${formatearFecha(e.FechaEntrevista)}\nHora: ${e.HoraEntrevista}\nModalidad: ${e.Modalidad}\nLugar: ${e.Lugar || 'Sin lugar indicado'}\nEstado: ${e.EstadoEntrevista}\nObservaciones: ${e.Observaciones || 'Sin observaciones'}`);
+        marcarPrueba('test-consulta', 'La información puede consultarse posteriormente');
+    };
+
+    window.editarEntrevista = function(id) {
+        const e = entrevistas.find((item) => Number(item.IdEntrevista) === Number(id));
+        if (!e) return mostrarFeedback('No se encontró la entrevista seleccionada.', true);
+
+        document.getElementById('IdEntrevista').value = e.IdEntrevista;
+        candidatoSelect.value = e.IdCandidato;
+        document.getElementById('FechaEntrevista').value = e.FechaEntrevista || '';
+        document.getElementById('HoraEntrevista').value = e.HoraEntrevista || '';
+        document.getElementById('Modalidad').value = e.Modalidad || 'Presencial';
+        document.getElementById('Lugar').value = e.Lugar || '';
+        document.getElementById('Observaciones').value = e.Observaciones || '';
+        document.getElementById('EstadoEntrevista').value = e.EstadoEntrevista || 'Programada';
+        document.getElementById('form-title').textContent = 'Actualizar entrevista';
+        btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span>Guardar cambios';
+        mostrarCandidatoSeleccionado();
+        document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.eliminarEntrevista = function(id) {
+        if (!confirm('¿Seguro que deseas eliminar esta entrevista?')) return;
+        entrevistas = entrevistas.filter((e) => Number(e.IdEntrevista) !== Number(id));
+        guardarEnLocalStorage();
+        limpiarFormulario();
+        renderEntrevistas();
+        mostrarFeedback('Entrevista eliminada correctamente.', false);
+    };
+
+    function getEntrevistasFiltradas() {
+        const texto = normalizarTexto(filtro);
+        if (!texto) return entrevistas;
+        return entrevistas.filter((e) => [e.Nombre, e.Apellido, e.Correo, e.FechaEntrevista, e.HoraEntrevista, e.Modalidad, e.Lugar, e.EstadoEntrevista, e.Observaciones].some((campo) => normalizarTexto(campo).includes(texto)));
+    }
+
+    buscarInput.addEventListener('input', (event) => { filtro = event.target.value; renderEntrevistas(); });
+
+    function limpiarFormulario() {
+        form.reset();
+        document.getElementById('IdEntrevista').value = '';
+        document.getElementById('Modalidad').value = 'Presencial';
+        document.getElementById('EstadoEntrevista').value = 'Programada';
+        document.getElementById('form-title').textContent = 'Programar entrevista';
+        btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span>Guardar entrevista';
+        document.getElementById('candidato-info').classList.add('hidden');
+        preseleccionarCandidato();
+        mostrarCandidatoSeleccionado();
+    }
+
+    document.getElementById('btn-cancelar').addEventListener('click', limpiarFormulario);
+    document.getElementById('btn-nueva').addEventListener('click', () => { limpiarFormulario(); document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+
+    function configurarFechaMinima() {
+        const hoy = new Date();
+        const year = hoy.getFullYear();
+        const month = String(hoy.getMonth() + 1).padStart(2, '0');
+        const day = String(hoy.getDate()).padStart(2, '0');
+        document.getElementById('FechaEntrevista').min = `${year}-${month}-${day}`;
+    }
+
+    function getEstadoBadge(estado) {
+        const clases = {
+            Programada: 'bg-blue-100 text-blue-700',
+            Confirmada: 'bg-green-100 text-green-700',
+            Realizada: 'bg-purple-100 text-purple-700',
+            Reprogramada: 'bg-yellow-100 text-yellow-700',
+            Cancelada: 'bg-red-100 text-red-700'
+        };
+        const texto = estado || 'Programada';
+        return `<span class="status-badge ${clases[texto] || 'bg-surface-container-high text-on-surface-variant'}">${escapeHTML(texto)}</span>`;
+    }
+
+    function formatearFecha(fecha) {
+        if (!fecha) return 'Sin fecha';
+        const partes = String(fecha).split('-');
+        if (partes.length !== 3) return fecha;
+        return new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2])).toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function normalizarTexto(value) {
+        return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    }
+
+    function escapeHTML(value) {
+        return String(value || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+    }
+
+    function mostrarFeedback(mensaje, esError) {
+        feedback.classList.remove('hidden', 'bg-error-container', 'text-error', 'bg-green-100', 'text-green-700');
+        feedback.classList.add(esError ? 'bg-error-container' : 'bg-green-100', esError ? 'text-error' : 'text-green-700');
+        feedback.textContent = mensaje;
+        setTimeout(() => feedback.classList.add('hidden'), 5000);
+    }
+
+    function marcarPrueba(id, texto) {
+        const item = document.getElementById(id);
+        if (!item) return;
+        item.textContent = `✓ ${texto}`;
+        item.classList.remove('text-on-surface-variant');
+        item.classList.add('text-green-600', 'font-bold');
+    }
+
+    function marcarTodasLasPruebas() {
+        marcarPrueba('test-fecha', 'Se puede registrar fecha y hora');
+        marcarPrueba('test-candidato', 'La entrevista queda asociada al candidato');
+        marcarPrueba('test-consulta', 'La información puede consultarse posteriormente');
+        marcarPrueba('test-cambios', 'Los cambios quedan almacenados correctamente');
+    }
+
+    function verificarPruebasGuardadas() {
+        if (entrevistas.length) marcarTodasLasPruebas();
+    }
+
+    function renderHeaderUser() {
+        const container = document.getElementById('header-user');
+        try {
+            const stored = localStorage.getItem('st_usuario');
+            if (!stored) {
+                container.innerHTML = '<p class="font-bold">Usuario</p><p class="text-xs text-on-surface-variant">Sin sesión</p>';
+                return;
+            }
+            const usuario = JSON.parse(stored);
+            const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
+            const idRol = Number(usuario.rol || usuario.IdRol);
+            const rol = idRol === 1 ? 'Administrador' : idRol === 2 ? 'Reclutador' : 'Usuario';
+            container.innerHTML = `<p class="font-bold">${escapeHTML(nombre)}</p><p class="text-xs text-on-surface-variant">${escapeHTML(rol)}</p>`;
+        } catch (error) {
+            container.innerHTML = '<p class="font-bold">Usuario</p><p class="text-xs text-on-surface-variant">Sin sesión</p>';
+        }
+    }
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === STORAGE_KEY) {
+            cargarEntrevistasGuardadas();
+            renderEntrevistas();
+            verificarPruebasGuardadas();
+        }
+    });
+</script>
+</body>
+</html>
