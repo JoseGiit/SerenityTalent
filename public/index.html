@@ -177,20 +177,10 @@
 
             <div class="flex flex-col gap-md">
                 <div class="flex flex-col gap-xs">
-                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant">¿Cómo querés registrarte?</label>
-                    <div class="grid grid-cols-2 gap-sm">
-                        <label class="rol-option cursor-pointer">
-                            <input type="radio" name="regRol" id="regRolCandidato" value="3" checked class="sr-only peer">
-                            <span class="block text-center p-3 border border-outline-variant rounded font-body-sm text-body-sm transition-all">
-                                Candidato
-                            </span>
-                        </label>
-                        <label class="rol-option cursor-pointer">
-                            <input type="radio" name="regRol" id="regRolReclutador" value="2" class="sr-only peer">
-                            <span class="block text-center p-3 border border-outline-variant rounded font-body-sm text-body-sm transition-all">
-                                Reclutador
-                            </span>
-                        </label>
+                    <div class="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">
+                            Tu cuenta se creará siempre como candidato.
+                        </p>
                     </div>
                 </div>
 
@@ -495,7 +485,6 @@
             document.getElementById('regEmail').value = '';
             document.getElementById('regUser').value = '';
             document.getElementById('regPassword').value = '';
-            document.getElementById('regRolCandidato').checked = true;
         }
 
         function closeRegister() {
@@ -594,19 +583,10 @@
             const IJsuario = document.getElementById('regUser').value.trim();
             const Contrasena = document.getElementById('regPassword').value;
 
-            const rolInput = document.querySelector('input[name="regRol"]:checked');
-            const IdRol = rolInput ? Number(rolInput.value) : null;
+            const IdRol = 3;
 
-            if (!Nombre || !Correo || !IJsuario || !Contrasena || !IdRol) {
-                errorText.textContent = 'Todos los campos son obligatorios, incluyendo el tipo de cuenta.';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            // Solo se permite auto-registro como Reclutador (2) o Candidato (3).
-            // El rol Administrador (1) se asigna únicamente desde el panel interno.
-            if (IdRol !== 2 && IdRol !== 3) {
-                errorText.textContent = 'Tipo de cuenta inválido.';
+            if (!Nombre || !Correo || !IJsuario || !Contrasena) {
+                errorText.textContent = 'Todos los campos son obligatorios.';
                 errorDiv.classList.remove('hidden');
                 return;
             }

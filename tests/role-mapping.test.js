@@ -16,6 +16,8 @@ assert.match(server, /CANDIDATO:\s*3/);
 const index = read('public/index.html');
 assert.match(index, /if \(rol === 1 \|\| rol === 2\) return 'candidatos\.html';/);
 assert.match(index, /if \(rol === 3\) return 'vacantes\.html';/);
+assert.doesNotMatch(index, /id="regRolReclutador"/);
+assert.doesNotMatch(index, /<span[^>]*>\s*Reclutador\s*<\/span>/);
 
 const candidatos = read('public/candidatos.html');
 assert.match(candidatos, /if \(rol !== 1 && rol !== 2\)/);

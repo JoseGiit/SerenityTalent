@@ -220,17 +220,14 @@ async function permitirPropioCandidatoOStaff(req, res, next) {
 
 // ── POST /api/register ─────────────────────────────────────────
 app.post('/api/register', async (req, res) => {
-  const { Nombre, Correo, IJsuario, Contrasena, IdRol } = req.body;
+  const { Nombre, Correo, IJsuario, Contrasena } = req.body;
 
   if (!Nombre || !Correo || !IJsuario || !Contrasena) {
     return res.status(400).json({ error: 'Todos los campos son requeridos' });
   }
 
-  // Solo se permite auto-registro como Reclutador (2) o Candidato (3).
-  // El rol Administrador (1) no se asigna nunca desde este endpoint público.
-  const rolesPermitidosRegistro = [ROLES.CANDIDATO, ROLES.RECLUTADOR];
-  const rolSolicitado = Number(IdRol);
-  const rolFinal = rolesPermitidosRegistro.includes(rolSolicitado) ? rolSolicitado : ROLES.CANDIDATO;
+  // El registro público siempre crea cuentas con rol de candidato.
+  const rolFinal = ROLES.CANDIDATO;
 
   try {
     // Verificar si el usuario o correo ya existen
