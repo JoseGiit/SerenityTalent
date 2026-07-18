@@ -604,9 +604,11 @@ app.get('/api/postulaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROL
         c.Correo,
         c.Telefono,
         c.Curriculum,
-        c.FechaRegistro
+        c.FechaRegistro,
+        v.Titulo AS VacanteTitulo
       FROM Postulacion p
       INNER JOIN Candidato c ON p.IdCandidato = c.IdCandidato
+      LEFT JOIN Vacante v ON p.IdVacante = v.IdVacante
       ORDER BY p.UltimaActualizacion DESC, p.FechaPostulacion DESC
     `);
 
@@ -924,6 +926,126 @@ app.get('/api/entrevistas', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
   } catch (err) {
     console.error('Error en GET /api/entrevistas:', err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Helper: trae una entrevista por id ya con los joins de candidato/vacante,
+// para devolver siempre la misma "forma" de objeto en create/update.
+async function obtenerEntrevistaConDetalle(idEntrevista) {
+  const [rows] = await pool.query(
+    `
+    SELECT
+      e.IdEntrevista,
+      e.IdPostulacion,
+      e.Fecha,
+      e.Hora,
+      e.Modalidad,
+      e.Observaciones,
+      p.IdCandidato,
+      p.IdVacante,
+      p.Estado AS EstadoEntrevista,
+      p.FechaPostulacion,
+      c.Nombre,
+      c.Apellido,
+      c.Correo,
+      c.Telefono,
+      v.Titulo AS Vacante
+    FROM Entrevista e
+    LEFT JOIN Postulacion p ON e.IdPostulacion = p.IdPostulacion
+    LEFT JOIN Candidato c ON p.IdCandidato = c.IdCandidato
+    LEFT JOIN Vacante v ON p.IdVacante = v.IdVacante
+    WHERE e.IdEntrevista = ?
+    `,
+    [idEntrevista]
+  );
+  return rows[0] || null;
+}
+
+// ── POST /api/entrevistas ─────────────────────────────────────────
+// Admin y Reclutador. Crea una entrevista ligada a una Postulacion existente.
+app.post('/api/entrevistas', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
+  const { IdPostulacion, Fecha, Hora, Modalidad, Observaciones } = req.body;
+
+  if (!IdPostulacion || !Fecha || !Hora) {
+    return res.status(400).json({ error: 'IdPostulacion, Fecha y Hora son requeridos' });
+  }
+
+  try {
+    const [postulacionRows] = await pool.query(
+      'SELECT IdPostulacion FROM Postulacion WHERE IdPostulacion = ?',
+      [IdPostulacion]
+    );
+
+    if (postulacionRows.length === 0) {
+      return res.status(404).json({ error: 'La postulación indicada no existe' });
+    }
+
+    const [result] = await pool.query(
+      'INSERT INTO Entrevista (IdPostulacion, Fecha, Hora, Modalidad, Observaciones) VALUES (?, ?, ?, ?, ?)',
+      [IdPostulacion, Fecha, Hora, Modalidad || null, String(Observaciones || '').slice(0, 255)]
+    );
+
+    const entrevista = await obtenerEntrevistaConDetalle(result.insertId);
+    res.status(201).json({ entrevista });
+  } catch (err) {
+    console.error('Error en POST /api/entrevistas:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── PUT /api/entrevistas/:id ────────────────────────────────────
+// Admin y Reclutador.
+app.put('/api/entrevistas/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
+  const { id } = req.params;
+  const { IdPostulacion, Fecha, Hora, Modalidad, Observaciones } = req.body;
+
+  if (!IdPostulacion || !Fecha || !Hora) {
+    return res.status(400).json({ error: 'IdPostulacion, Fecha y Hora son requeridos' });
+  }
+
+  try {
+    const [postulacionRows] = await pool.query(
+      'SELECT IdPostulacion FROM Postulacion WHERE IdPostulacion = ?',
+      [IdPostulacion]
+    );
+
+    if (postulacionRows.length === 0) {
+      return res.status(404).json({ error: 'La postulación indicada no existe' });
+    }
+
+    const [result] = await pool.query(
+      'UPDATE Entrevista SET IdPostulacion = ?, Fecha = ?, Hora = ?, Modalidad = ?, Observaciones = ? WHERE IdEntrevista = ?',
+      [IdPostulacion, Fecha, Hora, Modalidad || null, String(Observaciones || '').slice(0, 255), id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Entrevista no encontrada' });
+    }
+
+    const entrevista = await obtenerEntrevistaConDetalle(id);
+    res.json({ entrevista });
+  } catch (err) {
+    console.error('Error en PUT /api/entrevistas/:id:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── DELETE /api/entrevistas/:id ─────────────────────────────────
+// Admin y Reclutador.
+app.delete('/api/entrevistas/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await pool.query('DELETE FROM Entrevista WHERE IdEntrevista = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Entrevista no encontrada' });
+    }
+
+    res.json({ message: 'Entrevista eliminada correctamente' });
+  } catch (err) {
+    console.error('Error en DELETE /api/entrevistas/:id:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 

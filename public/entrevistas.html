@@ -135,7 +135,7 @@
                 <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-lg">
                 <div>
                     <h2 class="font-headline text-2xl font-bold">Entrevistas</h2>
-                    <p class="text-sm text-on-surface-variant">Programa, consulta y actualiza entrevistas de candidatos seleccionados.</p>
+                    <p class="text-sm text-on-surface-variant">Programa, consulta y actualiza entrevistas de candidatos postulados.</p>
                 </div>
                 <button data-role-show="1,2" id="btn-nueva" type="button" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90">
                     <span class="material-symbols-outlined">add</span>Nueva entrevista
@@ -146,31 +146,33 @@
 
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md mb-lg">
                 <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Total</p><p id="total-entrevistas" class="text-3xl font-bold text-primary mt-2">0</p></div>
-                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Pendientes</p><p id="total-programadas" class="text-3xl font-bold text-blue-600 mt-2">0</p></div>
-                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Realizadas</p><p id="total-realizadas" class="text-3xl font-bold text-green-600 mt-2">0</p></div>
-                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Canceladas</p><p id="total-canceladas" class="text-3xl font-bold text-red-600 mt-2">0</p></div>
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Hoy</p><p id="total-hoy" class="text-3xl font-bold text-blue-600 mt-2">0</p></div>
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Próximas</p><p id="total-proximas" class="text-3xl font-bold text-green-600 mt-2">0</p></div>
+                <div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm"><p class="text-xs uppercase font-bold text-on-surface-variant">Evaluadas</p><p id="total-evaluadas" class="text-3xl font-bold text-purple-600 mt-2">0</p></div>
             </section>
 
             <div class="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-lg items-start">
                 <section id="form-card" class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
                     <div class="p-lg border-b border-outline-variant bg-surface-container-low">
                         <h3 id="form-title" class="font-headline text-xl font-bold">Programar entrevista</h3>
-                        <p class="text-sm text-on-surface-variant">Seleccione candidato, fecha y hora.</p>
+                        <p class="text-sm text-on-surface-variant">Seleccione la postulación, fecha y hora.</p>
                     </div>
 
                     <form id="entrevista-form" class="p-lg space-y-md">
                         <input type="hidden" id="IdEntrevista">
 
                         <div>
-                            <label for="IdCandidato" class="block text-sm font-bold text-on-surface-variant mb-2">Candidato</label>
-                            <select id="IdCandidato" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
-                                <option value="">Cargando candidatos...</option>
+                            <label for="IdPostulacion" class="block text-sm font-bold text-on-surface-variant mb-2">Postulación (candidato — vacante)</label>
+                            <select id="IdPostulacion" required class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                                <option value="">Cargando postulaciones...</option>
                             </select>
                         </div>
 
                         <div id="candidato-info" class="hidden p-4 bg-secondary-container/30 border border-secondary-container rounded-lg">
                             <p id="candidato-nombre" class="font-bold"></p>
                             <p id="candidato-correo" class="text-sm text-on-surface-variant"></p>
+                            <p id="candidato-vacante" class="text-sm text-on-surface-variant"></p>
+                            <p id="candidato-estado" class="text-xs text-on-surface-variant mt-1"></p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
@@ -184,35 +186,19 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                            <div>
-                                <label for="Modalidad" class="block text-sm font-bold text-on-surface-variant mb-2">Modalidad</label>
-                                <select id="Modalidad" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
-                                    <option value="Presencial">Presencial</option>
-                                    <option value="Virtual">Virtual</option>
-                                    <option value="Telefónica">Telefónica</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="EstadoEntrevista" class="block text-sm font-bold text-on-surface-variant mb-2">Estado</label>
-                                <select id="EstadoEntrevista" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
-                                    <option value="Programada">Programada</option>
-                                    <option value="Confirmada">Confirmada</option>
-                                    <option value="Realizada">Realizada</option>
-                                    <option value="Reprogramada">Reprogramada</option>
-                                    <option value="Cancelada">Cancelada</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <div>
-                            <label for="Lugar" class="block text-sm font-bold text-on-surface-variant mb-2">Lugar o enlace</label>
-                            <input id="Lugar" type="text" maxlength="200" placeholder="Sala 2 o enlace de reunión" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                            <label for="Modalidad" class="block text-sm font-bold text-on-surface-variant mb-2">Modalidad</label>
+                            <select id="Modalidad" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+                                <option value="Presencial">Presencial</option>
+                                <option value="Virtual">Virtual</option>
+                                <option value="Telefónica">Telefónica</option>
+                            </select>
                         </div>
 
                         <div>
                             <label for="Observaciones" class="block text-sm font-bold text-on-surface-variant mb-2">Observaciones</label>
-                            <textarea id="Observaciones" rows="4" maxlength="500" placeholder="Indicaciones para la entrevista..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary"></textarea>
+                            <textarea id="Observaciones" rows="4" maxlength="255" placeholder="Lugar, enlace, indicaciones..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">Máximo 255 caracteres. Puede anotar aquí el lugar o el enlace de la reunión.</p>
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-md border-t border-outline-variant">
@@ -243,14 +229,15 @@
                             <thead>
                                 <tr class="border-b border-outline-variant text-xs uppercase text-on-surface-variant">
                                     <th class="px-5 py-4">Candidato</th>
+                                    <th class="px-5 py-4">Vacante</th>
                                     <th class="px-5 py-4">Fecha y hora</th>
                                     <th class="px-5 py-4">Modalidad</th>
-                                    <th class="px-5 py-4">Estado</th>
+                                    <th class="px-5 py-4">Estado postulación</th>
                                     <th class="px-5 py-4 text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="entrevistas-tbody" class="divide-y divide-outline-variant">
-                                <tr><td colspan="5" class="px-5 py-8 text-center text-on-surface-variant">Cargando entrevistas...</td></tr>
+                                <tr><td colspan="6" class="px-5 py-8 text-center text-on-surface-variant">Cargando entrevistas...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -261,9 +248,9 @@
                 <h3 class="font-headline text-xl font-bold mb-4">Cumplimiento de la historia de usuario</h3>
                 <ul class="space-y-2 text-sm text-on-surface-variant">
                     <li id="test-fecha">○ Se puede registrar fecha y hora</li>
-                    <li id="test-candidato">○ La entrevista queda asociada al candidato</li>
+                    <li id="test-candidato">○ La entrevista queda asociada a la postulación del candidato</li>
                     <li id="test-consulta">○ La información puede consultarse posteriormente</li>
-                    <li id="test-cambios">○ Los cambios quedan almacenados correctamente</li>
+                    <li id="test-cambios">○ Los cambios quedan almacenados en la base de datos</li>
                 </ul>
             </section>
         </div>
@@ -272,209 +259,179 @@
 
 <script>
     const API = '/api';
-    const STORAGE_KEY = 'st_entrevistas';
-    const MAX_SQL_INT = 2147483647;
     const token = localStorage.getItem('st_token');
 
     const form = document.getElementById('entrevista-form');
     const tbody = document.getElementById('entrevistas-tbody');
-    const candidatoSelect = document.getElementById('IdCandidato');
+    const postulacionSelect = document.getElementById('IdPostulacion');
     const feedback = document.getElementById('feedback');
     const btnGuardar = document.getElementById('btn-guardar');
     const buscarInput = document.getElementById('buscar');
 
     let entrevistas = [];
-    let candidatos = [];
+    let postulaciones = [];
     let filtro = '';
 
     function authHeaders(extra) {
         return Object.assign({ 'Authorization': `Bearer ${token}` }, extra || {});
     }
 
+    function manejarSesionInvalida(response) {
+        if (response.status === 401 || response.status === 403) {
+            // Limpiar la sesión inválida: si no lo hacemos, index.html la va a
+            // ver como 'todavía válida' y nos manda de vuelta acá, generando
+            // un bucle infinito entre las dos páginas.
+            localStorage.removeItem('st_token');
+            localStorage.removeItem('st_usuario');
+            window.location.href = 'index.html';
+            return true;
+        }
+        return false;
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
         configurarFechaMinima();
         renderHeaderUser();
-        cargarEntrevistasGuardadas();
-        await cargarCandidatos();
-        preseleccionarCandidato();
-        mostrarCandidatoSeleccionado();
-        renderEntrevistas();
-        verificarPruebasGuardadas();
+        await cargarPostulaciones();
+        await cargarEntrevistas();
+        preseleccionarPostulacion();
+        mostrarPostulacionSeleccionada();
     });
 
-    function cargarEntrevistasGuardadas() {
+    // ── Postulaciones (para el selector del formulario) ──────────────
+    async function cargarPostulaciones() {
         try {
-            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            entrevistas = Array.isArray(data) ? data : [];
-            migrarIdsEntrevistas();
-        } catch (error) {
-            console.error('Error cargando entrevistas:', error);
-            entrevistas = [];
-        }
-    }
-
-    function guardarEnLocalStorage() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(entrevistas));
-    }
-
-    function generarIdEntrevista() {
-        const idsValidos = entrevistas
-            .map((item) => Number(item.IdEntrevista))
-            .filter((id) => Number.isInteger(id) && id > 0 && id <= MAX_SQL_INT);
-
-        return idsValidos.length > 0 ? Math.max(...idsValidos) + 1 : 1;
-    }
-
-    function migrarIdsEntrevistas() {
-        let cambio = false;
-        const usados = new Set();
-        let siguiente = 1;
-
-        entrevistas = entrevistas.map((item) => {
-            let id = Number(item.IdEntrevista);
-
-            if (!Number.isInteger(id) || id <= 0 || id > MAX_SQL_INT || usados.has(id)) {
-                while (usados.has(siguiente)) siguiente += 1;
-                id = siguiente;
-                cambio = true;
-            }
-
-            usados.add(id);
-            if (id >= siguiente) siguiente = id + 1;
-            return { ...item, IdEntrevista: id };
-        });
-
-        if (cambio) guardarEnLocalStorage();
-    }
-
-    async function cargarCandidatos() {
-        try {
-            const response = await fetch(`${API}/candidatos`, {
-                headers: authHeaders()
-            });
-
-            if (response.status === 401 || response.status === 403) {
-                // Limpiar la sesión inválida: si no lo hacemos, index.html
-                // la va a ver como 'todavía válida' y nos manda de vuelta acá,
-                // generando un bucle infinito entre las dos páginas.
-                localStorage.removeItem('st_token');
-                localStorage.removeItem('st_usuario');
-                window.location.href = 'index.html';
-                return;
-            }
+            const response = await fetch(`${API}/postulaciones`, { headers: authHeaders() });
+            if (manejarSesionInvalida(response)) return;
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'No se pudieron cargar los candidatos.');
-            candidatos = Array.isArray(data) ? data : [];
-            candidatos.sort((a, b) => `${a.Nombre || ''} ${a.Apellido || ''}`.localeCompare(`${b.Nombre || ''} ${b.Apellido || ''}`));
-            pintarCandidatos();
+            if (!response.ok) throw new Error(data.error || 'No se pudieron cargar las postulaciones.');
+
+            postulaciones = Array.isArray(data) ? data : [];
+            postulaciones.sort((a, b) => `${a.Nombre || ''} ${a.Apellido || ''}`.localeCompare(`${b.Nombre || ''} ${b.Apellido || ''}`));
+            pintarPostulaciones();
         } catch (error) {
-            console.error('Error cargando candidatos:', error);
-            cargarCandidatosDesdeEntrevistas();
-            if (!candidatos.length) {
-                candidatoSelect.innerHTML = '<option value="">No se pudieron cargar los candidatos</option>';
-                mostrarFeedback('No se pudieron cargar los candidatos. Verifique que su servidor actual esté iniciado.', true);
-            }
+            console.error('Error cargando postulaciones:', error);
+            postulacionSelect.innerHTML = '<option value="">No se pudieron cargar las postulaciones</option>';
+            mostrarFeedback('No se pudieron cargar las postulaciones. Verifique la conexión con el servidor.', true);
         }
     }
 
-    function cargarCandidatosDesdeEntrevistas() {
-        const unicos = new Map();
-        entrevistas.forEach((e) => {
-            if (e.IdCandidato) unicos.set(String(e.IdCandidato), { IdCandidato: e.IdCandidato, Nombre: e.Nombre || '', Apellido: e.Apellido || '', Correo: e.Correo || '', Telefono: e.Telefono || '' });
-        });
-        candidatos = Array.from(unicos.values());
-        pintarCandidatos();
-    }
-
-    function pintarCandidatos() {
-        candidatoSelect.innerHTML = '<option value="">Seleccione un candidato</option>' + candidatos.map((c) => `
-            <option value="${c.IdCandidato}">${escapeHTML(c.Nombre)} ${escapeHTML(c.Apellido)} — ${escapeHTML(c.Correo)}</option>
+    function pintarPostulaciones() {
+        postulacionSelect.innerHTML = '<option value="">Seleccione una postulación</option>' + postulaciones.map((p) => `
+            <option value="${p.IdPostulacion}">${escapeHTML(p.Nombre)} ${escapeHTML(p.Apellido)} — ${escapeHTML(p.VacanteTitulo || 'Sin vacante')} (${escapeHTML(p.Estado)})</option>
         `).join('');
     }
 
-    function preseleccionarCandidato() {
-        const id = new URLSearchParams(window.location.search).get('id');
-        if (id && candidatos.some((c) => String(c.IdCandidato) === String(id))) candidatoSelect.value = id;
+    function preseleccionarPostulacion() {
+        const params = new URLSearchParams(window.location.search);
+        const idPostulacion = params.get('postulacion');
+        const idCandidato = params.get('id');
+
+        if (idPostulacion && postulaciones.some((p) => String(p.IdPostulacion) === String(idPostulacion))) {
+            postulacionSelect.value = idPostulacion;
+            return;
+        }
+
+        if (idCandidato) {
+            const match = postulaciones.find((p) => String(p.IdCandidato) === String(idCandidato));
+            if (match) postulacionSelect.value = match.IdPostulacion;
+        }
     }
 
-    function mostrarCandidatoSeleccionado() {
-        const candidato = candidatos.find((c) => String(c.IdCandidato) === String(candidatoSelect.value));
+    function mostrarPostulacionSeleccionada() {
+        const postulacion = postulaciones.find((p) => String(p.IdPostulacion) === String(postulacionSelect.value));
         const contenedor = document.getElementById('candidato-info');
-        if (!candidato) {
+        if (!postulacion) {
             contenedor.classList.add('hidden');
             return;
         }
-        document.getElementById('candidato-nombre').textContent = `${candidato.Nombre || ''} ${candidato.Apellido || ''}`.trim();
-        document.getElementById('candidato-correo').textContent = candidato.Correo || 'Sin correo';
+        document.getElementById('candidato-nombre').textContent = `${postulacion.Nombre || ''} ${postulacion.Apellido || ''}`.trim();
+        document.getElementById('candidato-correo').textContent = postulacion.Correo || 'Sin correo';
+        document.getElementById('candidato-vacante').textContent = `Vacante: ${postulacion.VacanteTitulo || 'Sin asignar'}`;
+        document.getElementById('candidato-estado').textContent = `Estado de la postulación: ${postulacion.Estado || 'Registrado'}`;
         contenedor.classList.remove('hidden');
     }
 
-    candidatoSelect.addEventListener('change', mostrarCandidatoSeleccionado);
+    postulacionSelect.addEventListener('change', mostrarPostulacionSeleccionada);
 
-    form.addEventListener('submit', (event) => {
+    // ── Entrevistas (API real, sin localStorage) ──────────────────────
+    async function cargarEntrevistas() {
+        try {
+            const response = await fetch(`${API}/entrevistas`, { headers: authHeaders() });
+            if (manejarSesionInvalida(response)) return;
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'No se pudieron cargar las entrevistas.');
+
+            entrevistas = Array.isArray(data) ? data : [];
+            renderEntrevistas();
+            verificarPruebasGuardadas();
+        } catch (error) {
+            console.error('Error cargando entrevistas:', error);
+            tbody.innerHTML = '<tr><td colspan="6" class="px-5 py-8 text-center text-error">No se pudieron cargar las entrevistas. Verifique la conexión con el servidor.</td></tr>';
+        }
+    }
+
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const idEntrevista = document.getElementById('IdEntrevista').value;
-        const idCandidato = Number(candidatoSelect.value);
+        const idPostulacion = postulacionSelect.value;
         const fecha = document.getElementById('FechaEntrevista').value;
         const hora = document.getElementById('HoraEntrevista').value;
-        const candidato = candidatos.find((c) => Number(c.IdCandidato) === idCandidato);
 
-        if (!candidato) return mostrarFeedback('Debe seleccionar un candidato.', true);
+        if (!idPostulacion) return mostrarFeedback('Debe seleccionar una postulación.', true);
         if (!fecha || !hora) return mostrarFeedback('Debe registrar la fecha y la hora.', true);
 
         const fechaHora = new Date(`${fecha}T${hora}`);
         if (Number.isNaN(fechaHora.getTime())) return mostrarFeedback('La fecha u hora no es válida.', true);
 
-        const ahora = new Date().toISOString();
-        const registro = {
-            IdEntrevista: idEntrevista ? Number(idEntrevista) : generarIdEntrevista(),
-            IdCandidato: candidato.IdCandidato,
-            Nombre: candidato.Nombre || '',
-            Apellido: candidato.Apellido || '',
-            Correo: candidato.Correo || '',
-            Telefono: candidato.Telefono || '',
-            Vacante: candidato.Vacante || candidato.NombreVacante || 'Vacante sin asignar',
-            FechaEntrevista: fecha,
-            HoraEntrevista: hora,
+        const payload = {
+            IdPostulacion: Number(idPostulacion),
+            Fecha: fecha,
+            Hora: hora,
             Modalidad: document.getElementById('Modalidad').value,
-            Lugar: document.getElementById('Lugar').value.trim(),
-            Observaciones: document.getElementById('Observaciones').value.trim(),
-            EstadoEntrevista: document.getElementById('EstadoEntrevista').value,
-            FechaCreacion: ahora,
-            UltimaActualizacion: ahora,
-            Evaluada: false,
-            EvaluacionesCount: 0
+            Observaciones: document.getElementById('Observaciones').value.trim()
         };
 
-        if (idEntrevista) {
-            const indice = entrevistas.findIndex((e) => Number(e.IdEntrevista) === Number(idEntrevista));
-            if (indice === -1) return mostrarFeedback('No se encontró la entrevista que desea actualizar.', true);
-            registro.FechaCreacion = entrevistas[indice].FechaCreacion || ahora;
-            registro.Evaluada = Boolean(entrevistas[indice].Evaluada);
-            registro.EvaluacionesCount = Number(entrevistas[indice].EvaluacionesCount || 0);
-            entrevistas[indice] = registro;
-            mostrarFeedback('Entrevista actualizada y almacenada correctamente.', false);
-        } else {
-            entrevistas.push(registro);
-            mostrarFeedback('Entrevista programada y almacenada correctamente.', false);
-        }
+        const esEdicion = Boolean(idEntrevista);
+        const url = esEdicion ? `${API}/entrevistas/${idEntrevista}` : `${API}/entrevistas`;
+        const metodo = esEdicion ? 'PUT' : 'POST';
 
-        guardarEnLocalStorage();
-        marcarTodasLasPruebas();
-        limpiarFormulario();
-        renderEntrevistas();
+        btnGuardar.disabled = true;
+
+        try {
+            const response = await fetch(url, {
+                method: metodo,
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify(payload)
+            });
+
+            if (manejarSesionInvalida(response)) return;
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'No se pudo guardar la entrevista.');
+
+            mostrarFeedback(esEdicion ? 'Entrevista actualizada correctamente en la base de datos.' : 'Entrevista programada y guardada en la base de datos.', false);
+            marcarTodasLasPruebas();
+            limpiarFormulario();
+            await cargarEntrevistas();
+        } catch (error) {
+            console.error('Error guardando entrevista:', error);
+            mostrarFeedback(error.message || 'Ocurrió un error al guardar la entrevista.', true);
+        } finally {
+            btnGuardar.disabled = false;
+        }
     });
 
     function renderEntrevistas() {
-        ordenarEntrevistas();
         const visibles = getEntrevistasFiltradas();
         actualizarResumen();
         document.getElementById('contador').textContent = `Mostrando ${visibles.length} entrevista${visibles.length === 1 ? '' : 's'}`;
 
         if (!visibles.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-on-surface-variant">No hay entrevistas registradas.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-5 py-8 text-center text-on-surface-variant">No hay entrevistas registradas.</td></tr>';
             return;
         }
 
@@ -483,10 +440,10 @@
                 <td class="px-5 py-4">
                     <p class="font-bold">${escapeHTML(e.Nombre)} ${escapeHTML(e.Apellido)}</p>
                     <p class="text-xs text-on-surface-variant">${escapeHTML(e.Correo)}</p>
-                    <p class="text-xs text-on-surface-variant">ID candidato: ${escapeHTML(e.IdCandidato)}</p>
                 </td>
-                <td class="px-5 py-4"><p class="font-bold">${formatearFecha(e.FechaEntrevista)}</p><p class="text-sm text-on-surface-variant">${escapeHTML(e.HoraEntrevista)}</p></td>
-                <td class="px-5 py-4"><p class="font-bold">${escapeHTML(e.Modalidad)}</p><p class="text-xs text-on-surface-variant">${escapeHTML(e.Lugar || 'Sin lugar indicado')}</p></td>
+                <td class="px-5 py-4">${escapeHTML(e.Vacante || 'Sin vacante')}</td>
+                <td class="px-5 py-4"><p class="font-bold">${formatearFecha(e.Fecha)}</p><p class="text-sm text-on-surface-variant">${escapeHTML(e.Hora)}</p></td>
+                <td class="px-5 py-4">${escapeHTML(e.Modalidad || 'Sin definir')}</td>
                 <td class="px-5 py-4">${getEstadoBadge(e.EstadoEntrevista)}</td>
                 <td class="px-5 py-4">
                     <div class="flex items-center justify-center gap-2">
@@ -499,21 +456,18 @@
         `).join('');
     }
 
-    function ordenarEntrevistas() {
-        entrevistas.sort((a, b) => `${a.FechaEntrevista || ''}T${a.HoraEntrevista || '00:00'}`.localeCompare(`${b.FechaEntrevista || ''}T${b.HoraEntrevista || '00:00'}`));
-    }
-
     function actualizarResumen() {
+        const hoyStr = new Date().toISOString().slice(0, 10);
         document.getElementById('total-entrevistas').textContent = entrevistas.length;
-        document.getElementById('total-programadas').textContent = entrevistas.filter((e) => ['Programada', 'Confirmada', 'Reprogramada'].includes(e.EstadoEntrevista)).length;
-        document.getElementById('total-realizadas').textContent = entrevistas.filter((e) => e.EstadoEntrevista === 'Realizada').length;
-        document.getElementById('total-canceladas').textContent = entrevistas.filter((e) => e.EstadoEntrevista === 'Cancelada').length;
+        document.getElementById('total-hoy').textContent = entrevistas.filter((e) => String(e.Fecha).slice(0, 10) === hoyStr).length;
+        document.getElementById('total-proximas').textContent = entrevistas.filter((e) => String(e.Fecha).slice(0, 10) > hoyStr).length;
+        document.getElementById('total-evaluadas').textContent = entrevistas.filter((e) => e.Evaluada).length;
     }
 
     window.verEntrevista = function(id) {
         const e = entrevistas.find((item) => Number(item.IdEntrevista) === Number(id));
         if (!e) return mostrarFeedback('No se encontró la entrevista.', true);
-        alert(`ENTREVISTA PROGRAMADA\n\nCandidato: ${e.Nombre} ${e.Apellido}\nCorreo: ${e.Correo || 'Sin correo'}\nFecha: ${formatearFecha(e.FechaEntrevista)}\nHora: ${e.HoraEntrevista}\nModalidad: ${e.Modalidad}\nLugar: ${e.Lugar || 'Sin lugar indicado'}\nEstado: ${e.EstadoEntrevista}\nObservaciones: ${e.Observaciones || 'Sin observaciones'}`);
+        alert(`ENTREVISTA PROGRAMADA\n\nCandidato: ${e.Nombre} ${e.Apellido}\nCorreo: ${e.Correo || 'Sin correo'}\nVacante: ${e.Vacante || 'Sin vacante'}\nFecha: ${formatearFecha(e.Fecha)}\nHora: ${e.Hora}\nModalidad: ${e.Modalidad || 'Sin definir'}\nEstado de la postulación: ${e.EstadoEntrevista || 'Registrado'}\nObservaciones: ${e.Observaciones || 'Sin observaciones'}`);
         marcarPrueba('test-consulta', 'La información puede consultarse posteriormente');
     };
 
@@ -522,32 +476,44 @@
         if (!e) return mostrarFeedback('No se encontró la entrevista seleccionada.', true);
 
         document.getElementById('IdEntrevista').value = e.IdEntrevista;
-        candidatoSelect.value = e.IdCandidato;
-        document.getElementById('FechaEntrevista').value = e.FechaEntrevista || '';
-        document.getElementById('HoraEntrevista').value = e.HoraEntrevista || '';
+        postulacionSelect.value = e.IdPostulacion;
+        document.getElementById('FechaEntrevista').value = e.Fecha ? String(e.Fecha).slice(0, 10) : '';
+        document.getElementById('HoraEntrevista').value = e.Hora || '';
         document.getElementById('Modalidad').value = e.Modalidad || 'Presencial';
-        document.getElementById('Lugar').value = e.Lugar || '';
         document.getElementById('Observaciones').value = e.Observaciones || '';
-        document.getElementById('EstadoEntrevista').value = e.EstadoEntrevista || 'Programada';
         document.getElementById('form-title').textContent = 'Actualizar entrevista';
         btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span>Guardar cambios';
-        mostrarCandidatoSeleccionado();
+        mostrarPostulacionSeleccionada();
         document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    window.eliminarEntrevista = function(id) {
+    window.eliminarEntrevista = async function(id) {
         if (!confirm('¿Seguro que deseas eliminar esta entrevista?')) return;
-        entrevistas = entrevistas.filter((e) => Number(e.IdEntrevista) !== Number(id));
-        guardarEnLocalStorage();
-        limpiarFormulario();
-        renderEntrevistas();
-        mostrarFeedback('Entrevista eliminada correctamente.', false);
+
+        try {
+            const response = await fetch(`${API}/entrevistas/${id}`, {
+                method: 'DELETE',
+                headers: authHeaders()
+            });
+
+            if (manejarSesionInvalida(response)) return;
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'No se pudo eliminar la entrevista.');
+
+            mostrarFeedback('Entrevista eliminada correctamente.', false);
+            limpiarFormulario();
+            await cargarEntrevistas();
+        } catch (error) {
+            console.error('Error eliminando entrevista:', error);
+            mostrarFeedback(error.message || 'Ocurrió un error al eliminar la entrevista.', true);
+        }
     };
 
     function getEntrevistasFiltradas() {
         const texto = normalizarTexto(filtro);
         if (!texto) return entrevistas;
-        return entrevistas.filter((e) => [e.Nombre, e.Apellido, e.Correo, e.FechaEntrevista, e.HoraEntrevista, e.Modalidad, e.Lugar, e.EstadoEntrevista, e.Observaciones].some((campo) => normalizarTexto(campo).includes(texto)));
+        return entrevistas.filter((e) => [e.Nombre, e.Apellido, e.Correo, e.Vacante, e.Fecha, e.Hora, e.Modalidad, e.EstadoEntrevista, e.Observaciones].some((campo) => normalizarTexto(campo).includes(texto)));
     }
 
     buscarInput.addEventListener('input', (event) => { filtro = event.target.value; renderEntrevistas(); });
@@ -556,12 +522,11 @@
         form.reset();
         document.getElementById('IdEntrevista').value = '';
         document.getElementById('Modalidad').value = 'Presencial';
-        document.getElementById('EstadoEntrevista').value = 'Programada';
         document.getElementById('form-title').textContent = 'Programar entrevista';
         btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span>Guardar entrevista';
         document.getElementById('candidato-info').classList.add('hidden');
-        preseleccionarCandidato();
-        mostrarCandidatoSeleccionado();
+        postulacionSelect.value = '';
+        mostrarPostulacionSeleccionada();
     }
 
     document.getElementById('btn-cancelar').addEventListener('click', limpiarFormulario);
@@ -577,19 +542,22 @@
 
     function getEstadoBadge(estado) {
         const clases = {
-            Programada: 'bg-blue-100 text-blue-700',
-            Confirmada: 'bg-green-100 text-green-700',
-            Realizada: 'bg-purple-100 text-purple-700',
-            Reprogramada: 'bg-yellow-100 text-yellow-700',
-            Cancelada: 'bg-red-100 text-red-700'
+            'Registrado': 'bg-surface-container-high text-on-surface-variant',
+            'En revisión': 'bg-blue-100 text-blue-700',
+            'Entrevista': 'bg-yellow-100 text-yellow-700',
+            'Evaluación': 'bg-purple-100 text-purple-700',
+            'Oferta': 'bg-teal-100 text-teal-700',
+            'Contratado': 'bg-green-100 text-green-700',
+            'Rechazado': 'bg-red-100 text-red-700'
         };
-        const texto = estado || 'Programada';
+        const texto = estado || 'Registrado';
         return `<span class="status-badge ${clases[texto] || 'bg-surface-container-high text-on-surface-variant'}">${escapeHTML(texto)}</span>`;
     }
 
     function formatearFecha(fecha) {
         if (!fecha) return 'Sin fecha';
-        const partes = String(fecha).split('-');
+        const soloFecha = String(fecha).slice(0, 10);
+        const partes = soloFecha.split('-');
         if (partes.length !== 3) return fecha;
         return new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2])).toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
     }
@@ -619,9 +587,9 @@
 
     function marcarTodasLasPruebas() {
         marcarPrueba('test-fecha', 'Se puede registrar fecha y hora');
-        marcarPrueba('test-candidato', 'La entrevista queda asociada al candidato');
+        marcarPrueba('test-candidato', 'La entrevista queda asociada a la postulación del candidato');
         marcarPrueba('test-consulta', 'La información puede consultarse posteriormente');
-        marcarPrueba('test-cambios', 'Los cambios quedan almacenados correctamente');
+        marcarPrueba('test-cambios', 'Los cambios quedan almacenados en la base de datos');
     }
 
     function verificarPruebasGuardadas() {
@@ -645,14 +613,6 @@
             container.innerHTML = '<p class="font-bold">Usuario</p><p class="text-xs text-on-surface-variant">Sin sesión</p>';
         }
     }
-
-    window.addEventListener('storage', (event) => {
-        if (event.key === STORAGE_KEY) {
-            cargarEntrevistasGuardadas();
-            renderEntrevistas();
-            verificarPruebasGuardadas();
-        }
-    });
 </script>
 </body>
 </html>
