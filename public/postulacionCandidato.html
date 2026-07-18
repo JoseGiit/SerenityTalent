@@ -237,6 +237,17 @@
 <p id="postulante-hint" class="font-body-sm text-body-sm text-on-surface-variant mt-md">
                         Vas a registrar tu propia postulación. Ya cargamos tus datos guardados.
                     </p>
+<!-- Aviso: el usuario todavía no vinculó su cuenta con un perfil de candidato -->
+<div id="alerta-no-registrado" class="hidden mt-md flex items-start gap-3 bg-error-container/40 border border-error/30 rounded-lg p-md">
+<span class="material-symbols-outlined text-error">info</span>
+<div class="flex-1">
+<p class="font-body-sm text-body-sm font-bold text-on-surface">Todavía no estás registrado como candidato</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Necesitas crear tu perfil de candidato antes de poder postularte con tu propia cuenta.</p>
+<button type="button" id="btn-ir-a-registro" class="mt-2 bg-primary text-on-primary px-4 py-2 rounded-lg text-body-sm font-bold hover:bg-opacity-90 transition-all">
+                                Registrarme como candidato
+                            </button>
+</div>
+</div>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
 <!-- Main Form Section -->
@@ -436,16 +447,38 @@
         const vacanteDepartamento = document.getElementById('vacante-departamento');
         const curriculumInput = document.getElementById('curriculum');
         const resumenTexto = document.getElementById('resumen-texto');
+        const alertaNoRegistrado = document.getElementById('alerta-no-registrado');
+        const btnIrARegistro = document.getElementById('btn-ir-a-registro');
+        const btnPostularme = document.getElementById('btn-postularme');
+        const btnPostularTercero = document.getElementById('btn-postular-tercero');
+        const hintPostulante = document.getElementById('postulante-hint');
 
         let vacantesCache = [];
         let idCandidatoActual = null;
         let miPerfilCache = null;   // datos de MI perfil, para restaurar al volver al modo "yo mismo"
         let esParaTercero = false; // true = estoy postulando a otra persona
+        // true solo cuando confirmamos (vía GET /mi-perfil) que esta cuenta ya
+        // tiene un perfil de Candidato vinculado. Mientras sea false, no se
+        // puede enviar una postulación en modo "Me postulo yo".
+        let tieneMiPerfil = false;
 
-        // ── Toggle "¿Quién se postula?" ───────────────────────────────
-        const btnPostularme = document.getElementById('btn-postularme');
-        const btnPostularTercero = document.getElementById('btn-postular-tercero');
-        const hintPostulante = document.getElementById('postulante-hint');
+        // Si el usuario todavía no vinculó su cuenta con un perfil de
+        // candidato y está en modo "Me postulo yo", mostramos el aviso con
+        // el acceso directo al registro. En modo "tercero" no aplica: ahí
+        // se está creando el perfil de otra persona, no el propio.
+        function actualizarAlertaRegistro() {
+            if (!esParaTercero && !tieneMiPerfil) {
+                alertaNoRegistrado.classList.remove('hidden');
+            } else {
+                alertaNoRegistrado.classList.add('hidden');
+            }
+        }
+
+        if (btnIrARegistro) {
+            btnIrARegistro.addEventListener('click', () => {
+                window.location.href = 'candidatos.html';
+            });
+        }
 
         function setCamposPostulante(datos) {
             document.getElementById('nombre').value = datos?.Nombre || '';
@@ -483,8 +516,11 @@
         function activarModoYoMismo() {
             esParaTercero = false;
             marcarBotonActivo(btnPostularme, btnPostularTercero);
-            hintPostulante.textContent = 'Vas a registrar tu propia postulación. Ya cargamos tus datos guardados.';
+            hintPostulante.textContent = tieneMiPerfil
+                ? 'Vas a registrar tu propia postulación. Ya cargamos tus datos guardados.'
+                : 'Vas a registrar tu propia postulación, pero todavía no tienes un perfil de candidato creado.';
             setCamposPostulante(miPerfilCache);
+            actualizarAlertaRegistro();
         }
 
         function activarModoTercero() {
@@ -492,6 +528,7 @@
             marcarBotonActivo(btnPostularTercero, btnPostularme);
             hintPostulante.textContent = 'Vas a registrar la postulación de otra persona. Completa SUS datos, no los tuyos.';
             setCamposPostulante(null);
+            actualizarAlertaRegistro();
         }
 
         btnPostularme.addEventListener('click', activarModoYoMismo);
@@ -500,6 +537,9 @@
         // ── Precargar el perfil de candidato vinculado a esta cuenta ──────
         // Si ya se postuló antes, no le pedimos que vuelva a escribir todo:
         // traemos su Nombre/Apellido/Correo/Teléfono guardados.
+        // Además, esto es lo que nos dice si la cuenta YA tiene un perfil
+        // de Candidato vinculado (tieneMiPerfil), algo obligatorio para
+        // poder postularse a sí mismo.
         async function precargarMiPerfil() {
             try {
                 const response = await fetch(`${API}/candidatos/mi-perfil`, {
@@ -515,10 +555,16 @@
 
                 if (response.status === 404) {
                     // Todavía no tiene perfil: al menos completamos el correo
-                    // con el de su cuenta, para no pedirlo dos veces.
+                    // con el de su cuenta, para no pedirlo dos veces si decide
+                    // ir a registrarse.
+                    tieneMiPerfil = false;
                     if (window.currentUser && window.currentUser.Correo) {
                         document.getElementById('correo').value = window.currentUser.Correo;
                         miPerfilCache = { Correo: window.currentUser.Correo };
+                    }
+                    if (!esParaTercero) {
+                        actualizarAlertaRegistro();
+                        hintPostulante.textContent = 'Vas a registrar tu propia postulación, pero todavía no tienes un perfil de candidato creado.';
                     }
                     return;
                 }
@@ -528,6 +574,7 @@
                 const candidato = await response.json();
                 idCandidatoActual = candidato.IdCandidato;
                 miPerfilCache = candidato;
+                tieneMiPerfil = true;
 
                 if (!esParaTercero) {
                     document.getElementById('nombre').value = candidato.Nombre || '';
@@ -536,6 +583,7 @@
                     document.getElementById('telefono').value = candidato.Telefono || '';
                     mostrarCurriculumActual(candidato.Curriculum || '');
                     actualizarResumen();
+                    actualizarAlertaRegistro();
                 }
             } catch (error) {
                 console.error('Error precargando el perfil de candidato:', error);
@@ -645,6 +693,19 @@
             feedback.classList.remove('text-red-600', 'text-green-600');
 
             if (!form.reportValidity()) {
+                return;
+            }
+
+            // Si es "Me postulo yo" pero la cuenta todavía no tiene un
+            // perfil de candidato vinculado, no dejamos avanzar: primero
+            // debe registrarse (esto evita crear perfiles "fantasma" desde
+            // este formulario y mantiene un único punto de alta: /candidatos.html).
+            if (!esParaTercero && !tieneMiPerfil) {
+                actualizarAlertaRegistro();
+                feedback.classList.remove('hidden');
+                feedback.classList.add('text-red-600');
+                feedback.textContent = 'Debes registrarte como candidato antes de postularte. Usa el botón "Registrarme como candidato".';
+                alertaNoRegistrado.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
 

@@ -124,15 +124,23 @@
             background: #c1c6d7;
             border-radius: 10px;
         }
+        .form-input-focus:focus {
+            border-color: #0059bb;
+            box-shadow: 0 0 0 2px rgba(0, 89, 187, 0.1);
+        }
     </style>
 <script src="/js/auth.js"></script>
 </head>
 <body class="bg-surface text-on-surface font-body-md">
 <script>
     // ---------------------------------------------------------------
-    // Guard de acceso: solo Administrador (1) y Reclutador (2) pueden
-    // ver el listado completo de candidatos (expone PII de terceros).
-    // Se ejecuta ANTES de pintar el resto de la página.
+    // Guard de acceso: esta pantalla ahora la pueden abrir los 3 roles.
+    //  - Administrador (1) / Reclutador (2): ven el listado completo de
+    //    candidatos (expone PII, por eso antes estaba bloqueada).
+    //  - Candidato (3): NO ve el listado de terceros. Solo ve una sección
+    //    para vincular su propia cuenta con un perfil de candidato
+    //    ("Registrarme como candidato"). El resto de la UI de esta
+    //    página se oculta para ese rol vía [data-role-show].
     // ---------------------------------------------------------------
     (function guardAccess() {
         const token = localStorage.getItem('st_token');
@@ -148,20 +156,6 @@
         if (!token || !usuario || !usuario.IdRol) {
             window.location.href = 'index.html';
             throw new Error('Sin sesión, redirigiendo.');
-        }
-
-        const rol = Number(usuario.IdRol);
-
-        if (rol !== 1 && rol !== 2) {
-            // Candidato: esta pantalla expone datos personales de otros
-            // candidatos, no está autorizado a verla.
-            if (typeof window.showAccessDeniedAlert === 'function') {
-                window.showAccessDeniedAlert('Esta sección está reservada para administradores y reclutadores.', 'vacantes.html');
-            } else {
-                window.location.href = 'vacantes.html';
-            }
-            window.__accessDenied = true;
-            throw new Error('Rol no autorizado, redirigiendo.');
         }
 
         window.currentUser = usuario;
@@ -191,13 +185,17 @@
 <span class="material-symbols-outlined">work</span>
 <span class="font-label-caps text-label-caps">Vacantes</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="entrevistas.html">
+<a data-role-show="1,2" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="entrevistas.html">
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="font-label-caps text-label-caps">Entrevistas</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="evaluaciones.html">
+<a data-role-show="1,2" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="evaluaciones.html">
 <span class="material-symbols-outlined">fact_check</span>
 <span class="font-label-caps text-label-caps">Evaluaciones</span>
+</a>
+<a data-role-show="3" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="postulacionCandidato.html">
+<span class="material-symbols-outlined">send</span>
+<span class="font-label-caps text-label-caps">Postularme</span>
 </a>
 <a data-role-show="1" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="admin_usuarios.html">
 <span class="material-symbols-outlined">manage_accounts</span>
@@ -209,7 +207,7 @@
 <header class="docked top-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant shrink-0">
 <div class="flex justify-between items-center px-lg h-full w-full max-w-container-max mx-auto">
 <div class="flex items-center gap-4 flex-1">
-<div class="relative w-full max-w-md">
+<div data-role-show="1,2" class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 <input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-body-md outline-none" placeholder="Buscar candidatos..." type="text"/>
 </div>
@@ -230,7 +228,7 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
 <div>
 <h2 class="font-headline-md text-headline-md text-on-surface">Candidatos</h2>
-<p class="text-body-md text-on-surface-variant">Gestiona y realiza seguimiento de las postulaciones actuales en Serenity Talent.</p>
+<p id="page-subtitle" class="text-body-md text-on-surface-variant">Gestiona y realiza seguimiento de las postulaciones actuales en Serenity Talent.</p>
 </div>
 <div class="flex flex-col sm:flex-row gap-3">
 <button data-role-show="1,2" type="button" onclick="window.location.href='registrarCandidatos.html'" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
@@ -239,7 +237,76 @@
 </button>
 </div>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant flex flex-wrap gap-md items-center shadow-sm">
+
+<!-- ══════════════ Vista Candidato (rol 3): auto-registro ══════════════ -->
+<div data-role-show="3" id="candidate-view" class="space-y-lg">
+<div id="candidate-loading" class="bg-white rounded-xl border border-outline-variant p-lg text-center text-on-surface-variant shadow-sm">
+                    Cargando tu información…
+                </div>
+
+<div id="candidate-already" class="hidden bg-white rounded-xl border border-outline-variant p-lg space-y-md shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ya estás registrado como candidato</h3>
+<p class="text-body-sm text-on-surface-variant">Estos son tus datos guardados. Puedes actualizarlos o postularte a una vacante disponible.</p>
+</div>
+</div>
+<div id="candidate-summary" class="grid grid-cols-1 sm:grid-cols-2 gap-md text-body-md border-t border-outline-variant pt-md"></div>
+<div class="flex flex-col sm:flex-row gap-3 pt-md border-t border-outline-variant">
+<button type="button" onclick="window.location.href='vacantes.html'" class="flex-1 bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">send</span>
+                        Postularme a una vacante
+                    </button>
+<button type="button" id="btn-editar-mi-perfil" class="flex-1 bg-transparent border border-outline text-on-surface-variant px-lg py-3 rounded-lg font-bold hover:bg-surface transition-all">
+                        Actualizar mis datos
+                    </button>
+</div>
+</div>
+
+<form id="candidate-register-form" class="hidden bg-white rounded-xl border border-outline-variant p-lg space-y-md shadow-sm">
+<div class="flex items-center gap-2 mb-1 border-b border-outline-variant pb-sm">
+<span class="material-symbols-outlined text-primary">person_add</span>
+<h3 class="font-headline-sm text-headline-sm">Registrarme como candidato</h3>
+</div>
+<p class="text-body-sm text-on-surface-variant">
+                    Para poder postularte a una vacante primero necesitamos vincular tu cuenta con un perfil de candidato. Completa tus datos:
+                </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<div>
+<label class="block font-body-sm text-body-sm font-bold mb-xs" for="cr-nombre">Nombre <span class="text-error">*</span></label>
+<input id="cr-nombre" class="w-full border border-outline-variant rounded-lg p-3 form-input-focus outline-none" required="" type="text" minlength="2"/>
+</div>
+<div>
+<label class="block font-body-sm text-body-sm font-bold mb-xs" for="cr-apellido">Apellido <span class="text-error">*</span></label>
+<input id="cr-apellido" class="w-full border border-outline-variant rounded-lg p-3 form-input-focus outline-none" required="" type="text" minlength="2"/>
+</div>
+<div>
+<label class="block font-body-sm text-body-sm font-bold mb-xs" for="cr-correo">Correo Electrónico <span class="text-error">*</span></label>
+<input id="cr-correo" class="w-full border border-outline-variant rounded-lg p-3 form-input-focus outline-none" required="" type="email"/>
+</div>
+<div>
+<label class="block font-body-sm text-body-sm font-bold mb-xs" for="cr-telefono">Teléfono <span class="text-error">*</span></label>
+<input id="cr-telefono" class="w-full border border-outline-variant rounded-lg p-3 form-input-focus outline-none" required="" type="tel" minlength="7" pattern="[0-9+\-\s()]{7,15}"/>
+</div>
+</div>
+<div>
+<label class="block font-body-sm text-body-sm font-bold mb-xs" for="cr-curriculum">Currículum Vitae (PDF, DOC o DOCX)</label>
+<input id="cr-curriculum" class="w-full text-body-sm text-on-surface border border-outline-variant rounded-lg p-2" type="file" accept=".pdf,.doc,.docx"/>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">El archivo no se sube al servidor, solo se registra su nombre en el sistema.</p>
+</div>
+<p id="candidate-register-feedback" class="text-body-sm hidden"></p>
+<button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">how_to_reg</span>
+                    Registrarme como candidato
+                </button>
+</form>
+</div>
+
+<!-- ══════════════ Vista Staff (roles 1 y 2): listado completo ══════════════ -->
+<div data-role-show="1,2" class="bg-white p-md rounded-xl border border-outline-variant flex flex-wrap gap-md items-center shadow-sm">
 <div class="flex-1 min-w-[200px]">
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
@@ -247,7 +314,7 @@
 </div>
 </div>
 </div>
-<div class="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div data-role-show="1,2" class="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
 <thead>
@@ -282,7 +349,7 @@
 </div>
 </div>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div data-role-show="1,2" class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
 <div class="lg:col-span-2 bg-primary-container text-on-primary-container p-lg rounded-xl flex items-center justify-between shadow-md relative overflow-hidden">
 <div class="relative z-10">
 <h3 class="font-headline-sm text-headline-sm mb-2">Optimización de Pipeline</h3>
@@ -318,6 +385,27 @@
         const token = localStorage.getItem('st_token');
         const currentRol = Number(window.currentUser && window.currentUser.IdRol);
 
+        function authHeaders(extra) {
+            return Object.assign(
+                { 'Authorization': `Bearer ${token}` },
+                extra || {}
+            );
+        }
+
+        // ── Rol Candidato: no ve el listado de terceros, solo su propio
+        // auto-registro. Toda la UI de staff ya está oculta vía
+        // [data-role-show], acá solo evitamos pedir /api/candidatos
+        // (que le devolvería 403 de todas formas) y arrancamos su flujo.
+        if (currentRol === 3) {
+            const subtitle = document.getElementById('page-subtitle');
+            if (subtitle) {
+                subtitle.textContent = 'Registra tu perfil para poder postularte a las vacantes disponibles.';
+            }
+            initCandidateSelfView(API, authHeaders);
+            return;
+        }
+
+        // ── Roles Administrador / Reclutador: listado completo ──────────
         // Solo Administrador puede eliminar de forma permanente.
         // El caso de Reclutador queda pendiente de definir (¿eliminar u
         // ofrecer solo "desactivar"?) - por ahora se oculta por seguridad.
@@ -326,13 +414,6 @@
         const searchInputs = document.querySelectorAll(
             'input[placeholder="Buscar candidatos..."], input[placeholder="Filtrar por nombre o correo..."]'
         );
-
-        function authHeaders(extra) {
-            return Object.assign(
-                { 'Authorization': `Bearer ${token}` },
-                extra || {}
-            );
-        }
 
         function formatDate(dateString) {
             if (!dateString) return 'Sin fecha';
@@ -618,6 +699,130 @@
 
         loadCandidates();
     });
+
+    // ── Rol Candidato: auto-registro de su propio perfil ────────────────
+    // Se ejecuta en vez de loadCandidates(). Consulta si la cuenta ya
+    // tiene un perfil de Candidato vinculado (GET /mi-perfil):
+    //   - 200 -> ya existe: mostramos resumen + accesos directos.
+    //   - 404 -> no existe: mostramos el formulario para crearlo
+    //            (POST /mi-perfil, el mismo endpoint que usa
+    //            postulacionCandidato.html para no duplicar lógica).
+    async function initCandidateSelfView(API, authHeaders) {
+        const loadingEl = document.getElementById('candidate-loading');
+        const yaRegistradoEl = document.getElementById('candidate-already');
+        const formEl = document.getElementById('candidate-register-form');
+        const resumenEl = document.getElementById('candidate-summary');
+        const feedbackEl = document.getElementById('candidate-register-feedback');
+
+        function escapeHTML(value) {
+            const div = document.createElement('div');
+            div.textContent = value ?? '';
+            return div.innerHTML;
+        }
+
+        try {
+            const response = await fetch(`${API}/candidatos/mi-perfil`, {
+                headers: authHeaders()
+            });
+
+            if (response.status === 401) {
+                localStorage.removeItem('st_token');
+                localStorage.removeItem('st_usuario');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            loadingEl.classList.add('hidden');
+
+            if (response.status === 404) {
+                formEl.classList.remove('hidden');
+                const correoInput = document.getElementById('cr-correo');
+                if (correoInput && window.currentUser && window.currentUser.Correo) {
+                    correoInput.value = window.currentUser.Correo;
+                }
+            } else if (response.ok) {
+                const candidato = await response.json();
+
+                yaRegistradoEl.classList.remove('hidden');
+                resumenEl.innerHTML = `
+                    <div><p class="text-body-sm text-on-surface-variant font-bold">Nombre</p><p>${escapeHTML(candidato.Nombre)} ${escapeHTML(candidato.Apellido)}</p></div>
+                    <div><p class="text-body-sm text-on-surface-variant font-bold">Correo</p><p>${escapeHTML(candidato.Correo)}</p></div>
+                    <div><p class="text-body-sm text-on-surface-variant font-bold">Teléfono</p><p>${escapeHTML(candidato.Telefono || 'Sin teléfono')}</p></div>
+                    <div><p class="text-body-sm text-on-surface-variant font-bold">Currículum</p><p>${escapeHTML(candidato.Curriculum || 'No adjuntado')}</p></div>
+                `;
+
+                const btnEditar = document.getElementById('btn-editar-mi-perfil');
+                if (btnEditar) {
+                    btnEditar.addEventListener('click', () => {
+                        window.location.href = `actualizar_candidato.html?id=${candidato.IdCandidato}`;
+                    });
+                }
+            } else {
+                throw new Error('No se pudo cargar tu información de candidato');
+            }
+        } catch (error) {
+            console.error('Error cargando tu perfil de candidato:', error);
+            loadingEl.textContent = 'Ocurrió un error al cargar tu información. Intenta recargar la página.';
+        }
+
+        formEl.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            feedbackEl.classList.add('hidden');
+            feedbackEl.classList.remove('text-red-600', 'text-green-600');
+
+            if (!formEl.reportValidity()) {
+                return;
+            }
+
+            const body = {
+                Nombre: document.getElementById('cr-nombre').value.trim(),
+                Apellido: document.getElementById('cr-apellido').value.trim(),
+                Correo: document.getElementById('cr-correo').value.trim(),
+                Telefono: document.getElementById('cr-telefono').value.trim(),
+                Curriculum: document.getElementById('cr-curriculum').files.length
+                    ? document.getElementById('cr-curriculum').files[0].name
+                    : '',
+            };
+
+            const submitBtn = formEl.querySelector('button[type="submit"]');
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70');
+            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Procesando...';
+
+            try {
+                const response = await fetch(`${API}/candidatos/mi-perfil`, {
+                    method: 'POST',
+                    headers: authHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify(body),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo completar el registro');
+                }
+
+                feedbackEl.classList.remove('hidden');
+                feedbackEl.classList.add('text-green-600');
+                feedbackEl.textContent = '¡Listo! Tu perfil de candidato fue creado. Ya puedes postularte a una vacante.';
+
+                setTimeout(() => {
+                    window.location.href = 'postulacionCandidato.html';
+                }, 1500);
+
+            } catch (error) {
+                feedbackEl.classList.remove('hidden');
+                feedbackEl.classList.add('text-red-600');
+                feedbackEl.textContent = error.message || 'Error al registrar tus datos.';
+
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70');
+                submitBtn.innerHTML = originalHTML;
+            }
+        });
+    }
 </script>
 <script>
   function logout() {
