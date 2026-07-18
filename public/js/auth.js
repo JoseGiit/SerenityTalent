@@ -1,7 +1,7 @@
 // Helper for client-side auth UI and requests
 (function(window){
   function getToken(){
-    return localStorage.getItem('token') || localStorage.getItem('st_token') || null;
+    return localStorage.getItem('st_token') || localStorage.getItem('token') || null;
   }
 
   function parseJwt(token){
@@ -23,6 +23,15 @@
     return parseJwt(t);
   }
 
+  function getRole(){
+    const user = getUser();
+    if (!user) return null;
+    if (user.rol !== undefined) return Number(user.rol);
+    if (user.IdRol !== undefined) return Number(user.IdRol);
+    if (user.idRol !== undefined) return Number(user.idRol);
+    return null;
+  }
+
   function fetchAuth(url, options){
     options = options || {};
     options.headers = options.headers || {};
@@ -32,14 +41,7 @@
   }
 
   function applyRoleVisibility(){
-    const user = getUser();
-    // Support different shapes: { rol } from JWT payload or { IdRol } from API user object
-    let role = null;
-    if (user) {
-      if (user.rol !== undefined) role = Number(user.rol);
-      else if (user.IdRol !== undefined) role = Number(user.IdRol);
-      else if (user.idRol !== undefined) role = Number(user.idRol);
-    }
+    const role = getRole();
     document.querySelectorAll('[data-role-show]').forEach(el => {
       const allowed = String(el.getAttribute('data-role-show')).split(',').map(s=>Number(s.trim()));
       if(role !== null && allowed.includes(role)) el.style.display = '';
@@ -52,14 +54,128 @@
     });
   }
 
-  function logout(){
+  // Clears ALL session keys used across the app. logout() must go through
+  // this instead of removing 'token' alone, or stale st_token/st_usuario
+  // survive and keep feeding a "logged in" user object to getUser().
+  function clearSession(){
     localStorage.removeItem('token');
+    localStorage.removeItem('st_token');
+    localStorage.removeItem('st_usuario');
+  }
+
+  function logout(){
+    clearSession();
     window.location.href = '/index.html';
   }
 
+  // Centralized response handler. This is the fix for the core bug:
+  // 401 = invalid/expired session -> real logout, back to login.
+  // 403 = valid session, wrong role -> DO NOT touch the session, just warn.
+  // Returns true if it already handled (and you should stop processing
+  // the response further), false if the response was fine.
+  function handleApiError(response, options){
+    if (response.status === 401) {
+      clearSession();
+      window.location.href = 'index.html';
+      return true;
+    }
+    if (response.status === 403) {
+      showAccessDeniedAlert(
+        (options && options.message) || 'Tu sesión sigue activa, pero tu rol no tiene acceso a esta sección.',
+        (options && options.redirectUrl) || 'vacantes.html'
+      );
+      return true;
+    }
+    return false;
+  }
+
+  // Reusable page guard. Await this at the very top of a page's script,
+  // BEFORE any data-loading calls, and bail out if it returns false.
+  // This is what actually stops the "flash" — not a throw (which only
+  // kills the current <script> block), but every other init function
+  // simply never gets called because you gated it with `if (!ok) return;`.
+  //
+  // Usage:
+  //   document.addEventListener('DOMContentLoaded', async () => {
+  //     const ok = await Auth.requireRole([1,2]);
+  //     if (!ok) return;
+  //     cargarEntrevistas();
+  //   });
+  async function requireRole(rolesPermitidos, opts){
+    const user = getUser();
+    if (!user) {
+      // no session at all -> straight to login, not a role message
+      window.location.href = (opts && opts.loginUrl) || 'index.html';
+      return false;
+    }
+    const role = getRole();
+    if (role === null || !rolesPermitidos.includes(role)) {
+      showAccessDeniedAlert(
+        (opts && opts.message) || 'No tenés permiso para ver esta página con tu rol actual.',
+        (opts && opts.redirectUrl) || 'vacantes.html',
+        opts
+      );
+      return false;
+    }
+    return true;
+  }
+
+  function showAccessDeniedAlert(message, redirectUrl, options){
+    const settings = Object.assign({ title: 'Acceso restringido', redirectDelay: 0, fallbackUrl: redirectUrl || 'vacantes.html' }, options || {});
+    if (!document.body) {
+      window.location.href = settings.fallbackUrl;
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center px-4';
+    overlay.innerHTML = `
+      <div class="w-full max-w-md rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-2xl">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <span class="material-symbols-outlined text-2xl">lock</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-on-surface">${settings.title}</h3>
+            <p class="text-sm text-on-surface-variant">Solo para el rol adecuado</p>
+          </div>
+        </div>
+        <p class="text-sm leading-6 text-on-surface-variant">${message}</p>
+        <div class="mt-5 flex items-center justify-end gap-3">
+          <button type="button" class="rounded-lg border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-all" data-action="back">Volver</button>
+          <span class="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Volviendo…</span>
+        </div>
+      </div>`;
+
+    document.body.appendChild(overlay);
+
+    const redirectToSafePage = () => {
+      const previousPage = document.referrer && document.referrer.includes(window.location.origin)
+        ? new URL(document.referrer).pathname.replace(/^\//, '')
+        : '';
+      const destination = previousPage || settings.fallbackUrl || 'vacantes.html';
+      if (destination && destination !== window.location.pathname.replace(/^\//, '')) {
+        window.location.href = destination;
+      } else {
+        window.history.back();
+      }
+    };
+
+    overlay.querySelector('[data-action="back"]').addEventListener('click', redirectToSafePage);
+
+    if (settings.redirectDelay > 0) {
+      setTimeout(() => {
+        overlay.remove();
+        redirectToSafePage();
+      }, settings.redirectDelay);
+    }
+  }
+
   window.Auth = {
-    getToken, getUser, fetchAuth, applyRoleVisibility, logout
+    getToken, getUser, getRole, fetchAuth, applyRoleVisibility, logout,
+    handleApiError, requireRole
   };
+  window.showAccessDeniedAlert = showAccessDeniedAlert;
 
   document.addEventListener('DOMContentLoaded', applyRoleVisibility);
   document.addEventListener('DOMContentLoaded', () => {

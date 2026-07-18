@@ -79,7 +79,11 @@
         }
 
         if (Number(usuario.IdRol) !== 1) {
-            window.location.href = 'index.html';
+            if (typeof window.showAccessDeniedAlert === 'function') {
+                window.showAccessDeniedAlert('Esta sección solo está disponible para administradores.', 'index.html');
+            } else {
+                window.location.href = 'index.html';
+            }
             throw new Error('Rol no autorizado, redirigiendo.');
         }
 

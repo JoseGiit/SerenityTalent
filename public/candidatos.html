@@ -155,7 +155,12 @@
         if (rol !== 1 && rol !== 2) {
             // Candidato: esta pantalla expone datos personales de otros
             // candidatos, no está autorizado a verla.
-            window.location.href = 'vacantes.html';
+            if (typeof window.showAccessDeniedAlert === 'function') {
+                window.showAccessDeniedAlert('Esta sección está reservada para administradores y reclutadores.', 'vacantes.html');
+            } else {
+                window.location.href = 'vacantes.html';
+            }
+            window.__accessDenied = true;
             throw new Error('Rol no autorizado, redirigiendo.');
         }
 
@@ -528,6 +533,8 @@
         });
 
         async function loadCandidates() {
+            if (window.__accessDenied) return;
+
             const tbody = document.getElementById('candidatos-tbody');
             const counter = document.getElementById('candidatos-count');
             const activeCandidatesCount = document.getElementById('active-candidates-count');
@@ -538,6 +545,8 @@
                 });
 
                 if (response.status === 401 || response.status === 403) {
+                    if (window.__accessDenied) return;
+
                     // Importante: si no limpiamos la sesión guardada, index.html
                     // la va a encontrar "válida" localmente y nos manda de vuelta
                     // acá, generando un bucle infinito entre las dos páginas.

@@ -22,4 +22,11 @@ assert.match(candidatos, /if \(rol !== 1 && rol !== 2\)/);
 assert.match(candidatos, /data-role-show="1,2"/);
 assert.match(candidatos, /data-role-show="1"[^>]*href="admin_usuarios\.html"|href="admin_usuarios\.html"[^>]*data-role-show="1"/);
 
+const auth = read('public/js/auth.js');
+assert.match(auth, /history\.back\(|document\.referrer/);
+
+const entrevistas = read('public/entrevistas.html');
+assert.match(entrevistas, /window\.__accessDenied\s*=\s*true/);
+assert.match(entrevistas, /__accessDenied/);
+
 console.log('Role mapping checks passed.');

@@ -144,7 +144,11 @@
         const rol = Number(usuario.IdRol);
 
         if (rol !== 1 && rol !== 2) {
-            window.location.href = 'vacantes.html';
+            if (typeof window.showAccessDeniedAlert === 'function') {
+                window.showAccessDeniedAlert('Esta sección está reservada para administradores y reclutadores.', 'vacantes.html');
+            } else {
+                window.location.href = 'vacantes.html';
+            }
             throw new Error('Rol no autorizado, redirigiendo.');
         }
 

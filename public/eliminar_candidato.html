@@ -88,7 +88,11 @@
         if (rol !== 1) {
             // Reclutador y Candidato: no autorizados a eliminar
             // candidatos de forma permanente.
-            window.location.href = 'candidatos.html';
+            if (typeof window.showAccessDeniedAlert === 'function') {
+                window.showAccessDeniedAlert('Esta acción solo está disponible para administradores.', 'candidatos.html');
+            } else {
+                window.location.href = 'candidatos.html';
+            }
             throw new Error('Rol no autorizado, redirigiendo.');
         }
 

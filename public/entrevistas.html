@@ -82,7 +82,12 @@
         const rol = Number(usuario.IdRol);
 
         if (rol !== 1 && rol !== 2) {
-            window.location.href = 'vacantes.html';
+            if (typeof window.showAccessDeniedAlert === 'function') {
+                window.showAccessDeniedAlert('Esta sección está reservada para administradores y reclutadores.', 'vacantes.html');
+            } else {
+                window.location.href = 'vacantes.html';
+            }
+            window.__accessDenied = true;
             throw new Error('Rol no autorizado, redirigiendo.');
         }
 
@@ -280,6 +285,8 @@
     }
 
     function manejarSesionInvalida(response) {
+        if (window.__accessDenied) return true;
+
         if (response.status === 401 || response.status === 403) {
             // Limpiar la sesión inválida: si no lo hacemos, index.html la va a
             // ver como 'todavía válida' y nos manda de vuelta acá, generando
@@ -293,6 +300,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+        if (window.__accessDenied) return;
+
         configurarFechaMinima();
         renderHeaderUser();
         await cargarPostulaciones();
@@ -303,6 +312,8 @@
 
     // ── Postulaciones (para el selector del formulario) ──────────────
     async function cargarPostulaciones() {
+        if (window.__accessDenied) return;
+
         try {
             const response = await fetch(`${API}/postulaciones`, { headers: authHeaders() });
             if (manejarSesionInvalida(response)) return;
@@ -360,6 +371,8 @@
 
     // ── Entrevistas (API real, sin localStorage) ──────────────────────
     async function cargarEntrevistas() {
+        if (window.__accessDenied) return;
+
         try {
             const response = await fetch(`${API}/entrevistas`, { headers: authHeaders() });
             if (manejarSesionInvalida(response)) return;
@@ -377,6 +390,8 @@
     }
 
     form.addEventListener('submit', async (event) => {
+        if (window.__accessDenied) return;
+
         event.preventDefault();
 
         const idEntrevista = document.getElementById('IdEntrevista').value;
@@ -468,6 +483,8 @@
     }
 
     window.verEntrevista = function(id) {
+        if (window.__accessDenied) return;
+
         const e = entrevistas.find((item) => Number(item.IdEntrevista) === Number(id));
         if (!e) return mostrarFeedback('No se encontró la entrevista.', true);
         alert(`ENTREVISTA PROGRAMADA\n\nCandidato: ${e.Nombre} ${e.Apellido}\nCorreo: ${e.Correo || 'Sin correo'}\nVacante: ${e.Vacante || 'Sin vacante'}\nFecha: ${formatearFecha(e.Fecha)}\nHora: ${e.Hora}\nModalidad: ${e.Modalidad || 'Sin definir'}\nEstado de la postulación: ${e.EstadoEntrevista || 'Registrado'}\nObservaciones: ${e.Observaciones || 'Sin observaciones'}`);
@@ -475,6 +492,8 @@
     };
 
     window.editarEntrevista = function(id) {
+        if (window.__accessDenied) return;
+
         const e = entrevistas.find((item) => Number(item.IdEntrevista) === Number(id));
         if (!e) return mostrarFeedback('No se encontró la entrevista seleccionada.', true);
 
@@ -491,6 +510,7 @@
     };
 
     window.eliminarEntrevista = async function(id) {
+        if (window.__accessDenied) return;
         if (!confirm('¿Seguro que deseas eliminar esta entrevista?')) return;
 
         try {

@@ -152,7 +152,12 @@
         const rol = Number(usuario.IdRol);
 
         if (rol !== 1 && rol !== 2) {
-            window.location.href = 'vacantes.html';
+            if (typeof window.showAccessDeniedAlert === 'function') {
+                window.showAccessDeniedAlert('Esta sección está reservada para administradores y reclutadores.', 'vacantes.html');
+            } else {
+                window.location.href = 'vacantes.html';
+            }
+            window.__accessDenied = true;
             throw new Error('Rol no autorizado, redirigiendo.');
         }
 
@@ -385,6 +390,8 @@
   }
 
   async function cargarEntrevistas() {
+    if (window.__accessDenied) return;
+
     const locales = leerEntrevistasLocales();
     let servidor = [];
 
@@ -394,6 +401,8 @@
       });
 
       if (response.status === 401 || response.status === 403) {
+        if (window.__accessDenied) return;
+
         // Limpiar la sesión inválida: si no lo hacemos, index.html
         // la va a ver como 'todavía válida' y nos manda de vuelta acá,
         // generando un bucle infinito entre las dos páginas.
