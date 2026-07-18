@@ -59,7 +59,8 @@ async function initializeDatabase() {
   await ensureColumnExists('Candidato', 'Estado', "Estado VARCHAR(50) DEFAULT 'Activo'");
   // Vínculo real entre la cuenta de login (Usuario) y su perfil de candidato.
   // Nullable: un Admin/Reclutador puede seguir dando de alta candidatos que
-  // no tienen cuenta propia en el sistema.
+  // no tienen cuenta propia en el sistema, y un Candidato puede postular a
+  // un tercero cuyo perfil tampoco queda vinculado a ninguna cuenta.
   await ensureColumnExists('Candidato', 'IdUsuario', 'IdUsuario INT UNSIGNED DEFAULT NULL');
 
   await pool.query(`
@@ -409,6 +410,62 @@ app.post('/api/candidatos/mi-perfil', authenticateToken, authorizeRoles(ROLES.CA
     res.status(200).json({ candidato: rows[0] });
   } catch (err) {
     console.error('Error en POST /api/candidatos/mi-perfil:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── POST /api/candidatos/postular-tercero ─────────────────────────
+// Solo Candidato. Crea o actualiza el perfil de OTRA persona (no la propia
+// cuenta del usuario autenticado) para postularla en su nombre.
+//
+// Reglas de seguridad:
+// - Nunca se le puede pasar el propio correo del usuario autenticado
+//   (para eso existe /mi-perfil).
+// - Nunca se toca un perfil que ya tenga IdUsuario asignado: esos
+//   pertenecen a la cuenta de otra persona y no son editables desde acá.
+//   Si el correo coincide con uno de esos, se crea un perfil nuevo en vez
+//   de sobrescribir datos ajenos.
+app.post('/api/candidatos/postular-tercero', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
+  const { Nombre, Apellido, Correo, Telefono, Curriculum } = req.body;
+
+  if (!Nombre || !Apellido || !Correo || !Telefono) {
+    return res.status(400).json({ error: 'Nombre, apellido, correo y teléfono son requeridos' });
+  }
+
+  const correoNormalizado = Correo.trim().toLowerCase();
+
+  if (correoNormalizado === (req.user.correo || '').toLowerCase()) {
+    return res.status(400).json({ error: 'Ese es tu propio correo. Para postularte a ti mismo usa la opción "Me postulo yo".' });
+  }
+
+  try {
+    const [existente] = await pool.query(
+      'SELECT IdCandidato FROM Candidato WHERE LOWER(Correo) = ? AND IdUsuario IS NULL LIMIT 1',
+      [correoNormalizado]
+    );
+
+    let idCandidato;
+
+    if (existente.length > 0) {
+      idCandidato = existente[0].IdCandidato;
+
+      await pool.query(
+        'UPDATE Candidato SET Nombre = ?, Apellido = ?, Correo = ?, Telefono = ?, Curriculum = ? WHERE IdCandidato = ?',
+        [Nombre.trim(), Apellido.trim(), Correo.trim(), Telefono.trim(), Curriculum || '', idCandidato]
+      );
+    } else {
+      const [result] = await pool.query(
+        'INSERT INTO Candidato (Nombre, Apellido, Correo, Telefono, Curriculum, FechaRegistro, IdUsuario) VALUES (?, ?, ?, ?, ?, CURDATE(), NULL)',
+        [Nombre.trim(), Apellido.trim(), Correo.trim(), Telefono.trim(), Curriculum || '']
+      );
+      idCandidato = result.insertId;
+    }
+
+    const [rows] = await pool.query('SELECT * FROM Candidato WHERE IdCandidato = ?', [idCandidato]);
+
+    res.status(200).json({ candidato: rows[0] });
+  } catch (err) {
+    console.error('Error en POST /api/candidatos/postular-tercero:', err.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
@@ -785,8 +842,12 @@ app.put('/api/postulaciones/:id/estado', authenticateToken, authorizeRoles(ROLES
 });
 
 // ── POST /api/postulaciones/crear-o-buscar ─────────────────────
-// Solo Candidato, y únicamente sobre su propio registro de Candidato
-// (se verifica por IdUsuario, con fallback a correo para registros viejos).
+// Solo Candidato. Se permite crear una postulación sobre:
+//   1. El propio perfil de candidato del usuario autenticado
+//      (por IdUsuario, con fallback a correo para registros viejos), o
+//   2. Un perfil de candidato SIN dueño (IdUsuario NULL), es decir, uno
+//      registrado en nombre de un tercero vía "Postular a otra persona".
+// Nunca se permite crear una postulación sobre el perfil de OTRA cuenta.
 app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
   const { IdCandidato, IdVacante } = req.body;
 
@@ -800,6 +861,7 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
 
   try {
     // Verificar que el candidato exista y que sea el propio dueño de la cuenta
+    // o un perfil de tercero sin cuenta vinculada.
     const [candidatoRows] = await pool.query(
       'SELECT IdCandidato, Correo, IdUsuario FROM Candidato WHERE IdCandidato = ?',
       [IdCandidato]
@@ -813,8 +875,12 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
     const esDuenoPorUsuario = candidato.IdUsuario !== null && candidato.IdUsuario !== undefined
       && Number(candidato.IdUsuario) === Number(req.user.id);
     const esDuenoPorCorreo = (req.user.correo || '').toLowerCase() === (candidato.Correo || '').toLowerCase();
+    // Perfil sin cuenta vinculada = fue registrado por otra persona en su
+    // nombre (vía "Postular a otra persona"). Cualquier candidato puede
+    // crear una postulación para este tipo de perfil.
+    const esPerfilSinDueno = candidato.IdUsuario === null || candidato.IdUsuario === undefined;
 
-    if (!esDuenoPorUsuario && !esDuenoPorCorreo) {
+    if (!esDuenoPorUsuario && !esDuenoPorCorreo && !esPerfilSinDueno) {
       return res.status(403).json({ error: 'Solo puede postularse con su propio perfil de candidato' });
     }
 

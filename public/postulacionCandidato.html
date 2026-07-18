@@ -212,6 +212,32 @@
 </div>
 </div>
 <form id="postulacion-form">
+<!-- ¿Quién se postula? -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm mb-lg">
+<div class="flex items-center gap-2 mb-md border-b border-outline-variant pb-sm">
+<span class="material-symbols-outlined text-primary">badge</span>
+<h3 class="font-headline-sm text-headline-sm">¿Quién se postula?</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<button type="button" id="btn-postularme" class="flex items-center gap-3 p-4 rounded-lg border-2 border-primary bg-secondary-container/40 text-left transition-all">
+<span class="material-symbols-outlined text-primary">person</span>
+<span>
+<span class="block font-bold text-on-surface">Me postulo yo</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant">Usamos los datos de tu cuenta</span>
+</span>
+</button>
+<button type="button" id="btn-postular-tercero" class="flex items-center gap-3 p-4 rounded-lg border-2 border-outline-variant bg-surface text-left transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">group_add</span>
+<span>
+<span class="block font-bold text-on-surface">Postulo a otra persona</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant">Completa los datos de esa persona</span>
+</span>
+</button>
+</div>
+<p id="postulante-hint" class="font-body-sm text-body-sm text-on-surface-variant mt-md">
+                        Vas a registrar tu propia postulación. Ya cargamos tus datos guardados.
+                    </p>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
 <!-- Main Form Section -->
 <div class="md:col-span-2 space-y-lg">
@@ -274,7 +300,8 @@
 <label class="block font-body-sm text-body-sm font-bold mb-xs" for="curriculum">Currículum Vitae (PDF, DOC o DOCX)</label>
 <div class="border border-outline-variant rounded-lg bg-surface-container-low p-3">
 <input id="curriculum" class="w-full text-body-sm text-on-surface" type="file" accept=".pdf,.doc,.docx">
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">El archivo no se sube al servidor, solo se registra su nombre en el sistema.</p>
+<p id="curriculum-actual" class="font-body-sm text-body-sm text-primary mt-2 hidden"></p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">El archivo no se sube al servidor, solo se registra su nombre en el sistema. Si no eliges uno nuevo, se conserva el que ya tenías guardado.</p>
 </div>
 </div>
 </div>
@@ -412,6 +439,63 @@
 
         let vacantesCache = [];
         let idCandidatoActual = null;
+        let miPerfilCache = null;   // datos de MI perfil, para restaurar al volver al modo "yo mismo"
+        let esParaTercero = false; // true = estoy postulando a otra persona
+
+        // ── Toggle "¿Quién se postula?" ───────────────────────────────
+        const btnPostularme = document.getElementById('btn-postularme');
+        const btnPostularTercero = document.getElementById('btn-postular-tercero');
+        const hintPostulante = document.getElementById('postulante-hint');
+
+        function setCamposPostulante(datos) {
+            document.getElementById('nombre').value = datos?.Nombre || '';
+            document.getElementById('apellido').value = datos?.Apellido || '';
+            document.getElementById('correo').value = datos?.Correo || '';
+            document.getElementById('telefono').value = datos?.Telefono || '';
+            curriculumInput.value = ''; // un input file nunca se puede prellenar
+            mostrarCurriculumActual(datos?.Curriculum || '');
+            actualizarResumen();
+        }
+
+        function mostrarCurriculumActual(nombreArchivo) {
+            const aviso = document.getElementById('curriculum-actual');
+            if (nombreArchivo) {
+                aviso.textContent = `Archivo actual guardado: ${nombreArchivo}`;
+                aviso.classList.remove('hidden');
+            } else {
+                aviso.textContent = '';
+                aviso.classList.add('hidden');
+            }
+        }
+
+        function marcarBotonActivo(activo, inactivo) {
+            activo.classList.add('border-primary', 'bg-secondary-container/40');
+            activo.classList.remove('border-outline-variant', 'bg-surface');
+            activo.querySelector('.material-symbols-outlined').classList.add('text-primary');
+            activo.querySelector('.material-symbols-outlined').classList.remove('text-on-surface-variant');
+
+            inactivo.classList.remove('border-primary', 'bg-secondary-container/40');
+            inactivo.classList.add('border-outline-variant', 'bg-surface');
+            inactivo.querySelector('.material-symbols-outlined').classList.remove('text-primary');
+            inactivo.querySelector('.material-symbols-outlined').classList.add('text-on-surface-variant');
+        }
+
+        function activarModoYoMismo() {
+            esParaTercero = false;
+            marcarBotonActivo(btnPostularme, btnPostularTercero);
+            hintPostulante.textContent = 'Vas a registrar tu propia postulación. Ya cargamos tus datos guardados.';
+            setCamposPostulante(miPerfilCache);
+        }
+
+        function activarModoTercero() {
+            esParaTercero = true;
+            marcarBotonActivo(btnPostularTercero, btnPostularme);
+            hintPostulante.textContent = 'Vas a registrar la postulación de otra persona. Completa SUS datos, no los tuyos.';
+            setCamposPostulante(null);
+        }
+
+        btnPostularme.addEventListener('click', activarModoYoMismo);
+        btnPostularTercero.addEventListener('click', activarModoTercero);
 
         // ── Precargar el perfil de candidato vinculado a esta cuenta ──────
         // Si ya se postuló antes, no le pedimos que vuelva a escribir todo:
@@ -434,6 +518,7 @@
                     // con el de su cuenta, para no pedirlo dos veces.
                     if (window.currentUser && window.currentUser.Correo) {
                         document.getElementById('correo').value = window.currentUser.Correo;
+                        miPerfilCache = { Correo: window.currentUser.Correo };
                     }
                     return;
                 }
@@ -442,13 +527,16 @@
 
                 const candidato = await response.json();
                 idCandidatoActual = candidato.IdCandidato;
+                miPerfilCache = candidato;
 
-                document.getElementById('nombre').value = candidato.Nombre || '';
-                document.getElementById('apellido').value = candidato.Apellido || '';
-                document.getElementById('correo').value = candidato.Correo || '';
-                document.getElementById('telefono').value = candidato.Telefono || '';
-
-                actualizarResumen();
+                if (!esParaTercero) {
+                    document.getElementById('nombre').value = candidato.Nombre || '';
+                    document.getElementById('apellido').value = candidato.Apellido || '';
+                    document.getElementById('correo').value = candidato.Correo || '';
+                    document.getElementById('telefono').value = candidato.Telefono || '';
+                    mostrarCurriculumActual(candidato.Curriculum || '');
+                    actualizarResumen();
+                }
             } catch (error) {
                 console.error('Error precargando el perfil de candidato:', error);
             }
@@ -525,7 +613,8 @@
 
             const nombreCompleto = `${nombre} ${apellido}`.trim() || 'Candidato sin nombre';
             const puesto = seleccionada ? seleccionada.Titulo : 'una vacante';
-            resumenTexto.textContent = `${nombreCompleto} será postulado a "${puesto}" bajo el estado inicial "Registrado".`;
+            const quien = esParaTercero ? 'será postulado' : 'será postulado';
+            resumenTexto.textContent = `${nombreCompleto} ${quien} a "${puesto}" bajo el estado inicial "Registrado".`;
         }
 
         ['nombre', 'apellido'].forEach(id => {
@@ -567,23 +656,51 @@
                 return;
             }
 
+            // Si estoy postulando a un tercero, el correo ingresado no puede
+            // ser el mío propio: para eso está la opción "Me postulo yo".
+            if (esParaTercero) {
+                const correoIngresado = document.getElementById('correo').value.trim().toLowerCase();
+                const miCorreo = (window.currentUser && window.currentUser.Correo || '').toLowerCase();
+                if (correoIngresado === miCorreo) {
+                    feedback.classList.remove('hidden');
+                    feedback.classList.add('text-red-600');
+                    feedback.textContent = 'Ese es tu propio correo. Para postularte a ti mismo, usa la opción "Me postulo yo".';
+                    return;
+                }
+            }
+
             const originalBtnHTML = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-70');
             submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Procesando...';
 
             try {
-                // 1. Crear o actualizar el perfil de candidato vinculado a esta cuenta
-                //    (mismo registro siempre, sin importar cuántas veces se postule).
+                // 1. Crear o actualizar el perfil de candidato.
+                //    - Modo "yo mismo": mismo registro vinculado a mi cuenta (IdUsuario).
+                //    - Modo "tercero": perfil sin cuenta vinculada, identificado por su correo.
+                //
+                // Un <input type="file"> nunca trae preseleccionado el archivo
+                // anterior (los navegadores no lo permiten por seguridad), así
+                // que si el usuario no eligió un archivo nuevo esta vez, hay que
+                // conservar el nombre que ya tenía guardado en su perfil en vez
+                // de mandar '' y borrarlo en la base de datos.
+                const nombreArchivoNuevo = curriculumInput.files.length ? curriculumInput.files[0].name : '';
+                const curriculumPrevio = (!esParaTercero && miPerfilCache && miPerfilCache.Curriculum) || '';
+                const curriculumFinal = nombreArchivoNuevo || curriculumPrevio;
+
                 const candidatoBody = {
                     Nombre: document.getElementById('nombre').value.trim(),
                     Apellido: document.getElementById('apellido').value.trim(),
                     Correo: document.getElementById('correo').value.trim(),
                     Telefono: document.getElementById('telefono').value.trim(),
-                    Curriculum: curriculumInput.files.length ? curriculumInput.files[0].name : '',
+                    Curriculum: curriculumFinal,
                 };
 
-                const resCandidato = await fetch(`${API}/candidatos/mi-perfil`, {
+                const endpointPerfil = esParaTercero
+                    ? `${API}/candidatos/postular-tercero`
+                    : `${API}/candidatos/mi-perfil`;
+
+                const resCandidato = await fetch(endpointPerfil, {
                     method: 'POST',
                     headers: authHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify(candidatoBody),
@@ -622,11 +739,13 @@
 
                 feedback.classList.remove('hidden');
                 feedback.classList.add('text-green-600');
-                feedback.textContent = 'Postulación registrada correctamente en la base de datos.';
+                feedback.textContent = esParaTercero
+                    ? 'Postulación de la persona registrada correctamente en la base de datos.'
+                    : 'Postulación registrada correctamente en la base de datos.';
 
                 form.reset();
                 vacanteDepartamento.textContent = 'Seleccione una vacante para ver el detalle';
-                actualizarResumen();
+                activarModoYoMismo();
 
                 setTimeout(() => {
                     window.location.href = 'vacantes.html';
