@@ -170,6 +170,10 @@
 <span class="material-symbols-outlined">fact_check</span>
 <span class="font-label-caps text-label-caps">Evaluaciones</span>
 </a>
+<a data-role-show="3" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="mi_seguimiento.html">
+<span class="material-symbols-outlined">timeline</span>
+<span class="font-label-caps text-label-caps">Mi seguimiento</span>
+</a>
 <a data-role-show="1" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="admin_usuarios.html">
 <span class="material-symbols-outlined">manage_accounts</span>
 <span class="font-label-caps text-label-caps">Usuarios</span>
@@ -409,6 +413,71 @@
             })
         });
 
+        // ── Rol del usuario actual ───────────────────────────────────────
+        // Se usa para decidir si se muestra el botón "Eliminar" en cada
+        // tarjeta de vacante. Solo Administrador (1) y Reclutador (2)
+        // pueden eliminar vacantes; el Candidato (3) nunca ve esa opción.
+        // No dependemos de auth.js/data-role-show para esto porque las
+        // tarjetas se generan dinámicamente después de cargar la página.
+        function obtenerRolActual() {
+            try {
+                const storedUser = localStorage.getItem('st_usuario');
+                if (!storedUser) return null;
+                const usuario = JSON.parse(storedUser);
+                return Number(usuario.IdRol) || null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function puedeEliminarVacantes() {
+            const rol = obtenerRolActual();
+            return rol === 1 || rol === 2; // Administrador o Reclutador
+        }
+
+        // ── Eliminar vacante ──────────────────────────────────────────────
+        async function eliminarVacante(idVacante, titulo, cardEl) {
+            const confirmado = confirm(`¿Seguro que deseas eliminar la vacante "${titulo}"? Esta acción no se puede deshacer.`);
+            if (!confirmado) return;
+
+            try {
+                const token = localStorage.getItem('st_token');
+                const response = await fetch(`/api/vacantes/${idVacante}`, {
+                    method: 'DELETE',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Esta sí es una acción activa del usuario (hizo clic en
+                    // "Eliminar"), así que si el servidor rechaza el token
+                    // es correcto cerrar la sesión y mandarlo al login.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type') || '';
+                    const body = contentType.includes('application/json')
+                        ? await response.json()
+                        : await response.text();
+                    const message = typeof body === 'object' ? body.error : body;
+                    throw new Error(message || 'No se pudo eliminar la vacante');
+                }
+
+                // Quitamos la tarjeta del DOM y refrescamos el contador de
+                // vacantes activas sin tener que recargar toda la lista.
+                if (cardEl && cardEl.parentElement) {
+                    cardEl.remove();
+                }
+                loadVacantes();
+            } catch (error) {
+                console.error('Error eliminando vacante:', error);
+                alert(error.message || 'No se pudo eliminar la vacante. Intenta de nuevo.');
+            }
+        }
+
         async function loadVacantes() {
             const statusEl = document.getElementById('vacantesStatus');
             const container = document.getElementById('vacantesContainer');
@@ -443,6 +512,7 @@
                 }
                 const vacantes = await response.json();
                 const activeVacantes = vacantes.filter(v => String(v.Estado || '').toLowerCase() === 'activa');
+                const mostrarEliminar = puedeEliminarVacantes();
 
                 activeCountEl.textContent = activeVacantes.length;
                 activeLabelEl.textContent = activeVacantes.length === 1 ? 'vacante activa' : 'vacantes activas';
@@ -460,6 +530,7 @@
                     const estado = vacante.Estado || 'Activa';
                     const fechaCreacion = vacante.FechaCreacion || '';
                     const fechaCierre = vacante.FechaCierre ? `• Cierra ${vacante.FechaCierre}` : '';
+                    const tituloEscapado = String(vacante.Titulo || 'Vacante sin título').replace(/"/g, '&quot;');
 
                     const card = document.createElement('article');
                     card.className = 'bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group';
@@ -468,7 +539,14 @@
                             <div class="w-12 h-12 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
                                 <span class="material-symbols-outlined text-[28px]">work_outline</span>
                             </div>
-                            <span class="bg-primary/10 text-primary font-label-caps text-label-caps px-2 py-1 rounded-sm">${departamento}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-primary/10 text-primary font-label-caps text-label-caps px-2 py-1 rounded-sm">${departamento}</span>
+                                ${mostrarEliminar ? `
+                                <button type="button" class="eliminar-vacante-btn p-1.5 rounded-full text-error hover:bg-error-container transition-colors" title="Eliminar vacante" aria-label="Eliminar vacante">
+                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                </button>
+                                ` : ''}
+                            </div>
                         </div>
                         <h4 class="font-headline-sm text-headline-sm text-on-surface mb-1">${vacante.Titulo || 'Vacante sin título'}</h4>
                         <p class="font-body-sm text-on-surface-variant mb-4">${estado} • ${fechaCreacion} ${fechaCierre}</p>
@@ -478,6 +556,17 @@
                             <a href="postulacionCandidato.html?vacante=${vacante.IdVacante}" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm font-bold group-hover:scale-105 transition-transform inline-block text-center">Ver vacante</a>
                         </div>
                     `;
+
+                    if (mostrarEliminar) {
+                        const deleteBtn = card.querySelector('.eliminar-vacante-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', (event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                eliminarVacante(vacante.IdVacante, tituloEscapado, card);
+                            });
+                        }
+                    }
 
                     container.appendChild(card);
                 });

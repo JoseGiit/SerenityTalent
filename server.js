@@ -414,6 +414,113 @@ app.post('/api/candidatos/mi-perfil', authenticateToken, authorizeRoles(ROLES.CA
   }
 });
 
+// ── GET /api/candidatos/mi-seguimiento ───────────────────────────
+// Solo Candidato. Devuelve, para el candidato vinculado a la cuenta
+// autenticada (por IdUsuario), todas sus postulaciones junto con las
+// entrevistas agendadas y la evaluación de cada entrevista (si ya
+// existe). Es de solo lectura: el candidato nunca puede modificar
+// nada de esto, solo consultarlo. Debe ir declarada ANTES de
+// '/api/candidatos/:id' o Express interpretaría "mi-seguimiento" como un id.
+app.get('/api/candidatos/mi-seguimiento', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
+  try {
+    // 1. Ubicar el perfil de Candidato vinculado a esta cuenta.
+    const [candidatoRows] = await pool.query(
+      'SELECT IdCandidato, Nombre, Apellido, Correo FROM Candidato WHERE IdUsuario = ? LIMIT 1',
+      [req.user.id]
+    );
+
+    if (candidatoRows.length === 0) {
+      return res.status(404).json({ error: 'Todavía no tiene un perfil de candidato registrado' });
+    }
+
+    const candidato = candidatoRows[0];
+
+    // 2. Traer postulaciones + vacante + entrevista + evaluación en una
+    //    sola consulta (con LEFT JOIN, porque una postulación puede no
+    //    tener entrevista todavía, y una entrevista puede no tener
+    //    evaluación todavía).
+    const [rows] = await pool.query(
+      `
+      SELECT
+        p.IdPostulacion,
+        p.IdVacante,
+        p.Estado AS EstadoPostulacion,
+        p.FechaPostulacion,
+        p.UltimaActualizacion,
+        v.Titulo AS VacanteTitulo,
+        v.Departamento,
+        e.IdEntrevista,
+        e.Fecha AS FechaEntrevista,
+        e.Hora,
+        e.Modalidad,
+        e.Observaciones,
+        ev.IdEvaluacion,
+        ev.Calificacion,
+        ev.Comentarios,
+        ev.Fecha AS FechaEvaluacion
+      FROM Postulacion p
+      LEFT JOIN Vacante v ON p.IdVacante = v.IdVacante
+      LEFT JOIN Entrevista e ON e.IdPostulacion = p.IdPostulacion
+      LEFT JOIN Evaluacion ev ON ev.IdEntrevista = e.IdEntrevista
+      WHERE p.IdCandidato = ?
+      ORDER BY p.UltimaActualizacion DESC, e.Fecha DESC
+      `,
+      [candidato.IdCandidato]
+    );
+
+    // 3. Agrupar filas planas en: postulaciones -> entrevistas -> evaluación.
+    const postulacionesMap = new Map();
+
+    for (const row of rows) {
+      if (!postulacionesMap.has(row.IdPostulacion)) {
+        postulacionesMap.set(row.IdPostulacion, {
+          IdPostulacion: row.IdPostulacion,
+          IdVacante: row.IdVacante,
+          VacanteTitulo: row.VacanteTitulo || 'Vacante no disponible',
+          Departamento: row.Departamento,
+          Estado: row.EstadoPostulacion,
+          FechaPostulacion: row.FechaPostulacion,
+          UltimaActualizacion: row.UltimaActualizacion,
+          entrevistas: [],
+        });
+      }
+
+      const postulacion = postulacionesMap.get(row.IdPostulacion);
+
+      if (row.IdEntrevista) {
+        let entrevista = postulacion.entrevistas.find((e) => e.IdEntrevista === row.IdEntrevista);
+
+        if (!entrevista) {
+          entrevista = {
+            IdEntrevista: row.IdEntrevista,
+            Fecha: row.FechaEntrevista,
+            Hora: row.Hora,
+            Modalidad: row.Modalidad,
+            Observaciones: row.Observaciones,
+            evaluacion: null,
+          };
+          postulacion.entrevistas.push(entrevista);
+        }
+
+        if (row.IdEvaluacion && !entrevista.evaluacion) {
+          entrevista.evaluacion = {
+            Calificacion: row.Calificacion,
+            Comentarios: row.Comentarios,
+            Fecha: row.FechaEvaluacion,
+          };
+        }
+      }
+    }
+
+    const postulaciones = Array.from(postulacionesMap.values());
+
+    res.json({ candidato, postulaciones });
+  } catch (err) {
+    console.error('Error en GET /api/candidatos/mi-seguimiento:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // ── POST /api/candidatos/postular-tercero ─────────────────────────
 // Solo Candidato. Crea o actualiza el perfil de OTRA persona (no la propia
 // cuenta del usuario autenticado) para postularla en su nombre.
@@ -658,8 +765,10 @@ app.post('/api/vacantes', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.R
 });
 
 // ── DELETE /api/vacantes/:id ─────────────────────────────────
-// Eliminación permanente: solo Administrador.
-app.delete('/api/vacantes/:id', authenticateToken, authorizeRoles(ROLES.ADMIN), async (req, res) => {
+// Eliminación permanente: Administrador y Reclutador. El Candidato nunca
+// puede eliminar vacantes (authorizeRoles lo bloquea con 403 aunque
+// intente llamar al endpoint directamente).
+app.delete('/api/vacantes/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { id } = req.params;
 
   try {
