@@ -54,9 +54,41 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #c1c6d7; border-radius: 10px; }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 
 <body class="bg-surface text-on-surface font-body">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: Entrevistas es exclusivo de Administrador (1)
+    // y Reclutador (2). Candidato no tiene acceso a esta pantalla.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <div class="flex h-screen overflow-hidden">
     <aside class="w-[280px] border-r border-outline-variant flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
         <div class="flex items-center gap-3 mb-xl">
@@ -100,12 +132,12 @@
         </header>
 
         <div class="flex-1 overflow-y-auto p-lg lg:p-xl">
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-lg">
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-lg">
                 <div>
                     <h2 class="font-headline text-2xl font-bold">Entrevistas</h2>
                     <p class="text-sm text-on-surface-variant">Programa, consulta y actualiza entrevistas de candidatos seleccionados.</p>
                 </div>
-                <button id="btn-nueva" type="button" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90">
+                <button data-role-show="1,2" id="btn-nueva" type="button" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90">
                     <span class="material-symbols-outlined">add</span>Nueva entrevista
                 </button>
             </div>
@@ -184,8 +216,8 @@
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-md border-t border-outline-variant">
-                            <button id="btn-cancelar" type="button" class="px-5 py-3 rounded-lg font-bold border border-outline-variant hover:bg-surface-container-low">Limpiar</button>
-                            <button id="btn-guardar" type="submit" class="px-5 py-3 rounded-lg font-bold bg-primary text-on-primary flex items-center justify-center gap-2 hover:opacity-90">
+                            <button data-role-show="1,2" id="btn-cancelar" type="button" class="px-5 py-3 rounded-lg font-bold border border-outline-variant hover:bg-surface-container-low">Limpiar</button>
+                            <button data-role-show="1,2" id="btn-guardar" type="submit" class="px-5 py-3 rounded-lg font-bold bg-primary text-on-primary flex items-center justify-center gap-2 hover:opacity-90">
                                 <span class="material-symbols-outlined">save</span>Guardar entrevista
                             </button>
                         </div>
@@ -242,6 +274,7 @@
     const API = '/api';
     const STORAGE_KEY = 'st_entrevistas';
     const MAX_SQL_INT = 2147483647;
+    const token = localStorage.getItem('st_token');
 
     const form = document.getElementById('entrevista-form');
     const tbody = document.getElementById('entrevistas-tbody');
@@ -253,6 +286,10 @@
     let entrevistas = [];
     let candidatos = [];
     let filtro = '';
+
+    function authHeaders(extra) {
+        return Object.assign({ 'Authorization': `Bearer ${token}` }, extra || {});
+    }
 
     document.addEventListener('DOMContentLoaded', async () => {
         configurarFechaMinima();
@@ -312,7 +349,20 @@
 
     async function cargarCandidatos() {
         try {
-            const response = await fetch(`${API}/candidatos`);
+            const response = await fetch(`${API}/candidatos`, {
+                headers: authHeaders()
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                // Limpiar la sesión inválida: si no lo hacemos, index.html
+                // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                // generando un bucle infinito entre las dos páginas.
+                localStorage.removeItem('st_token');
+                localStorage.removeItem('st_usuario');
+                window.location.href = 'index.html';
+                return;
+            }
+
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'No se pudieron cargar los candidatos.');
             candidatos = Array.isArray(data) ? data : [];

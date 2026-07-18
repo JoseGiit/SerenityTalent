@@ -84,8 +84,34 @@
             vertical-align: middle;
         }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 <body class="bg-surface text-on-surface font-body-md">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: los 3 roles pueden entrar a esta pantalla, pero
+    // el rol Candidato (3) solo puede editar SU PROPIO perfil, sin
+    // importar qué "id" venga en la URL.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <div class="flex min-h-screen overflow-hidden">
     <aside class="w-[280px] border-r border-outline-variant flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
         <div class="flex items-center gap-3 mb-xl">
@@ -97,12 +123,12 @@
                 <p class="font-label-caps text-label-caps text-on-surface-variant">Suite de Reclutamiento</p>
             </div>
         </div>
-        <nav class="flex-1 space-y-1">
+        <nav class="flex-1 space-y-1" id="sidebar-nav">
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="index.html">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="font-label-caps text-label-caps">Tablero</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="candidatos.html">
+            <a id="nav-candidatos" class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="candidatos.html">
                 <span class="material-symbols-outlined">group</span>
                 <span class="font-label-caps text-label-caps">Candidatos</span>
             </a>
@@ -115,16 +141,16 @@
 
     <main class="flex-1 min-w-0 overflow-y-auto">
         <header class="h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center px-lg">
-            <button type="button" onclick="window.location.href='candidatos.html'" class="flex items-center gap-2 text-primary font-bold hover:underline">
+            <button id="back-button" type="button" class="flex items-center gap-2 text-primary font-bold hover:underline">
                 <span class="material-symbols-outlined">arrow_back</span>
-                Volver a candidatos
+                <span id="back-button-label">Volver a candidatos</span>
             </button>
         </header>
 
         <section class="p-lg lg:p-xl max-w-3xl mx-auto">
             <div class="mb-lg">
-                <h2 class="font-headline-md text-headline-md text-on-surface">Actualizar candidato</h2>
-                <p class="text-body-md text-on-surface-variant">Modifica la información general del candidato seleccionado.</p>
+                <h2 id="page-title" class="font-headline-md text-headline-md text-on-surface">Actualizar candidato</h2>
+                <p id="page-subtitle" class="text-body-md text-on-surface-variant">Modifica la información general del candidato seleccionado.</p>
             </div>
 
             <div id="message" class="hidden mb-md p-4 rounded-lg text-body-md"></div>
@@ -165,13 +191,16 @@
                         <option value="Rechazado">Rechazado</option>
                         <option value="Inactivo">Inactivo</option>
                     </select>
+                    <p id="estado-hint" class="hidden text-body-sm text-on-surface-variant mt-1">
+                        El estado de tu proceso lo actualiza el equipo de reclutamiento; no es editable desde tu perfil.
+                    </p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row justify-end gap-3 pt-md border-t border-outline-variant">
-                    <button type="button" onclick="window.location.href='candidatos.html'" class="px-lg py-3 rounded-lg font-bold border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-all">
+                    <button data-role-show="1,2" id="btn-cancelar" type="button" class="px-lg py-3 rounded-lg font-bold border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-all">
                         Cancelar
                     </button>
-                    <button id="btn-guardar" type="submit" class="px-lg py-3 rounded-lg font-bold bg-primary text-on-primary hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2">
+                        <button data-role-show="1,2,3" id="btn-guardar" type="submit" class="px-lg py-3 rounded-lg font-bold bg-primary text-on-primary hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined">save</span>
                         Guardar cambios
                     </button>
@@ -184,11 +213,74 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const API = '/api';
+        const token = localStorage.getItem('st_token');
+        const usuario = window.currentUser;
+        const rol = Number(usuario.IdRol);
+        const isStaff = rol === 1 || rol === 2;
+        const isCandidato = rol === 3;
+
         const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
         const form = document.getElementById('form-candidato');
         const message = document.getElementById('message');
         const btnGuardar = document.getElementById('btn-guardar');
+        const estadoSelect = document.getElementById('Estado');
+        const estadoHint = document.getElementById('estado-hint');
+
+        // A dónde vuelve "Cancelar" / el botón de retroceso, según el rol.
+        const homePage = isStaff ? 'candidatos.html' : 'vacantes.html';
+        document.getElementById('back-button-label').textContent = isStaff ? 'Volver a candidatos' : 'Volver a vacantes';
+        document.getElementById('back-button').addEventListener('click', () => {
+            window.location.href = homePage;
+        });
+        document.getElementById('btn-cancelar').addEventListener('click', () => {
+            window.location.href = homePage;
+        });
+
+        // Ocultar el link "Candidatos" del menú lateral para el rol Candidato,
+        // ya que esa pantalla expone datos de otras personas.
+        if (isCandidato) {
+            const navCandidatos = document.getElementById('nav-candidatos');
+            if (navCandidatos) navCandidatos.remove();
+        }
+
+        // Determinar qué candidato se va a editar.
+        let id;
+
+        if (isStaff) {
+            id = params.get('id');
+            if (!id) {
+                showMessage('No se recibió el ID del candidato.');
+                form.classList.add('hidden');
+                return;
+            }
+        } else if (isCandidato) {
+            // Se ignora cualquier "id" que venga en la URL: el candidato
+            // solo puede editar el perfil asociado a su propia cuenta.
+            id = usuario.IdCandidato;
+
+            document.getElementById('page-title').textContent = 'Actualizar mi perfil';
+            document.getElementById('page-subtitle').textContent = 'Mantén actualizada tu información de contacto.';
+
+            estadoSelect.disabled = true;
+            estadoSelect.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+            estadoHint.classList.remove('hidden');
+
+            if (!id) {
+                showMessage('No se encontró un perfil de candidato asociado a tu cuenta.');
+                form.classList.add('hidden');
+                return;
+            }
+        } else {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        function authHeaders(extra) {
+            return Object.assign(
+                { 'Authorization': `Bearer ${token}` },
+                extra || {}
+            );
+        }
 
         function showMessage(text, type = 'error') {
             message.textContent = text;
@@ -207,14 +299,21 @@
         }
 
         async function cargarCandidato() {
-            if (!id) {
-                showMessage('No se recibió el ID del candidato.');
-                form.classList.add('hidden');
-                return;
-            }
-
             try {
-                const response = await fetch(`${API}/candidatos/${id}`);
+                const response = await fetch(`${API}/candidatos/${id}`, {
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Limpiar la sesión inválida: si no lo hacemos, index.html
+                    // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                    // generando un bucle infinito entre las dos páginas.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -248,6 +347,9 @@
                 Apellido: document.getElementById('Apellido').value.trim(),
                 Correo: document.getElementById('Correo').value.trim(),
                 Telefono: document.getElementById('Telefono').value.trim(),
+                // El campo Estado viaja tal cual se cargó cuando el rol es
+                // Candidato (está deshabilitado en el form), así que nunca
+                // lo modifica desde aquí.
                 Estado: document.getElementById('Estado').value
             };
 
@@ -262,11 +364,19 @@
 
                 const response = await fetch(`${API}/candidatos/${id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: authHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify(payload)
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Limpiar la sesión inválida: si no lo hacemos, index.html
+                    // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                    // generando un bucle infinito entre las dos páginas.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
                 const data = await response.json();
 
@@ -277,7 +387,7 @@
                 showMessage('Candidato actualizado correctamente.', 'success');
 
                 setTimeout(() => {
-                    window.location.href = 'candidatos.html';
+                    window.location.href = homePage;
                 }, 900);
 
             } catch (error) {

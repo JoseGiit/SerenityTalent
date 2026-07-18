@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Usuarios</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="/js/auth.js"></script>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<script>
+  // Solo Admin puede ver esta página
+  (function guard(){
+    const usuario = localStorage.getItem('st_usuario');
+    if(!usuario) return window.location.href = 'index.html';
+    try{
+      const u = JSON.parse(usuario);
+      if(Number(u.IdRol)!==1) return window.location.href = 'index.html';
+      window.currentUser = u;
+    }catch(e){ window.location.href='index.html'; }
+  })();
+</script>
+<main class="p-lg max-w-4xl mx-auto">
+  <h1 class="font-headline-md mb-md">Panel de administración — Usuarios</h1>
+
+  <section class="mb-lg">
+    <h2 class="font-headline-sm">Crear usuario</h2>
+    <form id="createForm" class="grid grid-cols-1 md:grid-cols-2 gap-md mt-md">
+      <input id="uNombre" placeholder="Nombre" class="p-sm border rounded" />
+      <input id="uCorreo" placeholder="Correo" class="p-sm border rounded" />
+      <input id="uUsuario" placeholder="Usuario" class="p-sm border rounded" />
+      <select id="uRol" class="p-sm border rounded">
+        <option value="1">Administrador</option>
+        <option value="2">Reclutador</option>
+        <option value="3" selected>Candidato</option>
+      </select>
+      <input id="uPassword" placeholder="Contraseña" type="password" class="p-sm border rounded" />
+      <div class="flex items-center gap-sm">
+        <button type="button" id="createBtn" class="bg-primary text-on-primary px-4 py-2 rounded">Crear</button>
+      </div>
+    </form>
+    <div id="createMsg" class="mt-sm text-sm"></div>
+  </section>
+
+  <section>
+    <h2 class="font-headline-sm">Usuarios registrados</h2>
+    <div id="usersList" class="mt-md space-y-2"></div>
+  </section>
+</main>
+
+<script>
+  const API = '/api';
+
+  async function loadUsers(){
+    const res = await Auth.fetchAuth(`${API}/usuarios`);
+    if(!res.ok){ document.getElementById('usersList').innerText = 'Error cargando usuarios'; return; }
+    const users = await res.json();
+    const container = document.getElementById('usersList');
+    container.innerHTML = users.map(u=>`<div class="p-sm bg-white border rounded flex items-center justify-between">
+      <div>
+        <div class="font-bold">${escapeHTML(u.Nombre)} (${escapeHTML(u.Usuario)})</div>
+        <div class="text-sm text-on-surface-variant">${escapeHTML(u.Correo)} — Rol: ${Number(u.IdRol)}</div>
+      </div>
+      <div class="flex gap-2">
+        <button data-id="${u.IdUsuario}" data-action="edit" class="px-3 py-1 border rounded">Editar</button>
+        <button data-id="${u.IdUsuario}" data-action="delete" class="px-3 py-1 bg-red-600 text-white rounded">Eliminar</button>
+      </div>
+    </div>`).join('');
+  }
+
+  function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  document.getElementById('createBtn').addEventListener('click', async ()=>{
+    const Nombre = document.getElementById('uNombre').value.trim();
+    const Correo = document.getElementById('uCorreo').value.trim();
+    const Usuario = document.getElementById('uUsuario').value.trim();
+    const IdRol = Number(document.getElementById('uRol').value);
+    const Contrasena = document.getElementById('uPassword').value;
+    const msg = document.getElementById('createMsg');
+    msg.textContent = '';
+
+    if(!Nombre||!Correo||!Usuario||!Contrasena){ msg.textContent='Todos los campos son obligatorios.'; return; }
+
+    try{
+      const res = await Auth.fetchAuth(`${API}/usuarios`, {
+        method:'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ Nombre, Correo, Usuario, Contrasena, IdRol })
+      });
+      const data = await res.json();
+      if(!res.ok) { msg.textContent = data.error || 'Error creando usuario'; return; }
+      msg.textContent = 'Usuario creado.';
+      document.getElementById('createForm').reset();
+      loadUsers();
+    }catch(e){ msg.textContent='Error de conexión'; }
+  });
+
+  document.getElementById('usersList').addEventListener('click', async (ev)=>{
+    const btn = ev.target.closest('button'); if(!btn) return;
+    const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action');
+    if(action==='delete'){
+      if(!confirm('Eliminar usuario permanentemente?')) return;
+      const res = await Auth.fetchAuth(`${API}/usuarios/${id}`, { method:'DELETE' });
+      if(res.ok) loadUsers(); else alert('Error borrando usuario');
+    } else if(action==='edit'){
+      const newName = prompt('Nuevo nombre'); if(!newName) return;
+      const res = await Auth.fetchAuth(`${API}/usuarios/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ Nombre:newName, Correo:'', Usuario:'', IdRol:1 }) });
+      if(res.ok) loadUsers(); else alert('Error actualizando');
+    }
+  });
+
+  loadUsers();
+</script>
+</body>
+</html>

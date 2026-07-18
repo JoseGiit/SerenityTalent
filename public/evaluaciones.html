@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html class="light" lang="es">
-<head>
+
+<html class="light" lang="es"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Serenity Talent - Evaluaciones</title>
@@ -125,8 +125,40 @@
             border-radius: 10px;
         }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 <body class="bg-surface text-on-surface font-body-md">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: Evaluaciones es exclusivo de Administrador (1)
+    // y Reclutador (2). Candidato no tiene acceso a esta pantalla.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <div class="flex h-screen overflow-hidden">
 <aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
 <div class="flex items-center gap-3 mb-xl">
@@ -185,9 +217,6 @@
 <h2 class="font-headline-md text-headline-md text-on-surface">Evaluaciones</h2>
 <p class="text-body-md text-on-surface-variant">Gestiona y registra la valoración final de cada entrevista.</p>
 </div>
-<div class="flex flex-col sm:flex-row gap-3">
-</button>
-</div>
 </div>
 <div class="bg-white p-md rounded-xl border border-outline-variant flex flex-wrap gap-md items-center shadow-sm">
 <div class="flex-1 min-w-[200px]">
@@ -241,7 +270,7 @@
 </div>
 <div class="flex flex-col gap-3 border-t border-outline-variant pt-4 sm:flex-row sm:items-center sm:justify-between">
 <p id="estado-form" class="text-body-sm text-on-surface-variant">Aún no se ha guardado la evaluación.</p>
-<button type="submit" class="rounded-lg bg-primary px-4 py-2 text-body-sm font-semibold text-on-primary transition hover:opacity-90">Guardar evaluación</button>
+<button data-role-show="1,2" type="submit" class="rounded-lg bg-primary px-4 py-2 text-body-sm font-semibold text-on-primary transition hover:opacity-90">Guardar evaluación</button>
 </div>
 </form>
 </div>
@@ -261,10 +290,15 @@
   const searchInput = document.getElementById('search-entrevistas');
 
   const EVALUACIONES_KEY = 'st_evaluaciones';
+  const token = localStorage.getItem('st_token');
 
   let entrevistas = [];
   let entrevistaSeleccionada = null;
   let filtroTexto = '';
+
+  function authHeaders(extra) {
+    return Object.assign({ 'Authorization': `Bearer ${token}` }, extra || {});
+  }
 
   function leerEvaluacionesLocales() {
     try {
@@ -351,7 +385,20 @@
     let servidor = [];
 
     try {
-      const response = await fetch('/api/entrevistas');
+      const response = await fetch('/api/entrevistas', {
+        headers: authHeaders()
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        // Limpiar la sesión inválida: si no lo hacemos, index.html
+        // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+        // generando un bucle infinito entre las dos páginas.
+        localStorage.removeItem('st_token');
+        localStorage.removeItem('st_usuario');
+        window.location.href = 'index.html';
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         servidor = Array.isArray(data) ? data : [];
@@ -432,7 +479,7 @@
 
     const payload = {
       IdEntrevista: Number(idEntrevistaInput.value),
-      IdUsuario: 1,
+      IdUsuario: window.currentUser ? Number(window.currentUser.IdUsuario || window.currentUser.IdRol) : null,
       Calificacion: Number(calificacionInput.value),
       Comentarios: comentariosInput.value.trim()
     };
@@ -490,8 +537,13 @@
   cargarEntrevistas();
 </script>
 
-</body>
 <script>
+  function logout() {
+    localStorage.removeItem('st_token');
+    localStorage.removeItem('st_usuario');
+    window.location.href = 'index.html';
+  }
+
   function renderHeaderUser() {
     const container = document.getElementById('header-user');
     if (!container) return;
@@ -504,14 +556,18 @@
       }
 
       const usuario = JSON.parse(storedUser);
-      const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
-      const rol = usuario.rol === 1 ? 'Administrador' : usuario.rol === 2 ? 'Reclutador' : 'Usuario';
+      const nombre = usuario.Nombre || usuario.nombre || usuario.Usuario || 'Usuario';
+      const rolMap = { 1: 'Administrador', 2: 'Reclutador', 3: 'Candidato' };
+      const rol = rolMap[Number(usuario.IdRol)] || 'Usuario';
 
       container.innerHTML = `
         <div class="text-right hidden sm:block">
           <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
           <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
         </div>
+        <button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error transition-all" title="Cerrar sesión">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
       `;
     } catch (error) {
       container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
@@ -520,4 +576,4 @@
 
   document.addEventListener('DOMContentLoaded', renderHeaderUser);
 </script>
-</html>
+</body></html>

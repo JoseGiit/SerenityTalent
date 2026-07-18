@@ -58,8 +58,43 @@
             vertical-align: middle;
         }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 <body class="bg-surface text-on-surface font-body-md">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: eliminar candidatos de forma permanente es
+    // exclusivo de Administrador (1). Reclutador y Candidato no pueden
+    // ver ni ejecutar esta pantalla.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1) {
+            // Reclutador y Candidato: no autorizados a eliminar
+            // candidatos de forma permanente.
+            window.location.href = 'candidatos.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <div class="min-h-screen flex items-center justify-center p-lg">
     <section class="w-full max-w-xl bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
         <div class="p-lg border-b border-outline-variant bg-error-container text-on-error-container flex items-center gap-3">
@@ -85,7 +120,7 @@
                 <button type="button" onclick="window.location.href='candidatos.html'" class="px-lg py-3 rounded-lg font-bold border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-all">
                     Cancelar
                 </button>
-                <button id="btn-eliminar" type="button" class="px-lg py-3 rounded-lg font-bold bg-error text-on-error hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2">
+                <button data-role-show="1" id="btn-eliminar" type="button" class="px-lg py-3 rounded-lg font-bold bg-error text-on-error hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined">delete</span>
                     Eliminar candidato
                 </button>
@@ -97,11 +132,19 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const API = '/api';
+        const token = localStorage.getItem('st_token');
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         const message = document.getElementById('message');
         const card = document.getElementById('card-candidato');
         const btnEliminar = document.getElementById('btn-eliminar');
+
+        function authHeaders(extra) {
+            return Object.assign(
+                { 'Authorization': `Bearer ${token}` },
+                extra || {}
+            );
+        }
 
         function escapeHTML(value) {
             return String(value || '')
@@ -131,7 +174,20 @@
             }
 
             try {
-                const response = await fetch(`${API}/candidatos/${id}`);
+                const response = await fetch(`${API}/candidatos/${id}`, {
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Limpiar la sesión inválida: si no lo hacemos, index.html
+                    // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                    // generando un bucle infinito entre las dos páginas.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -175,7 +231,8 @@
                 btnEliminar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Eliminando...';
 
                 const response = await fetch(`${API}/candidatos/${id}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: authHeaders()
                 });
 
                 let data = {};

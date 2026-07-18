@@ -125,8 +125,43 @@
             border-radius: 10px;
         }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 <body class="bg-surface text-on-surface font-body-md">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: solo Administrador (1) y Reclutador (2) pueden
+    // ver el listado completo de candidatos (expone PII de terceros).
+    // Se ejecuta ANTES de pintar el resto de la página.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            // Candidato: esta pantalla expone datos personales de otros
+            // candidatos, no está autorizado a verla.
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <div class="flex h-screen overflow-hidden">
 <aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
 <div class="flex items-center gap-3 mb-xl">
@@ -189,7 +224,7 @@
 <p class="text-body-md text-on-surface-variant">Gestiona y realiza seguimiento de las postulaciones actuales en Serenity Talent.</p>
 </div>
 <div class="flex flex-col sm:flex-row gap-3">
-<button type="button" onclick="window.location.href='registrarCandidatos.html'" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
+<button data-role-show="1,2" type="button" onclick="window.location.href='registrarCandidatos.html'" class="bg-primary text-on-primary px-lg py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 active:scale-95 transition-all shadow-md">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
 <span>Registrar Candidato</span>
 </button>
@@ -271,10 +306,24 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const API = '/api';
+        const token = localStorage.getItem('st_token');
+        const currentRol = Number(window.currentUser && window.currentUser.IdRol);
+
+        // Solo Administrador puede eliminar de forma permanente.
+        // El caso de Reclutador queda pendiente de definir (¿eliminar u
+        // ofrecer solo "desactivar"?) - por ahora se oculta por seguridad.
+        const puedeEliminar = currentRol === 1;
 
         const searchInputs = document.querySelectorAll(
             'input[placeholder="Buscar candidatos..."], input[placeholder="Filtrar por nombre o correo..."]'
         );
+
+        function authHeaders(extra) {
+            return Object.assign(
+                { 'Authorization': `Bearer ${token}` },
+                extra || {}
+            );
+        }
 
         function formatDate(dateString) {
             if (!dateString) return 'Sin fecha';
@@ -328,6 +377,16 @@
                 .map(word => word[0] || '')
                 .join('')
                 .toUpperCase();
+
+            const eliminarBtn = puedeEliminar ? `
+                <button 
+                    type="button"
+                    onclick="event.stopPropagation(); eliminarCandidato(${candidato.IdCandidato})"
+                    class="w-full px-4 py-2 text-left text-body-sm text-error hover:bg-error-container flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                    Eliminar
+                </button>
+            ` : '';
 
             return `
 <tr onclick="window.location.href='seguimiento_candidato.html?id=${candidato.IdCandidato}'"
@@ -392,13 +451,7 @@
                     Actualizar
                 </button>
 
-                <button 
-                    type="button"
-                    onclick="event.stopPropagation(); eliminarCandidato(${candidato.IdCandidato})"
-                    class="w-full px-4 py-2 text-left text-body-sm text-error hover:bg-error-container flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">delete</span>
-                    Eliminar
-                </button>
+                ${eliminarBtn}
             </div>
         </div>
     </td>
@@ -427,6 +480,11 @@
         };
 
         window.eliminarCandidato = async function(IdCandidato) {
+            if (!puedeEliminar) {
+                alert('No tienes permisos para eliminar candidatos.');
+                return;
+            }
+
             const confirmar = confirm('¿Seguro que deseas eliminar este candidato?');
 
             if (!confirmar) {
@@ -435,7 +493,8 @@
 
             try {
                 const response = await fetch(`${API}/candidatos/${IdCandidato}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: authHeaders()
                 });
 
                 let data = {};
@@ -470,7 +529,20 @@
             const activeCandidatesCount = document.getElementById('active-candidates-count');
 
             try {
-                const response = await fetch(`${API}/candidatos`);
+                const response = await fetch(`${API}/candidatos`, {
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Importante: si no limpiamos la sesión guardada, index.html
+                    // la va a encontrar "válida" localmente y nos manda de vuelta
+                    // acá, generando un bucle infinito entre las dos páginas.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
                 const candidates = await response.json();
 
                 if (!response.ok) {
@@ -535,6 +607,12 @@
     });
 </script>
 <script>
+  function logout() {
+    localStorage.removeItem('st_token');
+    localStorage.removeItem('st_usuario');
+    window.location.href = 'index.html';
+  }
+
   function renderHeaderUser() {
     const container = document.getElementById('header-user');
     if (!container) return;
@@ -547,14 +625,18 @@
       }
 
       const usuario = JSON.parse(storedUser);
-      const nombre = usuario.nombre || usuario.Nombre || usuario.usuario || usuario.Usuario || 'Usuario';
-      const rol = usuario.rol === 1 ? 'Administrador' : usuario.rol === 2 ? 'Reclutador' : 'Usuario';
+      const nombre = usuario.Nombre || usuario.nombre || usuario.Usuario || 'Usuario';
+      const rolMap = { 1: 'Administrador', 2: 'Reclutador', 3: 'Candidato' };
+      const rol = rolMap[Number(usuario.IdRol)] || 'Usuario';
 
       container.innerHTML = `
         <div class="text-right hidden sm:block">
           <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
           <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
         </div>
+        <button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error transition-all" title="Cerrar sesión">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
       `;
     } catch (error) {
       container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';

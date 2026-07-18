@@ -39,6 +39,12 @@
             font-size: 14px;
             font-weight: 700;
         }
+
+        .rol-option input:checked + span {
+            border-color: #0059bb;
+            background-color: rgba(0, 89, 187, 0.06);
+            font-weight: 700;
+        }
     </style>
 
     <script id="tailwind-config">
@@ -171,6 +177,24 @@
 
             <div class="flex flex-col gap-md">
                 <div class="flex flex-col gap-xs">
+                    <label class="font-body-sm text-body-sm font-bold text-on-surface-variant">¿Cómo querés registrarte?</label>
+                    <div class="grid grid-cols-2 gap-sm">
+                        <label class="rol-option cursor-pointer">
+                            <input type="radio" name="regRol" id="regRolCandidato" value="3" checked class="sr-only peer">
+                            <span class="block text-center p-3 border border-outline-variant rounded font-body-sm text-body-sm transition-all">
+                                Candidato
+                            </span>
+                        </label>
+                        <label class="rol-option cursor-pointer">
+                            <input type="radio" name="regRol" id="regRolReclutador" value="2" class="sr-only peer">
+                            <span class="block text-center p-3 border border-outline-variant rounded font-body-sm text-body-sm transition-all">
+                                Reclutador
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-xs">
                     <label class="font-body-sm text-body-sm font-bold text-on-surface-variant" for="regName">Nombre</label>
                     <input id="regName" type="text" class="w-full px-3 py-3 bg-white border border-outline-variant rounded outline-none focus:border-primary transition-all" placeholder="Tu nombre completo">
                 </div>
@@ -216,9 +240,7 @@
 
                 <div>
                     <h2 class="font-headline-sm text-headline-sm text-on-surface">Consulta Estado de Postulación</h2>
-                    <p class="font-body-sm text-body-sm text-on-surface-variant">
-                        Ingrese su correo para consultar el avance de su proceso.
-                    </p>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">Ingrese su correo para consultar el avance de su proceso.</p>
                 </div>
             </div>
 
@@ -420,6 +442,39 @@
     <script>
         const API = '/api';
 
+        // ---------------------------------------------------------------
+        // Convención de sesión / roles (reutilizada en todas las páginas):
+        // localStorage.st_token   -> token de autenticación
+        // localStorage.st_usuario -> JSON con al menos { IdUsuario, Nombre, Correo, IdRol, IdCandidato? }
+        // IdRol: 1 = Administrador, 2 = Reclutador, 3 = Candidato
+        // ---------------------------------------------------------------
+
+        function getHomeForRole(idRol) {
+            const rol = Number(idRol);
+            if (rol === 1 || rol === 2) return 'candidatos.html';
+            if (rol === 3) return 'vacantes.html';
+            return 'index.html';
+        }
+
+        // Si ya hay una sesión válida guardada, saltar el login directamente
+        // a la pantalla de inicio correspondiente al rol.
+        (function checkExistingSession() {
+            const token = localStorage.getItem('st_token');
+            const usuarioRaw = localStorage.getItem('st_usuario');
+
+            if (token && usuarioRaw) {
+                try {
+                    const usuario = JSON.parse(usuarioRaw);
+                    if (usuario && usuario.IdRol) {
+                        window.location.href = getHomeForRole(usuario.IdRol);
+                    }
+                } catch (e) {
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                }
+            }
+        })();
+
         function togglePassword() {
             const pwd = document.getElementById('password');
             const btn = document.getElementById('togglePwdBtn');
@@ -440,6 +495,7 @@
             document.getElementById('regEmail').value = '';
             document.getElementById('regUser').value = '';
             document.getElementById('regPassword').value = '';
+            document.getElementById('regRolCandidato').checked = true;
         }
 
         function closeRegister() {
@@ -492,9 +548,22 @@
                 const data = await res.json();
 
                 if (res.ok && data.token) {
+                    const idRol = data.usuario && data.usuario.IdRol;
+
+                    // Si el login "funciona" pero el usuario no trae IdRol, NO seguimos:
+                    // redirigir igual dejaría a getHomeForRole() sin caso válido y
+                    // terminaría mandando de vuelta a index.html (parece que "recarga
+                    // la página" y no pasa nada, sin ningún mensaje de error).
+                    if (!idRol) {
+                        console.error('Login exitoso pero el usuario no tiene IdRol asignado:', data.usuario);
+                        errorText.textContent = 'Tu cuenta no tiene un rol asignado (Administrador/Reclutador/Candidato). Contactá a un administrador o volvé a registrarte.';
+                        errorMsg.classList.remove('hidden');
+                        return;
+                    }
+
                     localStorage.setItem('st_token', data.token);
                     localStorage.setItem('st_usuario', JSON.stringify(data.usuario));
-                    window.location.href = 'candidatos.html';
+                    window.location.href = getHomeForRole(idRol);
                 } else {
                     errorText.textContent = data.error || 'Credenciales inválidas.';
                     errorMsg.classList.remove('hidden');
@@ -525,8 +594,19 @@
             const IJsuario = document.getElementById('regUser').value.trim();
             const Contrasena = document.getElementById('regPassword').value;
 
-            if (!Nombre || !Correo || !IJsuario || !Contrasena) {
-                errorText.textContent = 'Todos los campos son obligatorios.';
+            const rolInput = document.querySelector('input[name="regRol"]:checked');
+            const IdRol = rolInput ? Number(rolInput.value) : null;
+
+            if (!Nombre || !Correo || !IJsuario || !Contrasena || !IdRol) {
+                errorText.textContent = 'Todos los campos son obligatorios, incluyendo el tipo de cuenta.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Solo se permite auto-registro como Reclutador (2) o Candidato (3).
+            // El rol Administrador (1) se asigna únicamente desde el panel interno.
+            if (IdRol !== 2 && IdRol !== 3) {
+                errorText.textContent = 'Tipo de cuenta inválido.';
                 errorDiv.classList.remove('hidden');
                 return;
             }
@@ -539,7 +619,7 @@
                 const res = await fetch(`${API}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ Nombre, Correo, IJsuario, Contrasena })
+                    body: JSON.stringify({ Nombre, Correo, IJsuario, Contrasena, IdRol })
                 });
 
                 const data = await res.json();
@@ -576,6 +656,12 @@
             }
         }
 
+        // -----------------------------------------------------------------
+        // Consulta pública de estado (HU-04). Usa /api/postulaciones/consulta,
+        // que es público y devuelve SOLO los datos del correo consultado (no
+        // requiere sesión, y no expone el listado completo de candidatos ni
+        // de postulaciones de terceros).
+        // -----------------------------------------------------------------
         document.getElementById('consultaForm').addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -592,40 +678,26 @@
                 btn.classList.add('opacity-70');
                 mostrarConsultaFeedback('Consultando estado...', false);
 
-                const candidatosResponse = await fetch(`${API}/candidatos`);
-                const candidatos = await candidatosResponse.json();
+                const resp = await fetch(`${API}/postulaciones/consulta?correo=${encodeURIComponent(correo)}`);
+                const data = await resp.json();
 
-                if (!candidatosResponse.ok) {
-                    throw new Error('No se pudieron cargar los candidatos.');
+                if (!resp.ok) {
+                    throw new Error(data.error || 'No se pudo consultar el estado.');
                 }
 
-                const candidato = candidatos.find(c =>
-                    String(c.Correo || '').trim().toLowerCase() === correo
-                );
-
-                if (!candidato) {
-                    throw new Error('No se encontró ningún candidato registrado con ese correo.');
-                }
-
-                const postulacionesResponse = await fetch(`${API}/postulaciones`);
-                const postulaciones = await postulacionesResponse.json();
-
-                if (!postulacionesResponse.ok) {
-                    throw new Error('No se pudieron cargar las postulaciones.');
-                }
-
-                const postulacionesCandidato = postulaciones
-                    .filter(p => Number(p.IdCandidato) === Number(candidato.IdCandidato))
-                    .sort((a, b) => {
-                        const fechaA = new Date(a.UltimaActualizacion || a.FechaPostulacion || 0);
-                        const fechaB = new Date(b.UltimaActualizacion || b.FechaPostulacion || 0);
-                        return fechaB - fechaA;
-                    });
+                const candidato = data.candidato || {};
+                const postulaciones = data.postulaciones || [];
 
                 let postulacionActual;
 
-                if (postulacionesCandidato.length > 0) {
-                    postulacionActual = postulacionesCandidato[0];
+                if (postulaciones.length > 0) {
+                    postulacionActual = {
+                        ...postulaciones[0],
+                        Nombre: candidato.Nombre,
+                        Apellido: candidato.Apellido,
+                        Correo: candidato.Correo,
+                        FechaRegistro: candidato.FechaRegistro
+                    };
                 } else {
                     postulacionActual = {
                         IdPostulacion: 'Sin postulación',
@@ -637,22 +709,11 @@
                         Nombre: candidato.Nombre,
                         Apellido: candidato.Apellido,
                         Correo: candidato.Correo,
-                        Telefono: candidato.Telefono,
-                        Curriculum: candidato.Curriculum,
                         FechaRegistro: candidato.FechaRegistro
                     };
                 }
 
-                const historial = postulacionesCandidato.length > 0
-                    ? postulacionesCandidato
-                    : [
-                        {
-                            IdPostulacion: 'Sin postulación',
-                            Estado: 'Registrado',
-                            FechaPostulacion: candidato.FechaRegistro,
-                            UltimaActualizacion: candidato.FechaRegistro
-                        }
-                    ];
+                const historial = postulaciones.length > 0 ? postulaciones : [postulacionActual];
 
                 pintarConsulta({
                     postulacion: postulacionActual,
@@ -792,6 +853,8 @@
             }
         });
     </script>
+
+    <script src="/js/auth.js"></script>
 
 </body>
 </html>

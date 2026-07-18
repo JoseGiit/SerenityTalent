@@ -82,9 +82,43 @@
             }
         }
     </script>
+<script src="/js/auth.js"></script>
 </head>
 
 <body class="bg-background font-body-md text-on-surface flex min-h-screen">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: Seguimiento de candidato es exclusivo de
+    // Administrador (1) y Reclutador (2). El Candidato consulta su
+    // propio estado por otra vía (modal de consulta por correo), no
+    // por esta pantalla interna.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 
 <aside class="fixed left-0 h-screen w-[280px] bg-surface border-r border-outline-variant flex-col py-lg px-md z-30 hidden md:flex">
     <div class="mb-xl px-sm">
@@ -108,7 +142,7 @@
             <span>Vacantes</span>
         </a>
 
-        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg" href="#">
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg" href="entrevistas.html">
             <span class="material-symbols-outlined">calendar_today</span>
             <span>Entrevistas</span>
         </a>
@@ -134,12 +168,7 @@
                 <span class="material-symbols-outlined">notifications</span>
             </button>
 
-            <div class="flex items-center gap-sm">
-                <span class="text-body-md font-bold hidden lg:block">Perfil</span>
-                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
-                    P
-                </div>
-            </div>
+            <div id="header-user" class="flex items-center gap-3"></div>
         </div>
     </header>
 
@@ -157,12 +186,12 @@
             </nav>
 
             <div class="flex items-center gap-md">
-                <button id="btnCorreo" class="flex items-center gap-2 border border-outline px-4 py-2 rounded-lg text-primary hover:bg-surface-container-high">
+                <button data-role-show="1,2" id="btnCorreo" class="flex items-center gap-2 border border-outline px-4 py-2 rounded-lg text-primary hover:bg-surface-container-high">
                     <span class="material-symbols-outlined">mail</span>
                     Enviar Correo
                 </button>
 
-                <button id="btnActualizarEstado" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:opacity-90">
+                <button data-role-show="1,2" id="btnActualizarEstado" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:opacity-90">
                     Actualizar Estado
                     <span class="material-symbols-outlined">edit</span>
                 </button>
@@ -373,9 +402,14 @@
 
 <script>
     const API = '/api';
+    const token = localStorage.getItem('st_token');
 
     const params = new URLSearchParams(window.location.search);
     const idCandidato = params.get('id');
+
+    function authHeaders(extra) {
+        return Object.assign({ 'Authorization': `Bearer ${token}` }, extra || {});
+    }
 
     function escapeHTML(value) {
         return String(value || '')
@@ -496,9 +530,7 @@
         try {
             const response = await fetch(`${API}/postulaciones/crear-o-buscar`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ IdCandidato: id })
             });
 
@@ -528,7 +560,20 @@
         }
 
         try {
-            const response = await fetch(`${API}/candidatos`);
+            const response = await fetch(`${API}/candidatos`, {
+                headers: authHeaders()
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                // Limpiar la sesión inválida: si no lo hacemos, index.html
+                // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                // generando un bucle infinito entre las dos páginas.
+                localStorage.removeItem('st_token');
+                localStorage.removeItem('st_usuario');
+                window.location.href = 'index.html';
+                return;
+            }
+
             const candidatos = await response.json();
 
             if (!response.ok) {
@@ -606,6 +651,46 @@
     }
 
     cargarCandidato();
+</script>
+
+<script>
+    function logout() {
+        localStorage.removeItem('st_token');
+        localStorage.removeItem('st_usuario');
+        window.location.href = 'index.html';
+    }
+
+    function renderHeaderUser() {
+        const container = document.getElementById('header-user');
+        if (!container) return;
+
+        try {
+            const storedUser = localStorage.getItem('st_usuario');
+            if (!storedUser) {
+                container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+                return;
+            }
+
+            const usuario = JSON.parse(storedUser);
+            const nombre = usuario.Nombre || usuario.nombre || usuario.Usuario || 'Usuario';
+            const rolMap = { 1: 'Administrador', 2: 'Reclutador', 3: 'Candidato' };
+            const rol = rolMap[Number(usuario.IdRol)] || 'Usuario';
+
+            container.innerHTML = `
+                <div class="text-right hidden sm:block">
+                    <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
+                    <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
+                </div>
+                <button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error transition-all" title="Cerrar sesión">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            `;
+        } catch (error) {
+            container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderHeaderUser);
 </script>
 
 </body>

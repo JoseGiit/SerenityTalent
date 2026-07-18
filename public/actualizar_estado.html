@@ -67,9 +67,41 @@
             }
         }
     </script>
+<script src="/js/auth.js"></script>
 </head>
 
 <body class="bg-background font-body-md text-on-surface overflow-x-hidden">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: solo Administrador (1) y Reclutador (2) pueden
+    // cambiar el estado de una postulación.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 
 <div class="flex min-h-screen">
 
@@ -95,12 +127,12 @@
                 <span>Candidatos</span>
             </a>
 
-            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="vacantes.html">
                 <span class="material-symbols-outlined">work</span>
                 <span>Vacantes</span>
             </a>
 
-            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="entrevistas.html">
                 <span class="material-symbols-outlined">calendar_today</span>
                 <span>Entrevistas</span>
             </a>
@@ -118,7 +150,8 @@
 
             <div class="flex items-center gap-4">
                 <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">notifications</button>
-                <button class="text-body-md font-bold text-on-surface hover:text-primary transition-colors">Perfil</button>
+                <div class="h-8 w-px bg-outline-variant mx-2"></div>
+                <div id="header-user" class="flex items-center gap-3"></div>
             </div>
         </header>
 
@@ -142,11 +175,11 @@
                 </div>
 
                 <div class="flex gap-md">
-                    <button id="cancel-button" class="px-6 py-2 border border-outline-variant text-primary font-bold rounded-lg hover:bg-surface-container-high transition-colors">
+                    <button data-role-show="1,2" id="cancel-button" class="px-6 py-2 border border-outline-variant text-primary font-bold rounded-lg hover:bg-surface-container-high transition-colors">
                         Cancelar
                     </button>
 
-                    <button id="save-button" class="px-6 py-2 bg-primary text-on-primary font-bold rounded-lg shadow-sm hover:opacity-90 transition-all flex items-center gap-2">
+                    <button data-role-show="1,2" id="save-button" class="px-6 py-2 bg-primary text-on-primary font-bold rounded-lg shadow-sm hover:opacity-90 transition-all flex items-center gap-2">
                         <span class="material-symbols-outlined text-[20px]">save</span>
                         Guardar Cambios
                     </button>
@@ -277,6 +310,14 @@ const API = '/api';
 let selectedStatus = null;
 let postulationId = null;
 
+function authHeaders(extra) {
+    const token = localStorage.getItem('st_token');
+    return Object.assign(
+        { 'Authorization': `Bearer ${token}` },
+        extra || {}
+    );
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     postulationId = params.get('id');
@@ -306,7 +347,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarPostulacion() {
     try {
-        const response = await fetch(`${API}/postulaciones/${postulationId}`);
+        const response = await fetch(`${API}/postulaciones/${postulationId}`, {
+            headers: authHeaders()
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            // Limpiar la sesión inválida: si no lo hacemos, index.html
+            // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+            // generando un bucle infinito entre las dos páginas.
+            localStorage.removeItem('st_token');
+            localStorage.removeItem('st_usuario');
+            window.location.href = 'index.html';
+            return;
+        }
+
         const postulacion = await response.json();
 
         if (!response.ok) {
@@ -347,13 +401,21 @@ async function guardarEstado() {
     try {
         const response = await fetch(`${API}/postulaciones/${postulationId}/estado`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({
                 Estado: selectedStatus
             })
         });
+
+        if (response.status === 401 || response.status === 403) {
+            // Limpiar la sesión inválida: si no lo hacemos, index.html
+            // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+            // generando un bucle infinito entre las dos páginas.
+            localStorage.removeItem('st_token');
+            localStorage.removeItem('st_usuario');
+            window.location.href = 'index.html';
+            return;
+        }
 
         const data = await response.json();
 
@@ -440,6 +502,46 @@ function formatearFecha(fecha) {
         minute: '2-digit'
     });
 }
+</script>
+
+<script>
+  function logout() {
+    localStorage.removeItem('st_token');
+    localStorage.removeItem('st_usuario');
+    window.location.href = 'index.html';
+  }
+
+  function renderHeaderUser() {
+    const container = document.getElementById('header-user');
+    if (!container) return;
+
+    try {
+      const storedUser = localStorage.getItem('st_usuario');
+      if (!storedUser) {
+        container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase text-on-surface-variant">Sin sesión</p></div>';
+        return;
+      }
+
+      const usuario = JSON.parse(storedUser);
+      const nombre = usuario.Nombre || usuario.nombre || usuario.Usuario || 'Usuario';
+      const rolMap = { 1: 'Administrador', 2: 'Reclutador', 3: 'Candidato' };
+      const rol = rolMap[Number(usuario.IdRol)] || 'Usuario';
+
+      container.innerHTML = `
+        <div class="text-right hidden sm:block">
+          <p class="text-sm font-bold text-on-surface">${nombre}</p>
+          <p class="text-[10px] uppercase text-on-surface-variant">${rol}</p>
+        </div>
+        <button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error transition-all" title="Cerrar sesión">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      `;
+    } catch (error) {
+      container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase text-on-surface-variant">Sin sesión</p></div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderHeaderUser);
 </script>
 
 </body>

@@ -121,48 +121,64 @@
             box-shadow: 0 0 0 2px rgba(0, 89, 187, 0.1);
         }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 <body class="bg-background min-h-screen flex overflow-hidden">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: Postularse es exclusivo del Candidato (3).
+    // Administrador y Reclutador no aplican para esta pantalla.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 3) {
+            // Administrador y Reclutador no aplican para postularse.
+            window.location.href = 'index.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <!-- Sidebar (Shared Component) -->
 <aside class="hidden md:flex flex-col h-screen w-[280px] bg-surface dark:bg-surface-dim border-r border-outline-variant py-lg px-md fixed left-0 z-50">
 <div class="mb-xl px-2">
 <h1 class="font-headline-md text-headline-md font-bold text-primary">Serenity Talent</h1>
 <p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1 tracking-widest">Recruitment Suite</p>
 </div>
-<div class="mb-lg px-2">
-<button class="w-full bg-primary hover:bg-primary-container text-on-primary py-3 rounded-lg font-body-md font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
-<span class="material-symbols-outlined">add</span>
-<span class="">Crear Vacante</span>
-</button>
-</div>
 <nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-body-md text-body-md">Dashboard</span>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="vacantes.html">
+<span class="material-symbols-outlined">work</span>
+<span class="font-body-md text-body-md">Vacantes</span>
 </a>
-
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">group</span>
-<span class="font-body-md text-body-md">Candidatos</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">calendar_today</span>
-<span class="font-body-md text-body-md">Entrevistas</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">analytics</span>
-<span class="font-body-md text-body-md">Reportes</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-body-md text-body-md">Configuración</span>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container transition-colors rounded-lg" href="postulacionCandidato.html">
+<span class="material-symbols-outlined">send</span>
+<span class="font-body-md text-body-md font-bold">Postularme</span>
 </a>
 </nav>
 <div class="mt-auto border-t border-outline-variant pt-lg flex items-center gap-3 px-2">
-<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" alt="Admin Portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt_b1oi_13lPu-D6-QYdQMe0Mfeq7bPc7PX02kVqRry8d__m2fmxs9Cii6gW4TEnTH1pdnlDKMiI1W7qg5G0UlxVPA0BzVT6gOmDXHuZqXUTQoxIzNkWcsNRuQBYzgJPFnN-XVnEXqFh2t4mAYqwMzPj8_xQVwBMEc8_3F1se62Q6QQnDy7yT2hr8Lcpy9FrTPXyct1r0d07_KmFKhsJ8-cCAk9LvBzJfM2oogztV5mmnCBg6BIOwX-A">
-<div>
-<p class="font-body-sm text-body-sm font-bold">Admin Portal</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant">nexus@serenity.io</p>
+<div class="w-10 h-10 rounded-full border border-outline-variant bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div id="sidebar-user">
+<p class="font-body-sm text-body-sm font-bold">Candidato</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sesión activa</p>
 </div>
 </div>
 </aside>
@@ -177,16 +193,8 @@
 <h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Postulación</h2>
 </div>
 <div class="flex items-center gap-md">
-<div class="hidden sm:flex items-center bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant">
-<span class="material-symbols-outlined text-outline">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-body-sm px-2 w-48" placeholder="Buscar vacante..." type="text">
-</div>
-<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm font-bold">
-<span class="material-symbols-outlined">person</span>
-<span class="">Profile</span>
+<button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error rounded-full" title="Cerrar sesión">
+<span class="material-symbols-outlined">logout</span>
 </button>
 </div>
 </header>
@@ -368,6 +376,17 @@
 </div>
 <script>
         const API = '/api';
+        const token = localStorage.getItem('st_token');
+
+        function authHeaders(extra) {
+            return Object.assign({ 'Authorization': `Bearer ${token}` }, extra || {});
+        }
+
+        function logout() {
+            localStorage.removeItem('st_token');
+            localStorage.removeItem('st_usuario');
+            window.location.href = 'index.html';
+        }
 
         // Auto-generate dates for today
         const today = new Date();
@@ -392,13 +411,68 @@
         const resumenTexto = document.getElementById('resumen-texto');
 
         let vacantesCache = [];
+        let idCandidatoActual = null;
+
+        // ── Precargar el perfil de candidato vinculado a esta cuenta ──────
+        // Si ya se postuló antes, no le pedimos que vuelva a escribir todo:
+        // traemos su Nombre/Apellido/Correo/Teléfono guardados.
+        async function precargarMiPerfil() {
+            try {
+                const response = await fetch(`${API}/candidatos/mi-perfil`, {
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (response.status === 404) {
+                    // Todavía no tiene perfil: al menos completamos el correo
+                    // con el de su cuenta, para no pedirlo dos veces.
+                    if (window.currentUser && window.currentUser.Correo) {
+                        document.getElementById('correo').value = window.currentUser.Correo;
+                    }
+                    return;
+                }
+
+                if (!response.ok) return;
+
+                const candidato = await response.json();
+                idCandidatoActual = candidato.IdCandidato;
+
+                document.getElementById('nombre').value = candidato.Nombre || '';
+                document.getElementById('apellido').value = candidato.Apellido || '';
+                document.getElementById('correo').value = candidato.Correo || '';
+                document.getElementById('telefono').value = candidato.Telefono || '';
+
+                actualizarResumen();
+            } catch (error) {
+                console.error('Error precargando el perfil de candidato:', error);
+            }
+        }
 
         // ── Vacante preseleccionada por URL (?vacante=ID), ej. desde "Ver vacante" ──
         const idVacantePreseleccionada = new URLSearchParams(window.location.search).get('vacante');
         // ── Cargar vacantes reales desde la base de datos ──────────────
         async function cargarVacantes() {
             try {
-                const response = await fetch(`${API}/vacantes`);
+                const response = await fetch(`${API}/vacantes`, {
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Limpiar la sesión inválida: si no lo hacemos, index.html
+                    // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                    // generando un bucle infinito entre las dos páginas.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -460,7 +534,7 @@
 
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {
-                window.location.href = 'candidatos.html';
+                window.location.href = 'vacantes.html';
             });
         }
 
@@ -499,7 +573,8 @@
             submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Procesando...';
 
             try {
-                // 1. Registrar al candidato en la base de datos
+                // 1. Crear o actualizar el perfil de candidato vinculado a esta cuenta
+                //    (mismo registro siempre, sin importar cuántas veces se postule).
                 const candidatoBody = {
                     Nombre: document.getElementById('nombre').value.trim(),
                     Apellido: document.getElementById('apellido').value.trim(),
@@ -508,9 +583,9 @@
                     Curriculum: curriculumInput.files.length ? curriculumInput.files[0].name : '',
                 };
 
-                const resCandidato = await fetch(`${API}/candidatos`, {
+                const resCandidato = await fetch(`${API}/candidatos/mi-perfil`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify(candidatoBody),
                 });
 
@@ -525,7 +600,7 @@
                 // 2. Crear (o recuperar) la postulación para la vacante seleccionada
                 const resPostulacion = await fetch(`${API}/postulaciones/crear-o-buscar`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({ IdCandidato: idCandidato, IdVacante: idVacante }),
                 });
 
@@ -554,7 +629,7 @@
                 actualizarResumen();
 
                 setTimeout(() => {
-                    window.location.href = 'candidatos.html';
+                    window.location.href = 'vacantes.html';
                 }, 1800);
 
             } catch (error) {
@@ -570,11 +645,6 @@
         });
 
         cargarVacantes();
+        precargarMiPerfil();
     </script>
-
-
-
-
-
-
 </body></html>

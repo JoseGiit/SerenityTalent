@@ -117,8 +117,40 @@
             box-shadow: 0 0 0 2px rgba(0, 89, 187, 0.2);
         }
     </style>
+<script src="/js/auth.js"></script>
 </head>
 <body class="font-body-md text-on-surface bg-background min-h-screen flex overflow-hidden">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: Crear vacante es exclusivo de Administrador (1)
+    // y Reclutador (2). Candidato no tiene acceso a esta pantalla.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <!-- Sidebar Navigation -->
 <aside class="hidden md:flex flex-col h-screen w-[280px] bg-surface border-r border-outline-variant py-lg px-md shrink-0">
 <div class="mb-xl px-sm">
@@ -126,19 +158,19 @@
 <p class="font-body-md text-body-md text-on-surface-variant">Suite de Reclutamiento</p>
 </div>
 <nav class="flex-grow space-y-2">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="index.html">
 <span class="material-symbols-outlined">dashboard</span>
 <span class="font-label-caps text-label-caps">Panel de Control</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="candidatos.html">
 <span class="material-symbols-outlined">group</span>
 <span class="font-label-caps text-label-caps">Candidatos</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="vacantes.html">
 <span class="material-symbols-outlined">work</span>
 <span class="font-label-caps text-label-caps">Vacantes</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="entrevistas.html">
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="font-label-caps text-label-caps">Entrevistas</span>
 </a>
@@ -169,12 +201,7 @@
 </button>
 </div>
 <div class="h-8 w-px bg-outline-variant"></div>
-<div class="flex items-center gap-3 cursor-pointer">
-<span class="font-body-md font-bold text-primary">Perfil</span>
-<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A professional portrait of a Hispanic recruitment manager in a modern office setting. He is wearing a sharp charcoal suit and has a warm, confident expression. The background features soft bokeh of a high-tech coworking space with plants and glass partitions. The lighting is natural and bright, conveying a trustworthy corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmft5vaLqYWK17sxIhuVki6vh6I4CAiOvv0uy653dkaqbZWhNskoZfwaEqS1xg9fizUMcw9C8FE35fN2ss7YXK0NlPb2E63gdnrNfqqfPs8kEWm0XJX0jIn9zR2AcB_tLTESTTBhTwLO4RiRNpLz2KykCQ09YrdfdVbMzsmGPeSn2mzQGSMq7sgj9wsGRqndxzl3CHIrNtoswcRLByNnBS-VNz0U1ERIpV_tL5ixXAQ1Qc2aemTuRiYR4k5zuGmDqE2QfCC5PHJz2S">
-</div>
-</div>
+<div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </header>
 <!-- Page Header & Form Container -->
@@ -182,7 +209,7 @@
 <div class="flex flex-col md:flex-row md:items-end justify-between mb-xl gap-md">
 <div>
 <nav class="flex items-center gap-2 text-on-surface-variant mb-2">
-<a class="font-body-sm hover:text-primary transition-colors" href="#">Vacantes</a>
+<a class="font-body-sm hover:text-primary transition-colors" href="vacantes.html">Vacantes</a>
 <span class="material-symbols-outlined text-sm">chevron_right</span>
 <span class="font-body-sm font-bold text-on-surface">Nueva Vacante</span>
 </nav>
@@ -193,7 +220,7 @@
                     <button class="px-lg py-sm border border-outline-variant text-primary font-label-caps rounded-lg hover:bg-surface-container-low transition-colors" onclick="history.back();">
                         Descartar
                     </button>
-                    <button id="submitBtn" type="submit" disabled class="px-lg py-sm bg-primary text-white font-label-caps rounded-lg hover:opacity-90 shadow-sm transition-all active:scale-95">
+                    <button data-role-show="1,2" id="submitBtn" type="submit" disabled class="px-lg py-sm bg-primary text-white font-label-caps rounded-lg hover:opacity-90 shadow-sm transition-all active:scale-95">
                         Publicar vacante
                     </button>
                     <div id="formMessage" class="text-sm text-on-surface-variant ml-4"></div>
@@ -350,6 +377,7 @@
         const estadoInput = document.getElementById('estadoInput');
         const submitBtn = document.getElementById('submitBtn');
         const formMessage = document.getElementById('formMessage');
+        const token = localStorage.getItem('st_token');
 
         // Initialize creation date
         try {
@@ -405,9 +433,22 @@
             try {
                 const res = await fetch('/api/vacantes', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(payload)
                 });
+
+                if (res.status === 401 || res.status === 403) {
+                    // Limpiar la sesión inválida: si no lo hacemos, index.html
+                    // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                    // generando un bucle infinito entre las dos páginas.
+                    localStorage.removeItem('st_token');
+                    localStorage.removeItem('st_usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
                 if (res.ok) {
                     formMessage.textContent = 'Vacante publicada correctamente.';
@@ -438,5 +479,43 @@
     })();
 </script>
 
+<script>
+    function logout() {
+        localStorage.removeItem('st_token');
+        localStorage.removeItem('st_usuario');
+        window.location.href = 'index.html';
+    }
 
+    function renderHeaderUser() {
+        const container = document.getElementById('header-user');
+        if (!container) return;
+
+        try {
+            const storedUser = localStorage.getItem('st_usuario');
+            if (!storedUser) {
+                container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+                return;
+            }
+
+            const usuario = JSON.parse(storedUser);
+            const nombre = usuario.Nombre || usuario.nombre || usuario.Usuario || 'Usuario';
+            const rolMap = { 1: 'Administrador', 2: 'Reclutador', 3: 'Candidato' };
+            const rol = rolMap[Number(usuario.IdRol)] || 'Usuario';
+
+            container.innerHTML = `
+                <div class="text-right hidden sm:block">
+                    <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
+                    <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
+                </div>
+                <button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error transition-all" title="Cerrar sesión">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            `;
+        } catch (error) {
+            container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderHeaderUser);
+</script>
 </body></html>

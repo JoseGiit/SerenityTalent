@@ -114,8 +114,40 @@
             }
         }
     </script>
+<script src="/js/auth.js"></script>
 </head>
 <body class="bg-background font-body-md text-on-surface overflow-x-hidden">
+<script>
+    // ---------------------------------------------------------------
+    // Guard de acceso: solo Administrador (1) y Reclutador (2) pueden
+    // dar de alta candidatos manualmente.
+    // ---------------------------------------------------------------
+    (function guardAccess() {
+        const token = localStorage.getItem('st_token');
+        const usuarioRaw = localStorage.getItem('st_usuario');
+        let usuario = null;
+
+        try {
+            usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+        } catch (e) {
+            usuario = null;
+        }
+
+        if (!token || !usuario || !usuario.IdRol) {
+            window.location.href = 'index.html';
+            throw new Error('Sin sesión, redirigiendo.');
+        }
+
+        const rol = Number(usuario.IdRol);
+
+        if (rol !== 1 && rol !== 2) {
+            window.location.href = 'vacantes.html';
+            throw new Error('Rol no autorizado, redirigiendo.');
+        }
+
+        window.currentUser = usuario;
+    })();
+</script>
 <div class="flex min-h-screen">
 <aside class="fixed left-0 top-0 h-screen w-[280px] bg-surface border-r border-outline-variant flex flex-col py-lg px-md z-30 hidden md:flex">
 <div class="mb-xl flex items-center gap-3">
@@ -128,19 +160,19 @@
 </div>
 </div>
 <nav class="flex-grow space-y-2">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="index.html">
 <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
 <span class="font-body-md text-body-md">Panel de Control</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg" href="candidatos.html">
 <span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
 <span class="font-body-md text-body-md">Candidatos</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="vacantes.html">
 <span class="material-symbols-outlined" data-icon="work">work</span>
 <span class="font-body-md text-body-md">Vacantes</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="entrevistas.html">
 <span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
 <span class="font-body-md text-body-md">Entrevistas</span>
 </a>
@@ -158,10 +190,7 @@
 <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">notifications</button>
 <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">help</button>
 <div class="h-8 w-px bg-outline-variant mx-2"></div>
-<button class="text-body-md font-bold text-on-surface hover:text-primary transition-colors">Perfil</button>
-<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-surface-container">
-<img class="w-full h-full object-cover" data-alt="A professional corporate headshot of a recruitment manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPU49a3YQTGjgiCLA8alnG4jkyubK_XBYQM5X9jSRsXJZlYmXPPMYG1N8_c5FfSH5mFA4cyk6EDD8vZ-K_NdALJJIGYr_zoGmLa-xV4C1GTBOdojEAmgBiUAiKML3R0pf4VUE3ZebARrwVcBgys8KxDFPkyiLxxOOAo9X4OjfnrKiz3Hm54sKqij-Mdim5gsIjOMkpLrhDCy3aKHIyL62TBYr_szablEGKBRo2yDn8XMrTan-vD0HRmAjp2t9D2APer-KNM6LMlQy1"/>
-</div>
+<div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </header>
 <div class="pt-24 pb-12 px-lg max-w-5xl mx-auto">
@@ -217,7 +246,7 @@
 <button id="cancel-button" class="px-6 py-2 text-primary font-bold border border-primary rounded-lg hover:bg-primary-fixed transition-colors active:scale-95" type="button">
                                 Cancelar
                             </button>
-<button class="px-8 py-2 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-2" type="submit">
+<button data-role-show="1,2" class="px-8 py-2 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-2" type="submit">
 <span class="material-symbols-outlined text-[20px]">save</span>
                                 Registrar Candidato
                             </button>
@@ -229,22 +258,22 @@
 </main>
 </div>
 <nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface border-t border-outline-variant flex md:hidden items-center justify-around z-40">
-<button class="flex flex-col items-center text-on-surface-variant hover:text-primary">
+<a href="index.html" class="flex flex-col items-center text-on-surface-variant hover:text-primary">
 <span class="material-symbols-outlined">dashboard</span>
 <span class="text-[10px] font-bold">Panel</span>
-</button>
-<button class="flex flex-col items-center text-primary">
+</a>
+<a href="candidatos.html" class="flex flex-col items-center text-primary">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
 <span class="text-[10px] font-bold">Candidatos</span>
-</button>
-<button class="flex flex-col items-center text-on-surface-variant hover:text-primary">
+</a>
+<a href="vacantes.html" class="flex flex-col items-center text-on-surface-variant hover:text-primary">
 <span class="material-symbols-outlined">work</span>
 <span class="text-[10px] font-bold">Vacantes</span>
-</button>
-<button class="flex flex-col items-center text-on-surface-variant hover:text-primary">
-<span class="material-symbols-outlined">settings</span>
-<span class="text-[10px] font-bold">Ajustes</span>
-</button>
+</a>
+<a href="entrevistas.html" class="flex flex-col items-center text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-bold">Entrevistas</span>
+</a>
 </nav>
 <script>
         document.querySelectorAll('input, select').forEach(element => {
@@ -287,11 +316,26 @@
                 };
 
                 try {
+                    const token = localStorage.getItem('st_token');
+
                     const response = await fetch('/api/candidatos', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                         body: JSON.stringify(body),
                     });
+
+                    if (response.status === 401 || response.status === 403) {
+                        // Limpiar la sesión inválida: si no lo hacemos, index.html
+                        // la va a ver como 'todavía válida' y nos manda de vuelta acá,
+                        // generando un bucle infinito entre las dos páginas.
+                        localStorage.removeItem('st_token');
+                        localStorage.removeItem('st_usuario');
+                        window.location.href = 'index.html';
+                        return;
+                    }
 
                     const contentType = response.headers.get('content-type') || '';
                     const bodyText = contentType.includes('application/json')
@@ -316,4 +360,43 @@
             });
         }
     </script>
+<script>
+  function logout() {
+    localStorage.removeItem('st_token');
+    localStorage.removeItem('st_usuario');
+    window.location.href = 'index.html';
+  }
+
+  function renderHeaderUser() {
+    const container = document.getElementById('header-user');
+    if (!container) return;
+
+    try {
+      const storedUser = localStorage.getItem('st_usuario');
+      if (!storedUser) {
+        container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+        return;
+      }
+
+      const usuario = JSON.parse(storedUser);
+      const nombre = usuario.Nombre || usuario.nombre || usuario.Usuario || 'Usuario';
+      const rolMap = { 1: 'Administrador', 2: 'Reclutador', 3: 'Candidato' };
+      const rol = rolMap[Number(usuario.IdRol)] || 'Usuario';
+
+      container.innerHTML = `
+        <div class="text-right hidden sm:block">
+          <p class="text-body-sm font-bold text-on-surface">${nombre}</p>
+          <p class="text-[10px] uppercase font-label-caps text-on-surface-variant">${rol}</p>
+        </div>
+        <button type="button" onclick="logout()" class="p-2 text-on-surface-variant hover:text-error transition-all" title="Cerrar sesión">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      `;
+    } catch (error) {
+      container.innerHTML = '<div class="text-right hidden sm:block"><p class="text-body-sm font-bold text-on-surface">Usuario</p><p class="text-[10px] uppercase font-label-caps text-on-surface-variant">Sin sesión</p></div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderHeaderUser);
+</script>
 </body></html>
