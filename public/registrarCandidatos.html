@@ -236,6 +236,20 @@
 </div>
 <div class="space-y-6">
 <div class="flex items-center gap-2 border-l-4 border-primary pl-3">
+<h3 class="font-headline-sm text-headline-sm">Cuenta de Usuario</h3>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm font-bold text-on-surface-variant" for="idUsuario">Vincular a cuenta (opcional)</label>
+<select id="idUsuario" name="idUsuario" class="w-full border border-outline-variant rounded-lg p-3 text-body-md bg-white focus:ring-2 focus:ring-secondary-container focus:border-primary transition-all">
+<option value="">Sin vincular a una cuenta</option>
+</select>
+<p id="usuarios-loading" class="text-body-sm text-on-surface-variant mt-2">Cargando cuentas disponibles…</p>
+<p id="usuarios-error" class="text-body-sm text-error mt-2 hidden">No se pudieron cargar las cuentas de usuario. Puede continuar sin vincular una.</p>
+<p id="usuarios-help" class="text-body-sm text-on-surface-variant mt-2 hidden">Solo se muestran cuentas con rol Candidato. Las que ya tienen un candidato vinculado aparecen deshabilitadas.</p>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-2 border-l-4 border-primary pl-3">
 <h3 class="font-headline-sm text-headline-sm">Documentación</h3>
 </div>
 <div class="space-y-2">
@@ -293,12 +307,74 @@
         const feedback = document.getElementById('form-feedback');
         const form = document.getElementById('candidate-form');
         const cancelButton = document.getElementById('cancel-button');
+        const idUsuarioSelect = document.getElementById('idUsuario');
+        const usuariosLoading = document.getElementById('usuarios-loading');
+        const usuariosError = document.getElementById('usuarios-error');
+        const usuariosHelp = document.getElementById('usuarios-help');
 
         if (cancelButton) {
             cancelButton.addEventListener('click', () => {
                 window.location.href = 'candidatos.html';
             });
         }
+
+        // ── Cargar cuentas con rol Candidato disponibles para vincular ──────
+        // Se listan todas las cuentas con IdRol = 3, pero las que ya están
+        // vinculadas a un Candidato existente (relación 1 a 1 vía IdUsuario)
+        // se muestran deshabilitadas para que no puedan volver a elegirse
+        // desde el formulario. El backend vuelve a validar esto al guardar.
+        //
+        // IMPORTANTE: esta es una carga *secundaria* (mejora el formulario,
+        // no es indispensable). Si falla por cualquier motivo -incluido
+        // 401/403- NO debe cerrar la sesión del usuario ni redirigirlo al
+        // login: eso solo debe pasar cuando falla el guardado real del
+        // candidato (más abajo, en el submit). Acá solo degradamos el
+        // combo a "sin vincular cuenta" y mostramos un aviso.
+        async function cargarUsuariosDisponibles() {
+            if (!idUsuarioSelect) return;
+
+            try {
+                const token = localStorage.getItem('st_token');
+
+                if (!token) {
+                    throw new Error('No hay sesión activa para cargar las cuentas');
+                }
+
+                const response = await fetch('/api/usuarios/candidatos-disponibles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    const detalle = await response.text().catch(() => '');
+                    console.error('candidatos-disponibles respondió', response.status, detalle);
+                    throw new Error('No se pudieron cargar las cuentas de usuario');
+                }
+
+                const usuarios = await response.json();
+
+                usuarios.forEach((usuario) => {
+                    const option = document.createElement('option');
+                    option.value = usuario.IdUsuario;
+                    option.textContent = usuario.Vinculado
+                        ? `${usuario.Nombre} (${usuario.Correo}) — ya vinculado`
+                        : `${usuario.Nombre} (${usuario.Correo})`;
+                    option.disabled = usuario.Vinculado;
+                    idUsuarioSelect.appendChild(option);
+                });
+
+                if (usuariosLoading) usuariosLoading.classList.add('hidden');
+                if (usuariosHelp) usuariosHelp.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error cargando usuarios disponibles:', error);
+                // No bloqueamos el formulario ni tocamos la sesión si esto
+                // falla: el candidato simplemente se registra sin cuenta
+                // vinculada, como si el selector no existiera.
+                if (usuariosLoading) usuariosLoading.classList.add('hidden');
+                if (usuariosError) usuariosError.classList.remove('hidden');
+            }
+        }
+
+        cargarUsuariosDisponibles();
 
         if (form) {
             form.addEventListener('submit', async (event) => {
@@ -317,6 +393,7 @@
                     Correo: document.getElementById('correo').value.trim(),
                     Telefono: document.getElementById('telefono').value.trim(),
                     Curriculum: curriculumInput.files.length ? curriculumInput.files[0].name : '',
+                    IdUsuario: idUsuarioSelect && idUsuarioSelect.value ? idUsuarioSelect.value : null,
                 };
 
                 try {

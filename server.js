@@ -540,7 +540,10 @@ app.delete('/api/candidatos/:id', authenticateToken, authorizeRoles(ROLES.ADMIN)
 });
 
 // ── POST /api/candidatos (alta manual) ───────────────────────────
-// Admin y Reclutador.
+// Admin y Reclutador. Permite vincular opcionalmente el nuevo Candidato a
+// una cuenta de Usuario existente (rol Candidato) mediante IdUsuario. Se
+// valida que la cuenta exista, que tenga rol Candidato, y que no esté ya
+// vinculada a otro Candidato (relación 1 a 1 entre Usuario y Candidato).
 app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const {
     Nombre,
@@ -548,21 +551,68 @@ app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
     Correo,
     Telefono,
     Curriculum,
+    IdUsuario,
   } = req.body;
 
   if (!Nombre || !Apellido || !Correo || !Telefono) {
     return res.status(400).json({ error: 'Nombre, apellido, correo y teléfono son requeridos' });
   }
 
+  // IdUsuario es opcional: permite vincular esta ficha de candidato a una
+  // cuenta de login existente. Si viene vacío/null, el candidato queda
+  // sin cuenta vinculada (como hasta ahora).
+  let idUsuarioFinal = null;
+
+  if (IdUsuario !== undefined && IdUsuario !== null && IdUsuario !== '') {
+    const idUsuarioNum = Number(IdUsuario);
+
+    if (!Number.isInteger(idUsuarioNum) || idUsuarioNum <= 0) {
+      return res.status(400).json({ error: 'IdUsuario inválido' });
+    }
+
+    try {
+      // 1. La cuenta debe existir y tener rol Candidato.
+      const [usuarioRows] = await pool.query(
+        'SELECT IdUsuario, IdRol FROM Usuario WHERE IdUsuario = ?',
+        [idUsuarioNum]
+      );
+
+      if (usuarioRows.length === 0) {
+        return res.status(404).json({ error: 'El usuario seleccionado no existe' });
+      }
+
+      if (Number(usuarioRows[0].IdRol) !== ROLES.CANDIDATO) {
+        return res.status(400).json({ error: 'Solo se pueden vincular cuentas con rol Candidato' });
+      }
+
+      // 2. Esa cuenta no debe estar ya vinculada a otro candidato
+      //    (relación 1 a 1 entre Usuario y Candidato).
+      const [vinculoExistente] = await pool.query(
+        'SELECT IdCandidato FROM Candidato WHERE IdUsuario = ?',
+        [idUsuarioNum]
+      );
+
+      if (vinculoExistente.length > 0) {
+        return res.status(409).json({ error: 'Ese usuario ya está vinculado a otro candidato' });
+      }
+
+      idUsuarioFinal = idUsuarioNum;
+    } catch (err) {
+      console.error('Error validando IdUsuario en POST /api/candidatos:', err.message);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+
   try {
     const [result] = await pool.query(
-      'INSERT INTO Candidato (Nombre, Apellido, Correo, Telefono, Curriculum, FechaRegistro) VALUES (?, ?, ?, ?, ?, CURDATE())',
+      'INSERT INTO Candidato (Nombre, Apellido, Correo, Telefono, Curriculum, FechaRegistro, IdUsuario) VALUES (?, ?, ?, ?, ?, CURDATE(), ?)',
       [
         Nombre,
         Apellido,
         Correo,
         Telefono,
         Curriculum || '',
+        idUsuarioFinal,
       ]
     );
 
@@ -1208,6 +1258,43 @@ app.post('/api/usuarios', authenticateToken, authorizeRoles(ROLES.ADMIN), async 
     res.status(201).json({ usuario: rows[0] });
   } catch (err) {
     console.error('Error en POST /api/usuarios:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ── GET /api/usuarios/candidatos-disponibles ─────────────────────
+// Admin y Reclutador. Lista las cuentas con rol Candidato para poder
+// vincularlas a un registro de Candidato desde el alta manual
+// (registrar_candidato.html). Incluye un flag "Vinculado" para que el
+// frontend pueda marcar/deshabilitar las cuentas que ya tienen un
+// Candidato asociado (relación 1 a 1 vía IdUsuario). Debe ir declarada
+// ANTES de '/api/usuarios/:id' o Express interpretaría
+// "candidatos-disponibles" como un id.
+app.get('/api/usuarios/candidatos-disponibles', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT
+        u.IdUsuario,
+        u.Nombre,
+        u.Correo,
+        u.Usuario,
+        (SELECT COUNT(*) FROM Candidato c WHERE c.IdUsuario = u.IdUsuario) AS VinculadoCount
+      FROM Usuario u
+      WHERE u.IdRol = ?
+      ORDER BY u.Nombre ASC
+    `, [ROLES.CANDIDATO]);
+
+    const usuarios = rows.map((u) => ({
+      IdUsuario: u.IdUsuario,
+      Nombre: u.Nombre,
+      Correo: u.Correo,
+      Usuario: u.Usuario,
+      Vinculado: Number(u.VinculadoCount) > 0,
+    }));
+
+    res.json(usuarios);
+  } catch (err) {
+    console.error('Error en GET /api/usuarios/candidatos-disponibles:', err.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
