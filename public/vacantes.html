@@ -185,13 +185,12 @@
 <div class="flex-1 flex flex-col overflow-hidden">
 <!-- TopNavBar Shell -->
 <header class="docked top-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg shrink-0">
-<div class="flex items-center gap-lg flex-1">
-<div class="relative w-full max-w-md">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-md focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="Buscar vacantes, departamentos o etiquetas..." type="text"/>
-</div>
-</div>
+<div class="flex items-center gap-lg flex-1"></div>
 <div class="flex items-center gap-md">
+<button id="sortVacantesBtn" type="button" class="bg-surface border border-outline px-4 py-2 rounded-lg font-body-sm font-bold text-primary flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">sort</span>
+<span id="sortVacantesLabel">Ordenar: Vocal</span>
+</button>
 <button class="p-2 text-on-surface-variant hover:text-primary transition-all duration-200">
 <span class="material-symbols-outlined">notifications</span>
 </button>
@@ -212,16 +211,7 @@
 <p class="font-body-md text-on-surface-variant mt-1">Gestiona las vacantes activas y revisa las postulaciones entrantes.</p>
 </div>
 <div class="flex gap-sm">
-<button class="bg-surface border border-outline px-4 py-2 rounded-lg font-body-sm font-bold text-primary flex items-center gap-2 hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined text-[18px]">filter_list</span>
-                            Filtrar
-                        </button>
-                        
-<button class="bg-surface border border-outline px-4 py-2 rounded-lg font-body-sm font-bold text-primary flex items-center gap-2 hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined text-[18px]">sort</span>
-                            Ordenar
-                        </button>
-                        <div class="mt-auto p-sm">
+<div class="mt-auto p-sm">
 <a href="registroVacante.html" data-role-show="1,2" class="w-full inline-block bg-primary text-on-primary py-3 px-4 rounded-lg font-body-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 text-center">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
                 Nueva Vacante
@@ -246,14 +236,10 @@
 <!-- Featured Vacancy Card -->
 <div class="col-span-12 lg:col-span-8 bg-primary-container text-on-primary-container p-lg rounded-xl bento-item relative overflow-hidden flex flex-col justify-between">
 <div class="relative z-10">
-<span class="bg-primary text-white font-label-caps text-label-caps px-2 py-1 rounded-sm uppercase mb-4 inline-block">Contratación Urgente</span>
-<h3 class="font-headline-md text-headline-md font-bold mb-2">Arquitecto Senior Full Stack</h3>
-<p class="font-body-md opacity-90 max-w-md">Liderando la migración de infraestructura para nuestro ecosistema de talento central. Se requiere experiencia en Node.js, React y arquitecturas Cloud Native.</p>
+<h3 class="font-headline-md text-headline-md font-bold mb-2">Vacantes disponibles para tu equipo</h3>
+<p class="font-body-md opacity-90 max-w-md">Explora las oportunidades activas y gestiona los procesos de contratación desde un solo lugar.</p>
 </div>
-<div class="mt-lg flex gap-md relative z-10">
-<button data-role-show="3" class="bg-white text-primary px-6 py-2 rounded-lg font-body-md font-bold hover:shadow-lg transition-all">Postularse</button>
-<button class="border border-white text-white px-6 py-2 rounded-lg font-body-md font-bold hover:bg-white/10 transition-all">Ver Detalles</button>
-</div>
+<div class="mt-lg relative z-10"></div>
 <!-- Abstract Visual Pattern -->
 <div class="absolute right-0 top-0 h-full w-1/3 opacity-20 pointer-events-none flex items-center justify-center">
 <span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">architecture</span>
@@ -388,16 +374,12 @@
                 });
             });
 
-            // Search bar interaction
-            const searchInput = document.querySelector('input[type="text"]');
-            searchInput.addEventListener('focus', () => {
-                searchInput.parentElement.classList.add('scale-105');
-                searchInput.parentElement.classList.add('shadow-sm');
-            });
-            searchInput.addEventListener('blur', () => {
-                searchInput.parentElement.classList.remove('scale-105');
-                searchInput.parentElement.classList.remove('shadow-sm');
-            });
+            const sortBtn = document.getElementById('sortVacantesBtn');
+            if (sortBtn) {
+                sortBtn.addEventListener('click', toggleOrdenVacantes);
+            }
+
+            actualizarTextoOrden();
         });
 
         // Add custom selector for buttons
@@ -478,6 +460,38 @@
             }
         }
 
+        let sortMode = 'vocal';
+
+        function actualizarTextoOrden() {
+            const label = document.getElementById('sortVacantesLabel');
+            if (!label) return;
+            label.textContent = sortMode === 'vocal' ? 'Ordenar: Vocal' : 'Ordenar: Fecha';
+        }
+
+        function ordenarVacantes(vacantes) {
+            const copia = [...vacantes];
+
+            copia.sort((a, b) => {
+                if (sortMode === 'fecha') {
+                    const fechaA = a.FechaCreacion ? new Date(a.FechaCreacion) : new Date(0);
+                    const fechaB = b.FechaCreacion ? new Date(b.FechaCreacion) : new Date(0);
+                    return fechaB - fechaA;
+                }
+
+                const tituloA = String(a.Titulo || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                const tituloB = String(b.Titulo || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                return tituloA.localeCompare(tituloB, 'es', { sensitivity: 'base' });
+            });
+
+            return copia;
+        }
+
+        function toggleOrdenVacantes() {
+            sortMode = sortMode === 'vocal' ? 'fecha' : 'vocal';
+            actualizarTextoOrden();
+            loadVacantes();
+        }
+
         async function loadVacantes() {
             const statusEl = document.getElementById('vacantesStatus');
             const container = document.getElementById('vacantesContainer');
@@ -511,7 +525,8 @@
                     throw new Error('Error al cargar vacantes');
                 }
                 const vacantes = await response.json();
-                const activeVacantes = vacantes.filter(v => String(v.Estado || '').toLowerCase() === 'activa');
+                const vacantesOrdenadas = ordenarVacantes(vacantes);
+                const activeVacantes = vacantesOrdenadas.filter(v => String(v.Estado || '').toLowerCase() === 'activa');
                 const mostrarEliminar = puedeEliminarVacantes();
 
                 activeCountEl.textContent = activeVacantes.length;
@@ -523,9 +538,9 @@
                     return;
                 }
 
-                statusEl.textContent = `Mostrando ${vacantes.length} vacante${vacantes.length === 1 ? '' : 's'}`;
+                statusEl.textContent = `Mostrando ${vacantesOrdenadas.length} vacante${vacantesOrdenadas.length === 1 ? '' : 's'}`;
 
-                vacantes.forEach(vacante => {
+                vacantesOrdenadas.forEach(vacante => {
                     const departamento = vacante.Departamento || 'General';
                     const estado = vacante.Estado || 'Activa';
                     const fechaCreacion = vacante.FechaCreacion || '';
