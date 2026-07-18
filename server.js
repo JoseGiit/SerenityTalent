@@ -90,6 +90,11 @@ async function initializeDatabase() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
 
+  // Si la tabla Usuario ya existía (por ejemplo, creada manualmente en
+  // Railway sin esta columna), la agregamos para que las consultas que
+  // seleccionan FechaRegistro no fallen con "Unknown column".
+  await ensureColumnExists('Usuario', 'FechaRegistro', 'FechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP');
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS Postulacion (
       IdPostulacion INT UNSIGNED NOT NULL AUTO_INCREMENT,

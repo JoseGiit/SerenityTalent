@@ -20,5 +20,6 @@ assert.match(index, /if \(rol === 3\) return 'vacantes\.html';/);
 const candidatos = read('public/candidatos.html');
 assert.match(candidatos, /if \(rol !== 1 && rol !== 2\)/);
 assert.match(candidatos, /data-role-show="1,2"/);
+assert.match(candidatos, /data-role-show="1"[^>]*href="admin_usuarios\.html"|href="admin_usuarios\.html"[^>]*data-role-show="1"/);
 
 console.log('Role mapping checks passed.');
