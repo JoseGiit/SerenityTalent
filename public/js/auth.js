@@ -1,4 +1,4 @@
-// Helper for client-side auth UI and requests
+
 (function(window){
   function getToken(){
     return localStorage.getItem('st_token') || localStorage.getItem('token') || null;
@@ -54,9 +54,9 @@
     });
   }
 
-  // Clears ALL session keys used across the app. logout() must go through
-  // this instead of removing 'token' alone, or stale st_token/st_usuario
-  // survive and keep feeding a "logged in" user object to getUser().
+  
+  
+  
   function clearSession(){
     localStorage.removeItem('token');
     localStorage.removeItem('st_token');
@@ -68,11 +68,11 @@
     window.location.href = '/index.html';
   }
 
-  // Centralized response handler. This is the fix for the core bug:
-  // 401 = invalid/expired session -> real logout, back to login.
-  // 403 = valid session, wrong role -> DO NOT touch the session, just warn.
-  // Returns true if it already handled (and you should stop processing
-  // the response further), false if the response was fine.
+  
+  
+  
+  
+  
   function handleApiError(response, options){
     if (response.status === 401) {
       clearSession();
@@ -89,22 +89,22 @@
     return false;
   }
 
-  // Reusable page guard. Await this at the very top of a page's script,
-  // BEFORE any data-loading calls, and bail out if it returns false.
-  // This is what actually stops the "flash" — not a throw (which only
-  // kills the current <script> block), but every other init function
-  // simply never gets called because you gated it with `if (!ok) return;`.
-  //
-  // Usage:
-  //   document.addEventListener('DOMContentLoaded', async () => {
-  //     const ok = await Auth.requireRole([1,2]);
-  //     if (!ok) return;
-  //     cargarEntrevistas();
-  //   });
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   async function requireRole(rolesPermitidos, opts){
     const user = getUser();
     if (!user) {
-      // no session at all -> straight to login, not a role message
+      
       window.location.href = (opts && opts.loginUrl) || 'index.html';
       return false;
     }
@@ -180,7 +180,7 @@
   document.addEventListener('DOMContentLoaded', applyRoleVisibility);
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.renderHeaderUser === 'function') {
-      try { window.renderHeaderUser(); } catch (e) { /* ignore */ }
+      try { window.renderHeaderUser(); } catch (e) {  }
     }
   });
 })(window);

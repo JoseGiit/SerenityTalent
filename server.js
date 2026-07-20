@@ -10,14 +10,14 @@ const PORT = 3000;
 const JWT_SECRET = 'serenity_secret_2024';
 const DB_NAME = 'railway';
 
-// Roles del sistema (coinciden con los IdRol en la BD)
+
 const ROLES = {
   ADMIN: 1,
   RECLUTADOR: 2,
   CANDIDATO: 3,
 };
 
-// ── Base de datos ──────────────────────────────────────────────
+
 const pool = mysql.createPool({
   host: 'reseau.proxy.rlwy.net',
   port: 22884,
@@ -57,10 +57,10 @@ async function initializeDatabase() {
   `);
 
   await ensureColumnExists('Candidato', 'Estado', "Estado VARCHAR(50) DEFAULT 'Activo'");
-  // Vínculo real entre la cuenta de login (Usuario) y su perfil de candidato.
-  // Nullable: un Admin/Reclutador puede seguir dando de alta candidatos que
-  // no tienen cuenta propia en el sistema, y un Candidato puede postular a
-  // un tercero cuyo perfil tampoco queda vinculado a ninguna cuenta.
+  
+  
+  
+  
   await ensureColumnExists('Candidato', 'IdUsuario', 'IdUsuario INT UNSIGNED DEFAULT NULL');
 
   await pool.query(`
@@ -76,7 +76,7 @@ async function initializeDatabase() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
 
-  // Tabla de usuarios para login/roles
+  
   await pool.query(`
     CREATE TABLE IF NOT EXISTS Usuario (
       IdUsuario INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -91,9 +91,9 @@ async function initializeDatabase() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
 
-  // Si la tabla Usuario ya existía (por ejemplo, creada manualmente en
-  // Railway sin esta columna), la agregamos para que las consultas que
-  // seleccionan FechaRegistro no fallen con "Unknown column".
+  
+  
+  
   await ensureColumnExists('Usuario', 'FechaRegistro', 'FechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP');
 
   await pool.query(`
@@ -133,7 +133,7 @@ async function initializeDatabase() {
   `);
 }
 
-// ── Middleware ─────────────────────────────────────────────────
+
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
@@ -141,9 +141,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Middleware de autenticación y autorización ──────────────────
 
-// Verifica que venga un JWT válido en el header Authorization: Bearer <token>
+
+
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -156,13 +156,13 @@ function authenticateToken(req, res, next) {
     if (err) {
       return res.status(403).json({ error: 'Token inválido o expirado' });
     }
-    // payload: { id, usuario, rol, correo }
+    
     req.user = payload;
     next();
   });
 }
 
-// Genera un middleware que solo deja pasar a los roles indicados
+
 function authorizeRoles(...rolesPermitidos) {
   return (req, res, next) => {
     if (!req.user || !rolesPermitidos.includes(req.user.rol)) {
@@ -172,9 +172,9 @@ function authorizeRoles(...rolesPermitidos) {
   };
 }
 
-// Permite el acceso a Admin/Reclutador sobre cualquier candidato,
-// pero a un usuario con rol Candidato solo sobre su propio registro
-// (se identifica comparando el correo del token con el correo del Candidato).
+
+
+
 async function permitirPropioCandidatoOStaff(req, res, next) {
   if (req.user.rol === ROLES.ADMIN || req.user.rol === ROLES.RECLUTADOR) {
     return next();
@@ -191,9 +191,9 @@ async function permitirPropioCandidatoOStaff(req, res, next) {
         return res.status(404).json({ error: 'Candidato no encontrado' });
       }
 
-      // Preferimos comparar por IdUsuario (vínculo real de cuenta). Si el
-      // registro es antiguo y todavía no tiene IdUsuario asignado, caemos
-      // de vuelta a comparar por correo como antes.
+      
+      
+      
       if (rows[0].IdUsuario !== null && rows[0].IdUsuario !== undefined) {
         if (Number(rows[0].IdUsuario) !== Number(req.user.id)) {
           return res.status(403).json({ error: 'Solo puede acceder a su propio perfil' });
@@ -218,7 +218,7 @@ async function permitirPropioCandidatoOStaff(req, res, next) {
   return res.status(403).json({ error: 'No tiene permisos para realizar esta acción' });
 }
 
-// ── POST /api/register ─────────────────────────────────────────
+
 app.post('/api/register', async (req, res) => {
   const { Nombre, Correo, IJsuario, Contrasena } = req.body;
 
@@ -226,11 +226,11 @@ app.post('/api/register', async (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son requeridos' });
   }
 
-  // El registro público siempre crea cuentas con rol de candidato.
+  
   const rolFinal = ROLES.CANDIDATO;
 
   try {
-    // Verificar si el usuario o correo ya existen
+    
     const [existe] = await pool.query(
       'SELECT IdUsuario FROM Usuario WHERE Correo = ? OR Usuario = ?',
       [Correo, IJsuario]
@@ -240,16 +240,16 @@ app.post('/api/register', async (req, res) => {
       return res.status(409).json({ error: 'El usuario o correo ya está registrado' });
     }
 
-    // Hashear contraseña antes de guardar
+    
     const hash = await bcrypt.hash(Contrasena, 10);
 
-    // Insertar nuevo usuario con el rol elegido (Reclutador o Candidato)
+    
     const [result] = await pool.query(
       'INSERT INTO Usuario (Nombre, Correo, Usuario, Contrasena, IdRol) VALUES (?, ?, ?, ?, ?)',
       [Nombre, Correo, IJsuario, hash, rolFinal]
     );
 
-    // Recuperar el usuario recién creado
+    
     const [rows] = await pool.query(
       'SELECT IdUsuario, Nombre, Correo, Usuario, IdRol FROM Usuario WHERE IdUsuario = ?',
       [result.insertId]
@@ -269,7 +269,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// ── POST /api/login ────────────────────────────────────────────
+
 app.post('/api/login', async (req, res) => {
   const { identifier, Contrasena } = req.body;
 
@@ -278,7 +278,7 @@ app.post('/api/login', async (req, res) => {
   }
 
   try {
-    // Buscar por correo o nombre de usuario
+    
     const [rows] = await pool.query(
       'SELECT * FROM Usuario WHERE Correo = ? OR Usuario = ? LIMIT 1',
       [identifier, identifier]
@@ -290,7 +290,7 @@ app.post('/api/login', async (req, res) => {
 
     const usuarioDb = rows[0];
 
-    // Comparar contraseña con el hash guardado
+    
     const coincide = await bcrypt.compare(Contrasena, usuarioDb.Contrasena);
 
     if (!coincide) {
@@ -303,7 +303,7 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '8h' }
     );
 
-    // Misma forma que /api/register: siempre IdUsuario, Nombre, Correo, Usuario, IdRol
+    
     res.json({
       token,
       usuario: {
@@ -320,8 +320,8 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ── GET /api/candidatos (listado completo) ─────────────────────
-// Admin y Reclutador. Candidato NO: expone PII de otros candidatos.
+
+
 app.get('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -345,10 +345,10 @@ app.get('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.
   }
 });
 
-// ── GET /api/candidatos/mi-perfil ────────────────────────────────
-// Solo Candidato. Devuelve el perfil de candidato vinculado a esta cuenta
-// (por IdUsuario), si ya existe. Debe ir declarada ANTES de
-// '/api/candidatos/:id' o Express interpretaría "mi-perfil" como un id.
+
+
+
+
 app.get('/api/candidatos/mi-perfil', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -367,11 +367,11 @@ app.get('/api/candidatos/mi-perfil', authenticateToken, authorizeRoles(ROLES.CAN
   }
 });
 
-// ── POST /api/candidatos/mi-perfil ───────────────────────────────
-// Solo Candidato. Crea o actualiza (upsert) el perfil de candidato vinculado
-// a esta cuenta, identificado por IdUsuario. Así, sin importar cuántas veces
-// se postule, siempre es el mismo registro de Candidato el que se actualiza
-// y el que aparece vinculado a sus postulaciones.
+
+
+
+
+
 app.post('/api/candidatos/mi-perfil', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
   const { Nombre, Apellido, Correo, Telefono, Curriculum } = req.body;
 
@@ -411,16 +411,16 @@ app.post('/api/candidatos/mi-perfil', authenticateToken, authorizeRoles(ROLES.CA
   }
 });
 
-// ── GET /api/candidatos/mi-seguimiento ───────────────────────────
-// Solo Candidato. Devuelve, para el candidato vinculado a la cuenta
-// autenticada (por IdUsuario), todas sus postulaciones junto con las
-// entrevistas agendadas y la evaluación de cada entrevista (si ya
-// existe). Es de solo lectura: el candidato nunca puede modificar
-// nada de esto, solo consultarlo. Debe ir declarada ANTES de
-// '/api/candidatos/:id' o Express interpretaría "mi-seguimiento" como un id.
+
+
+
+
+
+
+
 app.get('/api/candidatos/mi-seguimiento', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
   try {
-    // 1. Ubicar el perfil de Candidato vinculado a esta cuenta.
+    
     const [candidatoRows] = await pool.query(
       'SELECT IdCandidato, Nombre, Apellido, Correo FROM Candidato WHERE IdUsuario = ? LIMIT 1',
       [req.user.id]
@@ -432,10 +432,10 @@ app.get('/api/candidatos/mi-seguimiento', authenticateToken, authorizeRoles(ROLE
 
     const candidato = candidatoRows[0];
 
-    // 2. Traer postulaciones + vacante + entrevista + evaluación en una
-    //    sola consulta (con LEFT JOIN, porque una postulación puede no
-    //    tener entrevista todavía, y una entrevista puede no tener
-    //    evaluación todavía).
+    
+    
+    
+    
     const [rows] = await pool.query(
       `
       SELECT
@@ -465,7 +465,7 @@ app.get('/api/candidatos/mi-seguimiento', authenticateToken, authorizeRoles(ROLE
       [candidato.IdCandidato]
     );
 
-    // 3. Agrupar filas planas en: postulaciones -> entrevistas -> evaluación.
+    
     const postulacionesMap = new Map();
 
     for (const row of rows) {
@@ -518,17 +518,17 @@ app.get('/api/candidatos/mi-seguimiento', authenticateToken, authorizeRoles(ROLE
   }
 });
 
-// ── POST /api/candidatos/postular-tercero ─────────────────────────
-// Solo Candidato. Crea o actualiza el perfil de OTRA persona (no la propia
-// cuenta del usuario autenticado) para postularla en su nombre.
-//
-// Reglas de seguridad:
-// - Nunca se le puede pasar el propio correo del usuario autenticado
-//   (para eso existe /mi-perfil).
-// - Nunca se toca un perfil que ya tenga IdUsuario asignado: esos
-//   pertenecen a la cuenta de otra persona y no son editables desde acá.
-//   Si el correo coincide con uno de esos, se crea un perfil nuevo en vez
-//   de sobrescribir datos ajenos.
+
+
+
+
+
+
+
+
+
+
+
 app.post('/api/candidatos/postular-tercero', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
   const { Nombre, Apellido, Correo, Telefono, Curriculum } = req.body;
 
@@ -574,8 +574,8 @@ app.post('/api/candidatos/postular-tercero', authenticateToken, authorizeRoles(R
   }
 });
 
-// ── GET /api/candidatos/:id ──────────────────────────────────────
-// Admin/Reclutador: cualquier candidato. Candidato: solo su propio perfil.
+
+
 app.get('/api/candidatos/:id', authenticateToken, permitirPropioCandidatoOStaff, async (req, res) => {
   const { id } = req.params;
 
@@ -596,8 +596,8 @@ app.get('/api/candidatos/:id', authenticateToken, permitirPropioCandidatoOStaff,
   }
 });
 
-// ── PUT /api/candidatos/:id ──────────────────────────────────────
-// Admin/Reclutador: cualquier candidato. Candidato: solo su propio perfil.
+
+
 app.put('/api/candidatos/:id', authenticateToken, permitirPropioCandidatoOStaff, async (req, res) => {
   const { id } = req.params;
   const { Nombre, Apellido, Correo, Telefono, Estado, Curriculum } = req.body;
@@ -624,8 +624,8 @@ app.put('/api/candidatos/:id', authenticateToken, permitirPropioCandidatoOStaff,
   }
 });
 
-// ── DELETE /api/candidatos/:id ───────────────────────────────────
-// Eliminación permanente: solo Administrador.
+
+
 app.delete('/api/candidatos/:id', authenticateToken, authorizeRoles(ROLES.ADMIN), async (req, res) => {
   const { id } = req.params;
 
@@ -643,11 +643,11 @@ app.delete('/api/candidatos/:id', authenticateToken, authorizeRoles(ROLES.ADMIN)
   }
 });
 
-// ── POST /api/candidatos (alta manual) ───────────────────────────
-// Admin y Reclutador. Permite vincular opcionalmente el nuevo Candidato a
-// una cuenta de Usuario existente (rol Candidato) mediante IdUsuario. Se
-// valida que la cuenta exista, que tenga rol Candidato, y que no esté ya
-// vinculada a otro Candidato (relación 1 a 1 entre Usuario y Candidato).
+
+
+
+
+
 app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const {
     Nombre,
@@ -662,9 +662,9 @@ app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
     return res.status(400).json({ error: 'Nombre, apellido, correo y teléfono son requeridos' });
   }
 
-  // IdUsuario es opcional: permite vincular esta ficha de candidato a una
-  // cuenta de login existente. Si viene vacío/null, el candidato queda
-  // sin cuenta vinculada (como hasta ahora).
+  
+  
+  
   let idUsuarioFinal = null;
 
   if (IdUsuario !== undefined && IdUsuario !== null && IdUsuario !== '') {
@@ -675,7 +675,7 @@ app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
     }
 
     try {
-      // 1. La cuenta debe existir y tener rol Candidato.
+      
       const [usuarioRows] = await pool.query(
         'SELECT IdUsuario, IdRol FROM Usuario WHERE IdUsuario = ?',
         [idUsuarioNum]
@@ -689,8 +689,8 @@ app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
         return res.status(400).json({ error: 'Solo se pueden vincular cuentas con rol Candidato' });
       }
 
-      // 2. Esa cuenta no debe estar ya vinculada a otro candidato
-      //    (relación 1 a 1 entre Usuario y Candidato).
+      
+      
       const [vinculoExistente] = await pool.query(
         'SELECT IdCandidato FROM Candidato WHERE IdUsuario = ?',
         [idUsuarioNum]
@@ -732,8 +732,8 @@ app.post('/api/candidatos', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
   }
 });
 
-// ── POST /api/vacantes ───────────────────────────────────────
-// Admin y Reclutador.
+
+
 app.post('/api/vacantes', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { Titulo, Descripcion, Departamento, Estado, FechaCreacion, FechaCierre } = req.body;
 
@@ -761,10 +761,10 @@ app.post('/api/vacantes', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.R
   }
 });
 
-// ── DELETE /api/vacantes/:id ─────────────────────────────────
-// Eliminación permanente: Administrador y Reclutador. El Candidato nunca
-// puede eliminar vacantes (authorizeRoles lo bloquea con 403 aunque
-// intente llamar al endpoint directamente).
+
+
+
+
 app.delete('/api/vacantes/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { id } = req.params;
 
@@ -782,8 +782,8 @@ app.delete('/api/vacantes/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, R
   }
 });
 
-// ── GET /api/vacantes ─────────────────────────────────────
-// Admin/Reclutador: todas las vacantes. Candidato: solo vacantes activas.
+
+
 app.get('/api/vacantes', authenticateToken, async (req, res) => {
   try {
     let query = 'SELECT * FROM Vacante';
@@ -804,9 +804,9 @@ app.get('/api/vacantes', authenticateToken, async (req, res) => {
   }
 });
 
-// ── GET /api/postulaciones ─────────────────────────────────────
-// Admin y Reclutador (seguimiento_candidato.html). Candidato consulta su
-// estado por otra vía (modal público por correo), no por este listado.
+
+
+
 app.get('/api/postulaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -837,11 +837,11 @@ app.get('/api/postulaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROL
   }
 });
 
-// ── GET /api/postulaciones/consulta ─────────────────────────────
-// Público (index.html, HU-04). Permite a cualquier persona consultar el
-// estado de SU postulación por correo, sin exponer el listado completo de
-// candidatos ni de postulaciones de terceros. Debe ir declarada ANTES de
-// '/api/postulaciones/:id' o Express interpretaría "consulta" como un id.
+
+
+
+
+
 app.get('/api/postulaciones/consulta', async (req, res) => {
   const correo = String(req.query.correo || '').trim().toLowerCase();
 
@@ -878,8 +878,8 @@ app.get('/api/postulaciones/consulta', async (req, res) => {
   }
 });
 
-// ── GET /api/postulaciones/:id ─────────────────────────────────
-// Admin y Reclutador.
+
+
 app.get('/api/postulaciones/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { id } = req.params;
 
@@ -917,8 +917,8 @@ app.get('/api/postulaciones/:id', authenticateToken, authorizeRoles(ROLES.ADMIN,
   }
 });
 
-// ── PUT /api/postulaciones/:id/estado ──────────────────────────
-// Admin y Reclutador (actualizar_estado.html).
+
+
 app.put('/api/postulaciones/:id/estado', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { id } = req.params;
   const { Estado } = req.body;
@@ -997,13 +997,13 @@ app.put('/api/postulaciones/:id/estado', authenticateToken, authorizeRoles(ROLES
   }
 });
 
-// ── POST /api/postulaciones/crear-o-buscar ─────────────────────
-// Solo Candidato. Se permite crear una postulación sobre:
-//   1. El propio perfil de candidato del usuario autenticado
-//      (por IdUsuario, con fallback a correo para registros viejos), o
-//   2. Un perfil de candidato SIN dueño (IdUsuario NULL), es decir, uno
-//      registrado en nombre de un tercero vía "Postular a otra persona".
-// Nunca se permite crear una postulación sobre el perfil de OTRA cuenta.
+
+
+
+
+
+
+
 app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(ROLES.CANDIDATO), async (req, res) => {
   const { IdCandidato, IdVacante } = req.body;
 
@@ -1016,8 +1016,8 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
   }
 
   try {
-    // Verificar que el candidato exista y que sea el propio dueño de la cuenta
-    // o un perfil de tercero sin cuenta vinculada.
+    
+    
     const [candidatoRows] = await pool.query(
       'SELECT IdCandidato, Correo, IdUsuario FROM Candidato WHERE IdCandidato = ?',
       [IdCandidato]
@@ -1031,16 +1031,16 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
     const esDuenoPorUsuario = candidato.IdUsuario !== null && candidato.IdUsuario !== undefined
       && Number(candidato.IdUsuario) === Number(req.user.id);
     const esDuenoPorCorreo = (req.user.correo || '').toLowerCase() === (candidato.Correo || '').toLowerCase();
-    // Perfil sin cuenta vinculada = fue registrado por otra persona en su
-    // nombre (vía "Postular a otra persona"). Cualquier candidato puede
-    // crear una postulación para este tipo de perfil.
+    
+    
+    
     const esPerfilSinDueno = candidato.IdUsuario === null || candidato.IdUsuario === undefined;
 
     if (!esDuenoPorUsuario && !esDuenoPorCorreo && !esPerfilSinDueno) {
       return res.status(403).json({ error: 'Solo puede postularse con su propio perfil de candidato' });
     }
 
-    // Verificar que la vacante exista
+    
     const [vacanteRows] = await pool.query(
       'SELECT IdVacante FROM Vacante WHERE IdVacante = ?',
       [IdVacante]
@@ -1050,9 +1050,9 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
       return res.status(404).json({ error: 'La vacante seleccionada no existe' });
     }
 
-    // Buscar si ya existe una postulación de ESTE candidato para ESTA
-    // vacante puntual (un candidato puede postularse a varias vacantes
-    // distintas; lo que no debe duplicarse es la misma vacante dos veces).
+    
+    
+    
     const [existente] = await pool.query(
       `
       SELECT 
@@ -1077,7 +1077,7 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
       });
     }
 
-    // Crear postulación nueva para la vacante seleccionada
+    
     const [result] = await pool.query(
       `
       INSERT INTO Postulacion
@@ -1113,8 +1113,8 @@ app.post('/api/postulaciones/crear-o-buscar', authenticateToken, authorizeRoles(
   }
 });
 
-// ── GET /api/entrevistas ─────────────────────────────────────────
-// Admin y Reclutador.
+
+
 app.get('/api/entrevistas', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -1156,8 +1156,8 @@ app.get('/api/entrevistas', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES
   }
 });
 
-// Helper: trae una entrevista por id ya con los joins de candidato/vacante,
-// para devolver siempre la misma "forma" de objeto en create/update.
+
+
 async function obtenerEntrevistaConDetalle(idEntrevista) {
   const [rows] = await pool.query(
     `
@@ -1188,8 +1188,8 @@ async function obtenerEntrevistaConDetalle(idEntrevista) {
   return rows[0] || null;
 }
 
-// ── POST /api/entrevistas ─────────────────────────────────────────
-// Admin y Reclutador. Crea una entrevista ligada a una Postulacion existente.
+
+
 app.post('/api/entrevistas', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { IdPostulacion, Fecha, Hora, Modalidad, Observaciones } = req.body;
 
@@ -1220,8 +1220,8 @@ app.post('/api/entrevistas', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLE
   }
 });
 
-// ── PUT /api/entrevistas/:id ────────────────────────────────────
-// Admin y Reclutador.
+
+
 app.put('/api/entrevistas/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { id } = req.params;
   const { IdPostulacion, Fecha, Hora, Modalidad, Observaciones } = req.body;
@@ -1257,8 +1257,8 @@ app.put('/api/entrevistas/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, R
   }
 });
 
-// ── DELETE /api/entrevistas/:id ─────────────────────────────────
-// Admin y Reclutador.
+
+
 app.delete('/api/entrevistas/:id', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { id } = req.params;
 
@@ -1276,8 +1276,8 @@ app.delete('/api/entrevistas/:id', authenticateToken, authorizeRoles(ROLES.ADMIN
   }
 });
 
-// ── GET /api/evaluaciones ────────────────────────────────────────
-// Admin y Reclutador.
+
+
 app.get('/api/evaluaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -1293,8 +1293,8 @@ app.get('/api/evaluaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLE
   }
 });
 
-// ── POST /api/evaluaciones ───────────────────────────────────────
-// Admin y Reclutador.
+
+
 app.post('/api/evaluaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   const { IdEntrevista, IdUsuario, Calificacion, Comentarios = '' } = req.body;
 
@@ -1308,7 +1308,7 @@ app.post('/api/evaluaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROL
     return res.status(400).json({ error: 'La calificación debe estar entre 1 y 5' });
   }
 
-  // Si no se envía IdUsuario explícito, se usa el usuario autenticado.
+  
   const idUsuarioEvaluador = IdUsuario || req.user.id || 1;
 
   try {
@@ -1344,7 +1344,7 @@ app.post('/api/evaluaciones', authenticateToken, authorizeRoles(ROLES.ADMIN, ROL
   }
 });
 
-// ── POST /api/usuarios (crear usuario por Admin) ─────────────────
+
 app.post('/api/usuarios', authenticateToken, authorizeRoles(ROLES.ADMIN), async (req, res) => {
   const { Nombre, Correo, Usuario: UsuarioName, Contrasena, IdRol } = req.body;
 
@@ -1368,14 +1368,14 @@ app.post('/api/usuarios', authenticateToken, authorizeRoles(ROLES.ADMIN), async 
   }
 });
 
-// ── GET /api/usuarios/candidatos-disponibles ─────────────────────
-// Admin y Reclutador. Lista las cuentas con rol Candidato para poder
-// vincularlas a un registro de Candidato desde el alta manual
-// (registrar_candidato.html). Incluye un flag "Vinculado" para que el
-// frontend pueda marcar/deshabilitar las cuentas que ya tienen un
-// Candidato asociado (relación 1 a 1 vía IdUsuario). Debe ir declarada
-// ANTES de '/api/usuarios/:id' o Express interpretaría
-// "candidatos-disponibles" como un id.
+
+
+
+
+
+
+
+
 app.get('/api/usuarios/candidatos-disponibles', authenticateToken, authorizeRoles(ROLES.ADMIN, ROLES.RECLUTADOR), async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -1405,8 +1405,8 @@ app.get('/api/usuarios/candidatos-disponibles', authenticateToken, authorizeRole
   }
 });
 
-// ── Endpoints de administración de Usuarios (solo Admin) ─────────────────
-// Panel de administración de usuarios/roles
+
+
 app.get('/api/usuarios', authenticateToken, authorizeRoles(ROLES.ADMIN), async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -1447,7 +1447,7 @@ app.put('/api/usuarios/:id', authenticateToken, authorizeRoles(ROLES.ADMIN), asy
   }
 
   try {
-    // Si se envía contraseña, hashearla
+    
     let params = [Nombre.trim(), Correo.trim(), UsuarioName.trim(), Number(IdRol), id];
     let query;
 
@@ -1491,7 +1491,7 @@ app.delete('/api/usuarios/:id', authenticateToken, authorizeRoles(ROLES.ADMIN), 
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Arrancar ───────────────────────────────────────────────────
+
 initializeDatabase()
   .then(() => {
     app.listen(PORT, () => {

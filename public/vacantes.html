@@ -138,7 +138,7 @@
 <script src="/js/auth.js"></script>
 </head>
 <body class="bg-background text-on-surface font-body-md overflow-hidden h-screen flex">
-<!-- SideNavBar Shell -->
+
 <aside class="docked left-0 h-screen w-[280px] border-r border-outline-variant flex flex-col py-lg px-md bg-surface hidden md:flex shrink-0">
 <div class="flex items-center gap-3 mb-xl">
 <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
@@ -181,9 +181,9 @@
 </nav>
 </nav>
 </aside>
-<!-- Main Content Shell -->
+
 <div class="flex-1 flex flex-col overflow-hidden">
-<!-- TopNavBar Shell -->
+
 <header class="docked top-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg shrink-0">
 <div class="flex items-center gap-lg flex-1"></div>
 <div class="flex items-center gap-md">
@@ -201,10 +201,10 @@
 <div id="header-user" class="flex items-center gap-3"></div>
 </div>
 </header>
-<!-- Canvas -->
+
 <main class="flex-1 overflow-y-auto p-lg custom-scrollbar">
 <div class="max-w-container-max mx-auto">
-<!-- Page Header -->
+
 <div class="flex items-end justify-between mb-xl">
 <div>
 <h2 class="font-headline-md text-headline-md text-on-surface">Vacantes Disponibles</h2>
@@ -219,9 +219,9 @@
 </div>
 </div>
 </div>
-<!-- Bento Grid Layout -->
+
 <div class="grid grid-cols-12 gap-gutter">
-<!-- Analytics Quick Card -->
+
 <div class="col-span-12 lg:col-span-4 glass-card p-lg rounded-xl bento-item flex flex-col justify-between min-h-[180px]">
 <div>
 <p class="font-label-caps text-label-caps text-on-surface-variant uppercase">Procesos Activos</p>
@@ -233,22 +233,22 @@
 <span class="font-body-sm font-bold text-green-600">+12% desde el mes pasado</span>
 </div>
 </div>
-<!-- Featured Vacancy Card -->
+
 <div class="col-span-12 lg:col-span-8 bg-primary-container text-on-primary-container p-lg rounded-xl bento-item relative overflow-hidden flex flex-col justify-between">
 <div class="relative z-10">
 <h3 class="font-headline-md text-headline-md font-bold mb-2">Vacantes disponibles para tu equipo</h3>
 <p class="font-body-md opacity-90 max-w-md">Explora las oportunidades activas y gestiona los procesos de contratación desde un solo lugar.</p>
 </div>
 <div class="mt-lg relative z-10"></div>
-<!-- Abstract Visual Pattern -->
+
 <div class="absolute right-0 top-0 h-full w-1/3 opacity-20 pointer-events-none flex items-center justify-center">
 <span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">architecture</span>
 </div>
 </div>
-<!-- Main Jobs List (Asymmetric Grid) -->
+
 <div id="vacantesStatus" class="text-center text-on-surface-variant text-sm mt-lg">Cargando vacantes...</div>
 <div id="vacantesContainer" class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter mt-lg">
-<!-- Job Card 1 -->
+
 <div class="bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group">
 <div class="flex justify-between items-start mb-md">
 <div class="w-12 h-12 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
@@ -270,7 +270,7 @@
 <button data-role-show="3" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm font-bold group-hover:scale-105 transition-transform">Postularse</button>
 </div>
 </div>
-<!-- Job Card 2 -->
+
 <div class="bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group">
 <div class="flex justify-between items-start mb-md">
 <div class="w-12 h-12 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
@@ -291,7 +291,7 @@
 <button data-role-show="3" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm font-bold group-hover:scale-105 transition-transform">Postularse</button>
 </div>
 </div>
-<!-- Job Card 3 -->
+
 <div class="bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group">
 <div class="flex justify-between items-start mb-md">
 <div class="w-12 h-12 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
@@ -309,7 +309,7 @@
 <button data-role-show="3" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm font-bold group-hover:scale-105 transition-transform">Postularse</button>
 </div>
 </div>
-<!-- Job Card 4 -->
+
 <div class="bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group lg:col-span-2">
 <div class="flex flex-col md:flex-row gap-lg">
 <div class="flex-1">
@@ -338,7 +338,7 @@
 </div>
 </div>
 </div>
-<!-- Job Card 5 -->
+
 <div class="bg-white border border-outline-variant p-lg rounded-xl bento-item flex flex-col group">
 <div class="flex justify-between items-start mb-md">
 <div class="w-12 h-12 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
@@ -360,7 +360,7 @@
 </div>
 </main>
 </div>
-<!-- Micro-interaction Scripts -->
+
 <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Hover effect for bento items
