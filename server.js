@@ -19,11 +19,11 @@ const ROLES = {
 
 // ── Base de datos ──────────────────────────────────────────────
 const pool = mysql.createPool({
-  host: 'reseau.proxy.rlwy.net',
-  port: 22884,
+  host: 'sakura.proxy.rlwy.net',
+  port: 21301,
   database: DB_NAME,
   user: 'root',
-  password: 'QbfQUyBUvPvDuURDeOyxkEPTrAOzznWn',
+  password: 'GCpYKCLXRMpHMfVwtxEWiVzUsBbxNzop',
   ssl: false,
   waitForConnections: true,
   connectionLimit: 10,
